@@ -1,0 +1,361 @@
+/* General Reset */
+body, h1, h2, h3, p, a {
+    margin: 0;
+    padding: 0;
+    font-family: 'Poppins', sans-serif;
+}
+
+/* Body and Background */
+body {
+    background: linear-gradient(180deg, #141414, #32054a);
+    color: #fff;
+    line-height: 1.6;
+    overflow-x: hidden;
+}
+
+p {
+    padding: 0px 5% 0px 5%;
+}
+
+
+
+/* Header */
+header {
+    background: linear-gradient(135deg, rgba(76, 41, 82, 0.8), rgba(34, 34, 34, 0.8)); /* ADDED: RGBA FOR TRANSPARENCY */
+    padding: 0px 3% 0px 3%;
+    position: sticky; /* Keep navbar at top of screen */
+    top: 0;
+    z-index: 10; /* Keep navbar in front of other elements */
+}
+
+header .container {
+    display: flex; /* Enables Flexbox for horizontal alignment */
+    justify-content: space-between; /* Pushes logo and navigation to opposite ends */
+    align-items: center; /* Vertically aligns items */
+    margin: 0 auto; /* Centers the container horizontally */
+}
+
+header .logo {
+    font-size: 1.5rem;
+    font-weight: bold;
+    text-transform: uppercase;
+    margin-top: 10px;
+    color: #fff;
+    flex: 0; /* Ensure the logo stays on the left */
+}
+
+.logo img {
+    height: 60px;
+    width: 60px;
+}
+
+header nav {
+    flex: 1; /* Take up remaining space */
+    display: flex; /* Enables Flexbox */
+    justify-content: center; /* Center navigation items */
+}
+
+header nav a {
+    color: #fff;
+    text-decoration: none;
+    font-weight: 600;
+    transition: color 0.3s;
+    font-family: 'Poppins', sans-serif;
+}
+
+header nav a:hover {
+    color: #48d4e7;
+}
+
+.nav-bar {
+    position: absolute; /* Allows independent styling */
+    left: 50%; /* Center horizontally */
+    transform: translateX(-50%); /* Adjust position to truly center the nav */
+    display: flex; /* Arrange nav links in a row */
+    gap: 35px; /* Add spacing between links */
+    white-space: nowrap; /* Prevent text from wrapping */
+    align-items: center; /* Vertically align items */
+    border-radius: 12px; /* ADDED: ROUNDED EDGES FOR DROPDOWN */
+    padding: 10px 0;
+    z-index: 1000;
+}
+
+.hamburger {
+    display: none; /* Hidden by default */
+    background: none;
+    border: none;
+    font-size: 24px;
+    color: white;
+    cursor: pointer;
+    padding-right: 20px;
+}
+
+@media (max-width: 768px) {
+    .logo img {
+        width: 40px; /* Smaller size for tablets and mobile devices */
+        height: 40px; /* Maintain aspect ratio */
+    }
+
+    .hamburger {
+        display: block; /* Show hamburger icon */
+    }
+
+    .nav-bar {
+        display: none; /* Hide the navbar initially */
+        flex-direction: column; /* Stack items vertically */
+        position: absolute;
+        left: 75%; /* Center horizontally */
+        transform: translateX(-50%); /* Adjust position to truly center the nav */
+        top: 60px; /* Position below the header */
+        right: 0px;
+        gap: 0px;
+        background: rgb(55, 47, 58, 1); /* Add a background for the dropdown */
+        opacity: 1;
+        transition: transform 0.3s ease, opacity 0.3s ease; /* Smooth animation */
+        border-radius: 12px; /* Rounded corners */
+        width: 45%;
+        padding: 10px 0;
+        z-index: 1000;
+    }
+
+    .nav-bar a {
+        padding: 10px;
+        text-align: center;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.6);
+    }
+
+    .nav-bar.show {
+        display: flex; /* Show the navbar when active */
+        opacity: 1; /* Fully visible */ 
+    }
+}
+
+@media (max-width: 480px) {
+    .logo img {
+        width: 30px; /* Even smaller size for small mobile devices */
+        height: 30px; /* Maintain aspect ratio */
+    }
+}
+
+
+
+/* Hero Section */
+.hero {
+    text-align: center;
+    background: url('images/hero_image.jpg') no-repeat center center/cover;
+    height: 80vh;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    color: #fff;
+}
+
+.hero h1 {
+    font-size: 3.5rem;
+    margin-bottom: 20px;
+    text-shadow: 2px 2px 5px rgba(0, 0, 0, 0.8);
+    padding: 0% 15% 0% 15%;
+    /*line-height: 1.2; /* ADJUST LINE HEIGHT */
+}
+
+.hero p {
+    font-size: 1rem;
+    margin-bottom: 30px;
+    padding: 0% 20% 0% 20%;
+    color:#aeaeae;
+    text-shadow: 2px 2px 5px rgba(0, 0, 0, 0.8);
+}
+
+@media (max-width: 768px) {
+    .hero h1 {
+        font-size: 2.5rem;
+        padding: 0% 10% 0% 10%;
+        line-height: 1.1; /* ADJUST LINE HEIGHT */
+    }
+}
+
+@media (max-width: 480px) {
+    .hero h1 {
+        font-size: 2rem;
+        padding: 0% 10% 0% 10%;
+        line-height: 1.1; /* ADJUST LINE HEIGHT */
+    }
+    
+    .hero p {
+        font-size: 0.9rem;
+        line-height: 1.2; /* ADJUST LINE HEIGHT */
+        padding: 0% 10% 0% 10%;
+    }
+}
+
+.carousel {
+    position: relative;
+    height: 100%;
+    width: 100%;
+    overflow: hidden;
+}
+
+.carousel-slide {
+    position: absolute;
+    height: 100%;
+    width: 100%;
+    top: 0;
+    left: 0;
+    opacity: 0;
+    transition: opacity 1s ease-in-out;
+}
+
+.carousel-slide img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.carousel-slide.active {
+    opacity: 1;
+}
+
+
+
+/* Buttons */
+.button {
+    background: #48d4e7;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 5px;
+    color: #fff;
+    text-transform: uppercase;
+    font-weight: bold;
+    cursor: pointer;
+    transition: background 0.3s;
+}
+
+.button:hover {
+    background: #3cbac5;
+}
+
+
+
+/* Section Styling */
+.section {
+    padding: 60px 20px;
+    text-align: center;
+}
+
+.section h2 {
+    font-size: 2.5rem;
+    margin-bottom: 20px;
+    color: #fdfdfd;
+}
+
+.section p {
+    max-width: 800px;
+    margin: 0 auto 40px auto;
+    font-size: 1.2rem;
+    color: #ddd;
+}
+
+/* Story Cards */
+.story-card-container {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 20px;
+    justify-content: center;
+    padding-bottom: 20px;
+}
+
+.story-card {
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 10px;
+    overflow: hidden;
+    width: 300px;
+    text-align: left;
+    color: #fff;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+    transition: transform 0.3s;
+}
+
+.story-card:hover {
+    transform: translateY(-10px);
+}
+
+.story-card img {
+    width: 100%;
+    height: auto;
+    border-bottom: 5px solid #48d4e7;
+}
+
+.story-card h3 {
+    padding: 20px;
+    font-size: 1.5rem;
+}
+
+.story-card p {
+    padding: 0 20px 20px;
+    font-size: 1rem;
+    line-height: 1.6;
+    color: #ccc;
+}
+
+/* Map Section */
+.map-section {
+    /*padding: 60px 0;*/
+    background: linear-gradient(#280b38, #000000);
+}
+
+.map-section h2 {
+    color: #fff;
+    margin-bottom: 20px;
+}
+
+.map {
+    max-width: 100%;
+    height: auto;
+    margin: 0 auto;
+}
+
+.map-image {
+    border: #000000;
+    border-style: solid;
+    border-width: medium;
+}
+
+/* Footer */
+footer {
+    background: rgba(0, 0, 0, 0.9);
+    padding: 20px 0;
+    text-align: center;
+    color: #ccc;
+}
+
+footer .social-icons a {
+    color: #48d4e7;
+    margin: 0 10px;
+    font-size: 1.5rem;
+    transition: color 0.3s;
+}
+
+footer .social-icons a:hover {
+    color: #3cbac5;
+}
+
+footer p {
+    font-size: 0.875rem;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .section h2 {
+        font-size: 2rem;
+    }
+
+    .story-card-container {
+        flex-direction: column;
+        align-items: center;
+    }
+
+    .story-card {
+        width: 90%;
+    }
+}
