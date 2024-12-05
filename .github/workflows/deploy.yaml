@@ -17,18 +17,17 @@ jobs:
         uses: actions/checkout@v3
 
       - name: Deploy to Environment
-        env:
-          ENV_NAME: ${{ github.ref_name }}
         run: |
-          if [[ "${{ github.ref_name }}" == dev ]]; then
+          if [[ "${{ github.ref_name }}" == "dev" ]]; then
             echo "Deploying to DEV environment"
             echo "Deployment steps go here"
-          elif [[ "${{ github.ref_name }}" == staging ]]; then
+          elif [[ "${{ github.ref_name }}" == "staging" ]]; then
             echo "Deploying to STAGING environment"
             echo "Deployment steps go here"
-          elif [[ "${{ github.ref_name }}" == master ]]; then
+          elif [[ "${{ github.ref_name }}" == "master" ]]; then
             echo "Deploying to PRODUCTION environment"
             echo "Deployment steps go here"
           else
             echo "Deploying to FEATURE environment"
             echo "Deployment steps go here"
+          fi
