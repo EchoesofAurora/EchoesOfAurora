@@ -1,0 +1,33 @@
+name: Deploy to Environment
+
+on:
+  push:
+    branches:
+      - feature/*  # Matches feature branches
+      - dev
+      - staging
+      - master
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Check out code
+        uses: actions/checkout@v3
+
+      - name: Deploy to Environment
+        run: |
+          if [[ "${{ github.ref_name }}" == "dev" ]]; then
+            echo "Deploying to DEV environment"
+            echo "Deployment steps go here"
+          elif [[ "${{ github.ref_name }}" == "staging" ]]; then
+            echo "Deploying to STAGING environment"
+            echo "Deployment steps go here"
+          elif [[ "${{ github.ref_name }}" == "master" ]]; then
+            echo "Deploying to PRODUCTION environment"
+            echo "Deployment steps go here"
+          else
+            echo "Deploying to FEATURE environment"
+            echo "Deployment steps go here"
+          fi
