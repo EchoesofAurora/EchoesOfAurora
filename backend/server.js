@@ -1,27 +1,9 @@
-// const express = require('express');
-// const app = express();
-// const PORT = process.env.PORT || 5001;
-
-// // Middleware
-// app.use(express.json()); // For parsing JSON data
-
-// // Routes
-// app.get('/', (req, res) => {
-//   res.send('Welcome to the Aurora Project Backend!');
-// });
-
-// // Start the server
-// app.listen(PORT, () => {
-//   console.log(`Server is running on http://localhost:${PORT}`);
-// });
-
-const app = require('./app');
+const app = require('./app'); // Import the app instance from app.js
 
 // Port Configuration
-const PORT = process.env.PORT || 5001;
+const PORT = process.env.PORT || 5001; // Use PORT from environment variables or default to 5001
 
 // Start the Server
 app.listen(PORT, () => {
     console.log(`Server running on http://localhost:${PORT}`);
 });
-
