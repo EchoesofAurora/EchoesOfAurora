@@ -1,6 +1,6 @@
 const express = require('express');
 const router = express.Router();
-const pool = require('../config/db'); // Assuming you have a db.js for database connection
+const pool = require('../config/db.js'); // Assuming you have a db.js for database connection
 
 // Get all stories
 router.get('/', async (req, res) => {
