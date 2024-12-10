@@ -88,7 +88,7 @@
     overflow: hidden;
     transition: transform 0.3s ease;
     padding: 20px; /* Internal padding */
-    width: 50%
+    width: 80%
   }
   
   .story-card.image-left {
@@ -105,7 +105,7 @@
   
   .story-image {
     width: 400px !important; /* Fixed width for images */
-    height: 100px; /* Fixed height */
+    /*height: 100px; /* Fixed height */
     object-fit: cover; /* Ensure the image is properly cropped */
     border-radius: 20px; /* Rounded corners for images */
     margin-right: 50px;
