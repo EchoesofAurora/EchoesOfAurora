@@ -2,6 +2,9 @@ import React from "react";
 import "../styles/styles.css"; 
 import Header from '../components/Header'
 import Footer from '../components/Footer'
+import { Link } from 'react-router-dom';
+
+
 // Hero Section Component
 const HeroSection = () => (
   <section className="hero">
@@ -67,7 +70,14 @@ const StoriesSection = () => (
 const MapSection = () => (
   <section className="section map-section">
     <h2>Interactive Map</h2>
-    <img className="map map-image" src={require("../images/template_map.png")} alt="Interactive Map of the United States" />
+    <Link to="/map">
+      <img
+        className="map map-image"
+        src={require("../images/template_map.png")}
+        alt="Interactive Map of the United States"
+      />
+    </Link>
+    {/* <img className="map map-image" src={require("../images/template_map.png")} alt="Interactive Map of the United States" /> */}
   </section>
 );
 

@@ -71,14 +71,14 @@ function StoriesPage() {
                 alt={story.story_name}
                 className="story-image"
               />
-              <div className="story-info">
-                <h3>{index + 1}. {story.story_name}</h3>
-                <p>
+              <div className="story-content">
+                <h3 className="story-title">{index + 1}. {story.story_name}</h3>
+                <p className="story-description">
                   <strong>Description:</strong>{" "}
                   {story.story_text.slice(0, 150)}...
                 </p>
                 <button
-                  className="learn-more"
+                  className="learn-more-button"
                   onClick={() => handleLearnMore(story)}
                 >
                   Learn more

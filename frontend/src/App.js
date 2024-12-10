@@ -6,6 +6,7 @@ import TribesPage from './pages/TribesPage';
 import TribeLandingPage from "./pages/tribeLandingPage";
 import StoryLandingPage from './pages/StoryLandingPage';
 import MapPage from './pages/mapPage';
+import ContactPage from './pages/contactPage';
  
  
 const App = () => {
@@ -16,9 +17,8 @@ const App = () => {
                 <Route path="/stories" element={<StoriesPage />} />
                 <Route path="/tribes" element={<TribesPage />} />
                 <Route path="/map" element={<MapPage />} />
-                <Route path="/contactus" element={<StoriesPage />} />
+                <Route path="/contactus" element={<ContactPage />} />
                 <Route path="/about" element={<StoriesPage />} />
-                <Route path="/" element={<StoriesPage />} />
                 <Route path="/tribe/:tribeId" element={<TribeLandingPage />} />
                 <Route path="/story/:storyId" element={<StoryLandingPage />} />
             </Routes>

@@ -88,8 +88,10 @@
     overflow: hidden;
     transition: transform 0.3s ease;
     padding: 20px; /* Internal padding */
-    width: 80%
+    width: 80%; /* Percentage width of the container */
+    margin: 0 auto; /* Center-align the card horizontally */
   }
+  
   
   .story-card.image-left {
     flex-direction: row; /* Default: image on the left */
@@ -132,21 +134,28 @@
     margin-bottom: 20px;
     line-height: 1.5; /* Add line height for better readability */
   }
-  
-  
-  
+
   .learn-more-button {
-    background-color: #7b61ff;
-    color: white;
-    padding: 12px 20px;
+    background-color: #A285FF; /* Updated lighter purple */
+    color: white; /* White text */
+    padding: 8px 16px; 
     border: none;
-    border-radius: 10px;
-    font-size: 1rem;
+    border-radius: 8px; /* Slightly rounded corners */
+    font-size: 0.9rem; /* Smaller font size */
     cursor: pointer;
+    font-weight: bold; /* Bold text for visibility */
+    width: 150px; /* Ensure the width is not fixed */
+    min-width: unset; /* Remove any default minimum width */
     transition: background-color 0.3s ease;
+    align-items: center;
   }
   
   .learn-more-button:hover {
-    background-color: #6448e8; /* Darker hover effect */
+    background-color: #9673EE; /* Darker shade for hover */
   }
+  
+  
+  /* .learn-more-button:hover {
+    background-color: #6448e8; /* Darker hover effect */
+  /*} */
   

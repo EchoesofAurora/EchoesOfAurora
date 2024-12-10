@@ -1,0 +1,357 @@
+/* Base styles */
+/* body {
+    margin: 0;
+    font-family: 'Poppins', sans-serif;
+    background: linear-gradient(185deg, #E1ADF7,#EFF4BC,#E1ADF7);
+  } */
+  
+  /* Navbar styles */
+  /* .Header{
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    background-color: #1a1a1a;
+    padding: 10px 20px;
+    opacity: 0.8;
+  } */
+  
+  /* .-logo img {
+    border-radius: 50%;
+  } */
+  
+  /* .-menu {
+    list-style: none;
+    display: flex;
+    gap: 56px;
+    margin: 0;
+    padding: 0;
+  } */
+  
+  /* .-menu li {
+    color: #ecf0f1;
+    font-family: 'Poppins', sans-serif;
+    font-weight: 600;
+    font-size: 20px;
+    line-height: 30px;
+    cursor: pointer;
+  }
+  
+  .-menu .contact {
+    font-weight: 800;
+    text-decoration: underline;
+  }
+  
+  .sign-in {
+    background: none;
+    border: 1px solid #a49cbe;
+    color: #a49cbe;
+    padding: 8px 22px;
+    cursor: pointer;
+    border-radius: 4px;
+    font-family: 'Texturina', serif;
+    font-weight: 400;
+    font-size: 16px;
+    line-height: 150%;
+  } */
+  
+  /* Hero section styles */
+   .contactus-page-hero-section {
+    padding: 100px 0;
+    
+    text-align: center;
+    color: rgb(0, 0, 0);
+    background-image: url('../images/contactus/img32.jpg');
+    opacity: 80%;
+    background-size: cover;
+    background-position: center;
+  }
+  
+  .contactus-page-hero-section h1 {
+    font-size: 48px;
+    margin-bottom: 20px;
+    font-family: 'Texturina', serif;
+  }
+  
+  /* .contactus-page-body-section {
+     background-image: url('../images/background\ img.png'); 
+     width: 100%;
+  }  */
+  
+  /* Contact section styles */
+  .contactus-page-contact-section {
+    display: flex;
+    padding: 50px 10%;
+    gap: 50px;
+  }
+  
+  .contactus-page-contact-info {
+    flex: 1;
+    padding-right: 50px;
+  }
+  
+  .contactus-page-contact-info h2 {
+    color: #498cff;
+    margin-bottom: 20px;
+  }
+  
+  .contact-details {
+    margin: 100px;
+    margin-left: 400px;
+    margin-right: 400px;
+    font-family: 'Texturina', serif;
+    text-align: center;
+  }
+  .contact-details h2{
+    color: #498cff;
+  }
+  
+  .detail-item {
+    display: flex;
+    align-items: flex-start;
+    margin-bottom: 30px;
+    gap: 15px;
+  }
+  
+  .detail-item img {
+    margin-top: 5px;
+  }
+  
+  .detail-item h3 {
+    margin: 0;
+    color: #333;
+    font-size: 18px;
+  }
+  
+  .detail-item p {
+    margin: 5px 0 0;
+    color: #666;
+  }
+  
+  /* Contact form styles */
+  .contact-form {
+    flex: 1;
+    padding: 30px;
+  
+    width: 100%;
+   
+    margin-bottom: 20px;
+    border: none;
+    /* border: 0px 2px 0 0; */
+    /* border-bottom: 2px solid transparent; */
+    background-color: transparent;
+    font-size: 16px;
+    outline: none;
+    color: #333;
+    /* transition: border-color 0.3s, background-color 0.3s; */
+  }
+  
+  .form-group {
+    margin-bottom: 20px;
+  }
+  
+  .form-group label {
+    display: block;
+    margin-bottom: 5px;
+    color: #333;
+  }
+  
+  .form-group input,
+  .form-group select,
+  .form-group textarea {
+    width: 100%;
+    padding: 10px;
+    /* border-radius: 5px; */
+    font-size: 16px;
+    border-bottom: 2px solid #1a1a2e; /* Highlight color on focus */
+    background-color: transparent;
+  
+  
+  }
+  .line-container {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 20px 0;
+    gap: 10px;
+  }
+  
+  .line-wrapper {
+    display: flex;
+    align-items: center;
+    flex: 1;
+    position: relative;
+  }
+  
+  .line {
+    flex-grow: 1;
+    height: 2px;
+    background: #498cff;
+    border: none;
+  }
+  
+  .circle {
+    width: 8px;
+    height: 8px;
+    background-color: #498cff;
+    border-radius: 50%;
+  }
+  
+  .line-text {
+    font-size: 18px;
+    font-weight: bold;
+    text-transform: uppercase;
+    color: #498cff;
+    padding: 0 10px;
+  }
+  
+  
+  .form-group textarea {
+    height: 120px;
+    resize: none;
+  }
+  
+  button[type="submit"] {
+    width: 105.3%;
+    padding: 15px;
+    background: #498cff;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    font-size: 16px;
+    cursor: pointer;
+  } */
+  
+  /* Map container styles */
+  /* .map-container {
+    width: 81%;
+    height: 400px;
+    padding-left: 150px;
+    margin-bottom: 40px;
+  }
+   */
+  /* Footer styles */
+  /* .footer {
+    display: flex;
+    background-color: #1a1a1a;
+    color: white;
+    padding: 50px 20px;
+    text-align: center;
+  }
+  
+  .footer-content {
+    flex: 4;
+    justify-content: space-around;
+    max-width: 1200px;
+    margin: 0 auto;
+  }
+  
+  .footer-logo {
+    flex: 1;
+    padding:  100px;
+    margin-bottom: 30px;
+  }
+  
+  .social-media .icons {
+    flex: 2;
+    gap: 15px;
+    justify-content: center;
+    margin-top: 20px;
+  }
+  
+  .useful-links ul {
+    flex: 3;
+    list-style: none;
+    padding: 0;
+  }
+  
+  .useful-links li {
+    margin: 10px 0;
+  }
+  
+  .footer-copyright {
+    margin-top: 30px;
+    padding-top: 20px;
+    border-top: 1px solid #333;
+  } */
+  
+  
+  /* General Footer Style */
+   .footer {
+    display: flex;
+    flex-direction: column;
+    background-color: #1a1a1a;
+    color: white;
+    padding: 20px 10px;
+    text-align: center;
+  }
+  
+  /* Top Footer Content Row */
+  .footer-content {
+    display: flex;
+    justify-content: space-between;
+    gap: 20px;
+    padding: 10px 0;
+  }
+  
+  /* Logo Section */
+  .footer-logo {
+    flex: 1 1 20%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+  
+  .footer-logo img {
+    max-width: 100px;
+  }
+  
+  /* Social Media Links */
+  .footer-social {
+    flex: 1 1 25%;
+    text-align: center;
+    padding-top: 50px
+  }
+  
+  .social-icons img {
+    margin: 5px 8px;
+    height: 30px;
+    cursor: pointer;
+  }
+  
+  /* Useful Links Section */
+  .footer-links {
+    flex: 1 1 25%;
+    padding: 10px;
+    text-align: left;
+  }
+  
+  .footer-links ul {
+    list-style: none;
+    padding: 0;
+  }
+  
+  .footer-links li {
+    margin: 5px 0;
+    cursor: pointer;
+    transition: color 0.3s ease;
+  }
+  
+  .footer-links li:hover {
+    color: #aaa;
+  }
+  
+
+  .footer-contacts {
+    flex: 1 1 25%;
+    padding: 10px;
+    text-align: left;
+  }
+  
+
+  .footer-copyright {
+    margin: 20px 0 0;
+    padding: 10px 0;
+    border-top: 1px solid #333;
+    font-size: 14px;
+    text-align: center;
+  } 

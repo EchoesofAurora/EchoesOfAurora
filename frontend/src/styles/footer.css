@@ -1,22 +1,107 @@
-/* Footer */
-footer {
-    background: radial-gradient(circle, rgb(0, 0, 0, 0.8) 30%, rgba(32, 22, 33, 0.8));
-    padding: 20px 0;
+/* Footer Container */
+.footer {
+    background-color: #121212; /* Match dark background */
+    color: white; /* Text color for better contrast */
+    padding: 40px 20px; /* Add spacing */
     text-align: center;
-    color: #ccc;
-}
-
-footer .social-icons a {
-    color: #48d4e7;
-    margin: 0 10px;
-    font-size: 1.5rem;
-    transition: color 0.3s;
-}
-
-footer .social-icons a:hover {
-    color: #3cbac5;
-}
-
-footer p {
-    font-size: 0.875rem;
-}
+  }
+  
+  /* Top Row Content */
+  .footer-content {
+    display: flex;
+    flex-wrap: wrap; /* Ensure responsiveness */
+    justify-content: space-around; /* Space out the sections */
+    align-items: center; /* Align items vertically */
+    margin-bottom: 30px; /* Space below the content */
+  }
+  
+  /* Footer Logo */
+  .footer-logo img {
+    border-radius: 50%; /* Circular logo */
+    width: 90px; /* Adjust size */
+    height: 90px; /* Adjust size */
+    margin-bottom: 10px; /* Space below the logo */
+  }
+  
+  /* Social Media Section */
+  .footer-social {
+    text-align: center; /* Center-align the social section */
+  }
+  
+  .footer-social h3 {
+    font-size: 1.2rem;
+    margin-bottom: 10px;
+    color: white; /* White text for better visibility */
+  }
+  
+  .social-icons {
+    display: flex;
+    gap: 10px; /* Space between icons */
+    justify-content: center;
+  }
+  
+  .social-icons img {
+    width: 40px; /* Adjust size */
+    height: 40px;
+    border-radius: 8px; /* Slight rounding for icons */
+    transition: transform 0.3s ease; /* Smooth hover effect */
+  }
+  
+  .social-icons img:hover {
+    transform: scale(1.1); /* Slightly enlarge on hover */
+  }
+  
+  /* Useful Links Section */
+  .footer-links {
+    text-align: left; /* Align links to the left */
+  }
+  
+  .footer-links h3 {
+    font-size: 1.2rem;
+    margin-bottom: 10px;
+    color: white;
+  }
+  
+  .footer-links ul {
+    list-style: none; /* Remove bullets */
+    padding: 0; /* Remove padding */
+  }
+  
+  .footer-links li {
+    margin-bottom: 5px; /* Space between links */
+    font-size: 0.9rem;
+    color: #d3d3d3; /* Light grey for links */
+    cursor: pointer; /* Make it look clickable */
+    transition: color 0.3s ease;
+  }
+  
+  .footer-links li:hover {
+    color: white; /* Change to white on hover */
+  }
+  
+  /* Contact Section */
+  .footer-contacts {
+    text-align: left; /* Align contacts to the left */
+  }
+  
+  .footer-contacts h3 {
+    font-size: 1.2rem;
+    margin-bottom: 10px;
+    color: white;
+  }
+  
+  .footer-contacts p {
+    margin: 5px 0; /* Space between lines */
+    font-size: 0.9rem;
+    color: #d3d3d3; /* Light grey for text */
+  }
+  
+  /* Bottom Row - Copyright */
+  .footer-copyright {
+    border-top: 1px solid #444; /* Subtle top border */
+    padding-top: 10px; /* Spacing above the copyright text */
+    font-size: 0.8rem;
+    color: #888; /* Grey for copyright text */
+    text-align: center;
+  }
+  
