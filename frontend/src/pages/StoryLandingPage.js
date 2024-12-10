@@ -1,8 +1,10 @@
 import React, { useEffect, useState } from "react";
-import { useParams, useNavigate } from "react-router-dom";
+import { useParams, useNavigate, Link } from "react-router-dom";
 import Header from "../components/Header";
 import Footer from "../components/Footer";
 import "../styles/tribeLandingPage.css"; // Use similar styling
+// import { Link } from 'react-router-dom';
+
 
 const StoryLandingPage = () => {
   const { storyId } = useParams();
@@ -31,7 +33,12 @@ const StoryLandingPage = () => {
   return (
     <div className="tribe-landing-page">
       <Header />
+      <Link to="/stories">
+
       <a href="/" className="back-button">← Back</a>
+      
+      </Link>
+
       <h1>{story.story_name}</h1>
       <div className="hero-image-container">
         <img src={story.image_url || '/default-story-image.png'} alt={story.story_name} className="hero-image" />

@@ -3,6 +3,8 @@ import { useLocation, useNavigate } from "react-router-dom";
 import "../styles/tribeLandingPage.css";
 import Header from "../components/Header";
 import Footer from "../components/Footer";
+import { Link } from 'react-router-dom';
+
  
 function TribeLandingPage() {
   const location = useLocation();
@@ -21,10 +23,13 @@ function TribeLandingPage() {
     <div className="tribe-landing-page">
       <Header />
       {/* Back Button */}
+      <Link to="/tribes">
+
       <a href="/" className="back-button">
         ← Back
       </a>
  
+      </Link>
       {/* Tribe Title */}
       <h1>{tribe.tribe_name}</h1>
  
