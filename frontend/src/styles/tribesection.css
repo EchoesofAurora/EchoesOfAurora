@@ -114,3 +114,12 @@ body {
     font-weight: bold;
     font-size: 0.9rem;
 }
+
+
+.tribe-text-truncate {
+    white-space: nowrap; /* Prevent text from wrapping to the next line */
+    overflow: hidden; /* Hide overflowing text */
+    text-overflow: ellipsis; /* Add ellipsis (...) for truncated text */
+  }
+  
+  
