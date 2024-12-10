@@ -161,9 +161,11 @@ p {
 }
 
 .story-card img {
-    width: 100%;
-    height: auto;
-    border-bottom: 5px solid #48d4e7;
+    width: 400px !important; /* Fixed width for images */
+    /*height: 100px; /* Fixed height */
+    object-fit: cover; /* Ensure the image is properly cropped */
+    border-radius: 20px; /* Rounded corners for images */
+    margin-right: 50px solid #48d4e7;
 }
 
 .story-card h3 {

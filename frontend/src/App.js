@@ -4,6 +4,7 @@ import HomePage from '../src/pages/homePage';
 import StoriesPage from '../src/pages/storiesPage';
 import TribesPage from './pages/TribesPage';
 import TribeLandingPage from "./pages/tribeLandingPage";
+import StoryLandingPage from './pages/StoryLandingPage';
 import MapPage from './pages/mapPage';
  
  
@@ -19,6 +20,7 @@ const App = () => {
                 <Route path="/about" element={<StoriesPage />} />
                 <Route path="/" element={<StoriesPage />} />
                 <Route path="/tribe/:tribeId" element={<TribeLandingPage />} />
+                <Route path="/story/:storyId" element={<StoryLandingPage />} />
             </Routes>
         </Router>
     );
