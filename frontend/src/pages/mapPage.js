@@ -10,7 +10,6 @@ const MapPage = () => {
        <>
        <Header/>
        <MapComponent/>
-       <Footer/>
        </>
     );
 };
