@@ -1,22 +1,50 @@
-import React from "react";
-import "../styles/styles.css"; 
-import Header from '../components/Header'
-import Footer from '../components/Footer'
+import React, { useState, useEffect } from "react";
+import "../styles/styles.css";
+import Header from '../components/Header';
+import Footer from '../components/Footer';
 import { Link } from 'react-router-dom';
 
+// Importing images directly
+import carousel2 from "../images/hero_carousel/carousel2.png";
+import carousel3 from "../images/hero_carousel/carousel3.png";
+import carousel4 from "../images/hero_carousel/carousel4.png";
+import carousel5 from "../images/hero_carousel/carousel5.png";
+import carousel6 from "../images/hero_carousel/carousel6.png";
+import carousel7 from "../images/hero_carousel/carousel7.png";
+import carousel8 from "../images/hero_carousel/carousel8.png";
+import carousel9 from "../images/hero_carousel/carousel9.png";
 
-// Hero Section Component
-const HeroSection = () => (
-  <section className="hero">
-    <h1 className="hero-title">Explore the Mystical World of Aurora Borealis</h1>
-    <p className="hero-text">
-      Welcome to the Indigenous Stories and Space Weather Platform, where we merge North American indigenous storytelling about the aurora borealis with historical space weather data.
-    </p>
-    <button className="button">Learn More</button>
-  </section>
-);
 
-// About Section Component
+// Hero Section Component with Slider
+const HeroSection = () => {
+  const images = [carousel4, carousel2, carousel3,carousel5,carousel6,carousel7,carousel8,carousel9];
+
+  const [currentImageIndex, setCurrentImageIndex] = useState(0);
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setCurrentImageIndex((prevIndex) => (prevIndex + 1) % images.length);
+    }, 5000); // Change slide every 5 seconds
+    return () => clearInterval(interval);
+  }, [images.length]);
+
+  return (
+    <section
+      className="hero"
+      style={{
+        background: `url(${images[currentImageIndex]}) no-repeat center center/cover`,
+      }}
+    >
+      <h1 className="hero-title">Explore the Mystical World of Aurora Borealis</h1>
+      <p className="hero-text">
+        Welcome to the Indigenous Stories and Space Weather Platform, where we merge North American indigenous storytelling about the aurora borealis with historical space weather data.
+      </p>
+      <button className="button">Learn More</button>
+    </section>
+  );
+};
+
+// Other Components
 const AboutSection = () => (
   <section className="section about">
     <h2>About This Project</h2>
@@ -27,7 +55,6 @@ const AboutSection = () => (
   </section>
 );
 
-// Story Card Component
 const StoryCard = ({ image, title, description }) => (
   <div className="story-card">
     <img src={image} alt={title} />
@@ -36,7 +63,6 @@ const StoryCard = ({ image, title, description }) => (
   </div>
 );
 
-// Stories Section Component
 const StoriesSection = () => (
   <section className="section stories">
     <h2>Stories</h2>
@@ -66,7 +92,6 @@ const StoriesSection = () => (
   </section>
 );
 
-// Map Section Component
 const MapSection = () => (
   <section className="section map-section">
     <h2>Interactive Map</h2>
@@ -77,19 +102,17 @@ const MapSection = () => (
         alt="Interactive Map of the United States"
       />
     </Link>
-    {/* <img className="map map-image" src={require("../images/template_map.png")} alt="Interactive Map of the United States" /> */}
   </section>
 );
 
-// Main App Component
 const HomePage = () => (
   <div>
-    <Header/>
+    <Header />
     <HeroSection />
     <AboutSection />
     <StoriesSection />
     <MapSection />
-    <Footer/>
+    <Footer />
   </div>
 );
 
