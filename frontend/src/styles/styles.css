@@ -145,7 +145,18 @@ p {
     padding-bottom: 20px;
 }
 
+.story-content{
+    display: flex; /* Enable Flexbox */
+    flex-direction: column; /* Align items vertically (default is row) */
+    justify-content: center; /* Center items vertically */
+    align-items: center;
+}
+
 .story-card {
+    display: flex; /* Enable Flexbox */
+    flex-direction: row; /* Align items vertically (default is row) */
+    justify-content: center; /* Center items vertically */
+    align-items: center; /* Center items horizontally */
     background: rgba(255, 255, 255, 0.1);
     border-radius: 10px;
     overflow: hidden;
@@ -169,7 +180,7 @@ p {
 }
 
 .story-card h3 {
-    padding: 20px;
+    /* padding: 20px; */
     font-size: 1.5rem;
 }
 

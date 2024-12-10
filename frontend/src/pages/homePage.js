@@ -58,8 +58,10 @@ const AboutSection = () => (
 const StoryCard = ({ image, title, description }) => (
   <div className="story-card">
     <img src={image} alt={title} />
+    <div className="story-content">
     <h3>{title}</h3>
     <p>{description}</p>
+    </div>
   </div>
 );
 

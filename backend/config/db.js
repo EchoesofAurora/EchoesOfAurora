@@ -3,8 +3,8 @@ const { Client } = require('pg');
 // Database connection configuration (hardcoded credentials)
 const client = new Client({
     host: 'localhost',
-    user: 'bhargavimarni', // Replace with your database username
-    password: 'root1234', // Replace with your database password
+    user: 'devakodali', // Replace with your database username
+    password: 'admin123', // Replace with your database password
     database: 'echoes_of_aurora', // Replace with your database name
     port: 5432, // Default PostgreSQL port
 });
