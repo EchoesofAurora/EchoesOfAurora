@@ -1,18 +1,12 @@
 .tribe-hero {
     text-align: center;
     background: url('../images/tribes/bg-tribe.png') no-repeat center center/cover;
-    height: 80vh;
     display: flex;
     flex-direction: column;
     justify-content: center;
     align-items: center;
     color: #fff;
     margin-bottom: 70px;
-}
-
-.hero {
-    text-align: center;
-    margin-bottom: 30px;
 }
 
 .hero h1 {

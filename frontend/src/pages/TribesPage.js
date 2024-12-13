@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import "../styles/tribesection.css";
+import "../styles/styles.css";
 import Header from '../components/Header';
 import Footer from '../components/Footer';
  
@@ -40,8 +41,8 @@ function TribesSection() {
   return (
     <div className="tribes-section">
       <Header />
-      <div className="tribe-hero">
-        <h1>Indigenous Tribes</h1>
+      <div className="hero tribe-hero">
+        <h1 className='hero-title'>Indigenous Tribes</h1>
         <p>
           “Discover the stories and heritage of indigenous tribes connected to
           the aurora borealis.”

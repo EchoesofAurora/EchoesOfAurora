@@ -13,7 +13,7 @@ function ContactPage() {
     <div className="contact-page">
       <Header />
       <div className="contactus-page-hero-section">
-        <h1>Contact us</h1>
+        <h1 className='hero-title'>Contact us</h1>
         <p>Have questions, feedback, or stories to share?</p>
       </div>
       <div className="contactus-page-body-section">

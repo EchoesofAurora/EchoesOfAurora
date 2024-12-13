@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import "../styles/storiesPage.css";
+import "../styles/styles.css";
 import Header from "../components/Header";
 import Footer from "../components/Footer";
 
@@ -40,9 +41,9 @@ function StoriesPage() {
   return (
     <div className="stories-page">
       <Header />
-      <div className="hero-section">
+      <div className="hero hero-section">
         <h1 className="hero-title">
-          "Whispers of the Ancestors: Tales of Land, Sky, and Spirit"
+          Aurora Stories
         </h1>
         <p>
           Explore a collection of ancient stories that reveal the celestial

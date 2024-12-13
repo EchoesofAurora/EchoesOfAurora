@@ -35,14 +35,7 @@
     font-weight: 1000; /* Extra bold text */
     font-style: italic; /* Adds italic style */
     color: white; /* Ensure text is white */
-    text-shadow: 2px 2px 0px black,  /* Black outline effect */
-                 -2px -2px 0px black,
-                 2px -2px 0px black,
-                 -2px 2px 0px black,
-                 0px 2px 0px black,
-                 0px -2px 0px black,
-                 2px 0px 0px black,
-                 -2px 0px 0px black;
+    text-shadow: 2px 2px 5px rgba(0, 0, 0, 0.8);
     text-align: center; /* Ensure text is centered */
     line-height: 1.5; /* Adjust line height for better readability */
     letter-spacing: 1px; /* Slightly increase spacing for impact */
