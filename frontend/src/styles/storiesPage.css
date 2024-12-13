@@ -1,9 +1,4 @@
-.stories-page {
-    font-family: Arial, sans-serif;
-    background: linear-gradient(135deg, #f0c7ff, #a2cffe);
-    
-  }
-  
+ 
   .hero-section {
     text-align: center;
     position: relative; /* To position the overlay properly */
@@ -84,6 +79,7 @@
     align-items: center;
     gap: 20px; /* Space between image and text */
     border-radius: 15px; /* Rounded corners */
+    background-color: rgba(255,255,255,0.6);
     box-shadow: 0px 8px 20px rgba(0, 0, 0, 0.1); /* Subtle shadow */
     overflow: hidden;
     transition: transform 0.3s ease;

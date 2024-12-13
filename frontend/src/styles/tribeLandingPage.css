@@ -54,13 +54,7 @@
     border-radius: 10px;
     border: 1px solid #ccc;
   }
-  
-  /* Section Headers */
-  .section h2 {
-    font-size: 1.8rem;
-    color: #6c63ff;
-    margin-bottom: 20px;
-  }
+
   
   /* Responsive Design */
   @media (max-width: 768px) {

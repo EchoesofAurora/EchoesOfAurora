@@ -1,5 +1,5 @@
 .header {
-    background: linear-gradient(135deg, rgba(76, 41, 82, 0.8), rgba(34, 34, 34, 0.9)); /* ADDED: RGBA FOR TRANSPARENCY */
+    background: linear-gradient(135deg, rgba(76, 41, 82, 0.95), rgba(34, 34, 34, 0.95)); /* ADDED: RGBA FOR TRANSPARENCY */
     box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1); /* Add a subtle shadow */
     padding: 10px 10px 10px 10px; /* Increase the vertical size */
     display: flex;

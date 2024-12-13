@@ -3,12 +3,17 @@ body, h1, h2, h3, p, a {
     margin: 0;
     padding: 0;
     font-family: 'Poppins', sans-serif;
+    color: rgb(91, 52, 10);
 }
 
 /* Body and Background */
 body {
-    background: linear-gradient(180deg, #141414, #32054a);
-    color: #fff;
+    background: url('../images/general/background.png') repeat-y, rgba(250, 181, 246, 0.7);
+    background-size: 100% auto; /* Contain the image horizontally */
+    background-position: center top; /* Align image to the top center */
+    background-repeat: repeat-y; /* Keep the vertical repeat */
+    background-blend-mode: overlay;
+    color: #000;
     line-height: 1.6;
     overflow-x: hidden;
 }
@@ -18,54 +23,52 @@ p {
 }
 
 
-
 /* Hero Section */
 .hero {
     text-align: center;
-    background: url('../images/hero_image.jpg') no-repeat center center/cover;
+    position: relative;
     height: 80vh;
     display: flex;
     flex-direction: column;
     justify-content: center;
     align-items: center;
     color: #fff;
+    overflow: hidden; /* Ensure the sliding images stay within the hero section */
 }
 
 .hero h1 {
     font-size: 3.5rem;
     margin-bottom: 20px;
     text-shadow: 2px 2px 5px rgba(0, 0, 0, 0.8);
-    padding: 0% 15% 0% 15%;
-    /*line-height: 1.2; /* ADJUST LINE HEIGHT */
+    padding: 0 15%;
 }
 
 .hero p {
     font-size: 1rem;
     margin-bottom: 30px;
-    padding: 0% 20% 0% 20%;
-    color:#aeaeae;
+    padding: 0 20%;
+    color: #aeaeae;
     text-shadow: 2px 2px 5px rgba(0, 0, 0, 0.8);
 }
 
 @media (max-width: 768px) {
     .hero h1 {
         font-size: 2.5rem;
-        padding: 0% 10% 0% 10%;
-        line-height: 1.1; /* ADJUST LINE HEIGHT */
+        padding: 0 10%;
+        line-height: 1.1;
     }
 }
 
 @media (max-width: 480px) {
     .hero h1 {
         font-size: 2rem;
-        padding: 0% 10% 0% 10%;
-        line-height: 1.1; /* ADJUST LINE HEIGHT */
+        padding: 0 10%;
+        line-height: 1.1;
     }
-    
     .hero p {
         font-size: 0.9rem;
-        line-height: 1.2; /* ADJUST LINE HEIGHT */
-        padding: 0% 10% 0% 10%;
+        line-height: 1.2;
+        padding: 0 10%;
     }
 }
 
@@ -81,9 +84,22 @@ p {
     height: 100%;
     width: 100%;
     top: 0;
+    left: 100%; /* Start each image off-screen */
+    transition: transform 1s ease-in-out;
+    will-change: transform;
+}
+
+.carousel-slide.active {
+    transform: translateX(-100%); /* Move to the left */
     left: 0;
-    opacity: 0;
-    transition: opacity 1s ease-in-out;
+}
+
+.carousel-slide.previous {
+    transform: translateX(-200%); /* Move off-screen to the left */
+}
+
+.carousel-slide.next {
+    transform: translateX(0); /* Move into view */
 }
 
 .carousel-slide img {
@@ -92,9 +108,6 @@ p {
     object-fit: cover;
 }
 
-.carousel-slide.active {
-    opacity: 1;
-}
 
 
 
@@ -124,16 +137,15 @@ p {
 }
 
 .section h2 {
-    font-size: 2.5rem;
-    margin-bottom: 20px;
-    color: #fdfdfd;
+    font-size: 3.8rem;
+    color: rgb(91, 52, 10);
 }
 
 .section p {
     max-width: 800px;
     margin: 0 auto 40px auto;
-    font-size: 1.2rem;
-    color: #ddd;
+    font-size: 1.3rem;
+    color: rgb(91, 52, 10);
 }
 
 /* Story Cards */
@@ -172,8 +184,9 @@ p {
 }
 
 .story-card img {
-    width: 400px !important; /* Fixed width for images */
-    /*height: 100px; /* Fixed height */
+    width: 50%;
+    max-width: 400px; /* Maximum width of 600px */
+    min-width: 200px; /* Minimum width of 200px */
     object-fit: cover; /* Ensure the image is properly cropped */
     border-radius: 20px; /* Rounded corners for images */
     margin-right: 50px solid #48d4e7;
@@ -181,14 +194,14 @@ p {
 
 .story-card h3 {
     /* padding: 20px; */
-    font-size: 1.5rem;
+    font-size: 3.5vw;
 }
 
 .story-card p {
     padding: 0 20px 20px;
-    font-size: 1rem;
+    font-size: 1.5vw;
     line-height: 1.6;
-    color: #ccc;
+    color: rgb(91, 52, 10);
 }
 
 /* Map Section */
@@ -252,3 +265,32 @@ footer p {
         width: 90%;
     }
 }
+
+/* About Section Styling */
+.about-content {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 20px;
+    padding: 0px 8%;
+  }
+  
+  .about-text {
+    width: 70%; /* Text occupies 60% of the width */
+  }
+  
+  .about-image {
+    width: 30%; /* Image occupies 40% of the width */
+  }
+  
+  .about-image img {
+    width: 100%;
+    height: auto;
+    object-fit: cover; /* Ensures the image scales proportionally */
+    border-radius: 10px; /* Optional: Adds rounded corners to the image */
+  }
+
+  .block-align {
+    text-align: justify;
+    line-height: 1.6; /* Adjust spacing between lines */
+  }

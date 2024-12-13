@@ -3,6 +3,7 @@ import "../styles/styles.css";
 import Header from '../components/Header';
 import Footer from '../components/Footer';
 import { Link } from 'react-router-dom';
+import logo from '../images/logo.png';
 
 // Importing images directly
 import carousel2 from "../images/hero_carousel/carousel2.png";
@@ -17,7 +18,7 @@ import carousel9 from "../images/hero_carousel/carousel9.png";
 
 // Hero Section Component with Slider
 const HeroSection = () => {
-  const images = [carousel4, carousel2, carousel3,carousel5,carousel6,carousel7,carousel8,carousel9];
+  const images = [carousel2, carousel4, carousel3,carousel5,carousel6,carousel7,carousel8,carousel9];
 
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
 
@@ -47,11 +48,21 @@ const HeroSection = () => {
 // Other Components
 const AboutSection = () => (
   <section className="section about">
-    <h2>About This Project</h2>
-    <p>
-      Welcome to a unique fusion of science, culture, and storytelling. This platform brings together indigenous knowledge and modern space weather research to explore the fascinating phenomena of the aurora borealis. Through interactive tools and real-life stories, we aim to educate, inspire, and celebrate the rich cultural heritage connected to the northern lights.
-    </p>
-    <button className="button">About Us</button>
+    <div className="about-content">
+      <div className="about-text">
+        <h2>About This Project</h2>
+        <p class='block-align'>
+          Welcome to a unique fusion of science, culture, and storytelling. This platform brings together indigenous knowledge and modern space weather research to explore the fascinating phenomena of the aurora borealis. Through interactive tools and real-life stories, we aim to educate, inspire, and celebrate the rich cultural heritage connected to the northern lights.<br></br>Discover more about auroras and the legends that surround them, as we bridge the gap between ancient traditions and cutting-edge science. 
+        </p>
+        <button className="button">About Us</button>
+      </div>
+      <div className="about-image">
+        <img
+          src={logo}
+          alt="Aurora Borealis"
+        />
+      </div>
+    </div>
   </section>
 );
 
