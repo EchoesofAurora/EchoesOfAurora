@@ -78,7 +78,8 @@
     transition: transform 0.3s ease;
     padding: 20px; /* Internal padding */
     width: 80%; /* Percentage width of the container */
-    margin: 0 auto; /* Center-align the card horizontally */
+    max-width: 800px;
+    margin: 30px auto; /* Center-align the card horizontally */
   }
   
   
@@ -120,7 +121,6 @@
   .story-description {
     font-size: 1rem;
     color: #000 !important; /* Ensure black color */
-    margin-bottom: 20px;
     line-height: 1.5; /* Add line height for better readability */
   }
 

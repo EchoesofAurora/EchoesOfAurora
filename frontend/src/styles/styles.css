@@ -164,22 +164,6 @@ p {
     align-items: center;
 }
 
-.story-card {
-    display: flex; /* Enable Flexbox */
-    flex-direction: row; /* Align items vertically (default is row) */
-    justify-content: center; /* Center items vertically */
-    align-items: center; /* Center items horizontally */
-    background: rgba(255, 255, 255, 0.1);
-    max-width: 900px;
-    border-radius: 10px;
-    overflow: hidden;
-    width: 300px;
-    text-align: left;
-    color: #fff;
-    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
-    transition: transform 0.3s;
-}
-
 .story-card:hover {
     transform: translateY(-10px);
 }
@@ -227,29 +211,6 @@ p {
     border: #000000;
     border-style: solid;
     border-width: medium;
-}
-
-/* Footer */
-footer {
-    background: rgba(0, 0, 0, 0.9);
-    padding: 20px 0;
-    text-align: center;
-    color: #ccc;
-}
-
-footer .social-icons a {
-    color: #48d4e7;
-    margin: 0 10px;
-    font-size: 1.5rem;
-    transition: color 0.3s;
-}
-
-footer .social-icons a:hover {
-    color: #3cbac5;
-}
-
-footer p {
-    font-size: 0.875rem;
 }
 
 /* Responsive Design */

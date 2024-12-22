@@ -21,11 +21,13 @@
     width: 90px; /* Adjust size */
     height: 90px; /* Adjust size */
     margin-bottom: 10px; /* Space below the logo */
+    padding: 0px 20px;
   }
   
   /* Social Media Section */
   .footer-social {
     text-align: center; /* Center-align the social section */
+    padding: 0px 20px;
   }
   
   .footer-social h3 {
@@ -54,17 +56,17 @@
   /* Useful Links Section */
   .footer-links {
     text-align: left; /* Align links to the left */
+    padding: 0px 20px;
   }
   
   .footer-links h3 {
     font-size: 1.2rem;
-    margin-bottom: 10px;
     color: white;
+    margin-bottom: 5px;
   }
   
   .footer-links ul {
     list-style: none; /* Remove bullets */
-    padding: 0; /* Remove padding */
   }
   
   .footer-links li {
@@ -73,6 +75,7 @@
     color: #d3d3d3; /* Light grey for links */
     cursor: pointer; /* Make it look clickable */
     transition: color 0.3s ease;
+    padding-left: 5px;
   }
   
   .footer-links li:hover {
@@ -82,11 +85,12 @@
   /* Contact Section */
   .footer-contacts {
     text-align: left; /* Align contacts to the left */
+    white-space: nowrap;
+    padding: 0px 20px 0px 20px;
   }
   
   .footer-contacts h3 {
     font-size: 1.2rem;
-    margin-bottom: 10px;
     color: white;
   }
   
@@ -100,8 +104,42 @@
   .footer-copyright {
     border-top: 1px solid #444; /* Subtle top border */
     padding-top: 10px; /* Spacing above the copyright text */
-    font-size: 0.8rem;
     color: #888; /* Grey for copyright text */
     text-align: center;
+    width: 100%;
+  }
+
+  .footer-copyright p {
+    font-size: 0.95rem;
+    color: #888; /* Grey for copyright text */
   }
   
+
+  @media (max-width: 768px) {
+  
+    .footer-content {
+      display: block;
+    }
+
+    .footer-logo img {
+      padding-bottom: 20px;
+    }
+
+    .footer-social {
+      text-align: center;
+      padding-bottom: 20px;
+    }
+
+    .footer-links {
+      text-align: center;
+      padding-bottom: 20px;
+    }
+
+    .footer-links ul {
+      padding: 0px;
+    }
+
+    .footer-contacts {
+      text-align: center;
+    }
+}

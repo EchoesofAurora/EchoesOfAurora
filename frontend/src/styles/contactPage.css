@@ -164,7 +164,7 @@
     border-radius: 5px;
     font-size: 16px;
     cursor: pointer;
-  } */
+  }
   
   /* Map container styles */
   /* .map-container {
@@ -218,85 +218,3 @@
     padding-top: 20px;
     border-top: 1px solid #333;
   } */
-  
-  
-  /* General Footer Style */
-   .footer {
-    display: flex;
-    flex-direction: column;
-    background-color: #1a1a1a;
-    color: white;
-    padding: 20px 10px;
-    text-align: center;
-  }
-  
-  /* Top Footer Content Row */
-  .footer-content {
-    display: flex;
-    justify-content: space-between;
-    gap: 20px;
-    padding: 10px 0;
-  }
-  
-  /* Logo Section */
-  .footer-logo {
-    flex: 1 1 20%;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-  }
-  
-  .footer-logo img {
-    max-width: 100px;
-  }
-  
-  /* Social Media Links */
-  .footer-social {
-    flex: 1 1 25%;
-    text-align: center;
-    padding-top: 50px
-  }
-  
-  .social-icons img {
-    margin: 5px 8px;
-    height: 30px;
-    cursor: pointer;
-  }
-  
-  /* Useful Links Section */
-  .footer-links {
-    flex: 1 1 25%;
-    padding: 10px;
-    text-align: left;
-  }
-  
-  .footer-links ul {
-    list-style: none;
-    padding: 0;
-  }
-  
-  .footer-links li {
-    margin: 5px 0;
-    cursor: pointer;
-    transition: color 0.3s ease;
-  }
-  
-  .footer-links li:hover {
-    color: #aaa;
-  }
-  
-
-  .footer-contacts {
-    flex: 1 1 25%;
-    padding: 10px;
-    text-align: left;
-  }
-  
-
-  .footer-copyright {
-    margin: 20px 0 0;
-    padding: 10px 0;
-    border-top: 1px solid #333;
-    font-size: 14px;
-    text-align: center;
-  } 
