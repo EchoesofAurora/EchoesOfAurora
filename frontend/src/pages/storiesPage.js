@@ -51,14 +51,14 @@ function StoriesPage() {
         </p>
         <button className="explore-button">Explore</button>
       </div>
-      {/* <div className="description">
-        <h2>Timeless Tales of Sky and Spirit</h2>
+      <div className="description">
+        {/* <h2>Timeless Tales of Sky and Spirit</h2>
         <p>
           Each story holds a profound connection to the celestial wonders of the
           aurora borealis, illuminating the heritage, beliefs, and spiritual
           insights of diverse cultures.
-        </p>
-      </div> */}
+        </p> */}
+      </div>
       <div className="stories-list">
         {loading ? (
           <p>Loading stories...</p>

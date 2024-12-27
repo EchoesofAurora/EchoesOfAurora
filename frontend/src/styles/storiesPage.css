@@ -19,12 +19,12 @@
     left: 0;
     width: 100%;
     height: 100%;
-    background-color: rgba(0, 0, 0, 0.2); /* Adjust opacity (0.5 in this case) */
-    z-index: 1; /* Ensure the overlay is behind the content */
+    background-color: rgba(0, 0, 0, 0.2); 
+    z-index: 1; 
   }
   
   .hero-section * {
-    position: relative; /* Ensure text and other elements appear above the overlay */
+    position: relative;
     z-index: 2;
   }
   
