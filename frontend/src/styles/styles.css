@@ -1,0 +1,298 @@
+/* General Reset */
+body, h1, h2, h3, p, a {
+    margin: 0;
+    padding: 0;
+    font-family: 'Poppins', sans-serif;
+    color: rgb(91, 52, 10);
+}
+
+/* Body and Background */
+body {
+    background: url('../images/general/background.png') repeat-y, rgba(250, 181, 246, 0.7);
+    background-size: 100% auto; /* Contain the image horizontally */
+    background-position: center top; /* Align image to the top center */
+    background-repeat: repeat-y; /* Keep the vertical repeat */
+    background-blend-mode: overlay;
+    color: #000;
+    line-height: 1.6;
+    overflow-x: hidden;
+}
+
+p {
+    padding: 0px 5% 0px 5%;
+}
+
+
+/* Hero Section */
+.hero {
+    text-align: center;
+    position: relative;
+    height: 90vh;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    color: #fff;
+    overflow: hidden; /* Ensure the sliding images stay within the hero section */
+}
+
+.hero h1 {
+    font-size: 3.5rem;
+    margin-bottom: 20px;
+    text-shadow: 2px 2px 5px rgba(0, 0, 0, 0.8);
+    padding: 0 15%;
+}
+
+.hero p {
+    font-size: 1rem;
+    margin-bottom: 30px;
+    padding: 0 20%;
+    color: #aeaeae;
+    text-shadow: 2px 2px 5px rgba(0, 0, 0, 0.8);
+}
+
+@media (max-width: 768px) {
+    .hero h1 {
+        font-size: 2.5rem;
+        padding: 0 10%;
+        line-height: 1.1;
+    }
+}
+
+@media (max-width: 480px) {
+    .hero h1 {
+        font-size: 2rem;
+        padding: 0 10%;
+        line-height: 1.1;
+    }
+    .hero p {
+        font-size: 0.9rem;
+        line-height: 1.2;
+        padding: 0 10%;
+    }
+}
+
+.carousel {
+    position: relative;
+    height: 100%;
+    width: 100%;
+    overflow: hidden;
+}
+
+.carousel-slide {
+    position: absolute;
+    height: 100%;
+    width: 100%;
+    top: 0;
+    left: 100%; /* Start each image off-screen */
+    transition: transform 1s ease-in-out;
+    will-change: transform;
+}
+
+.carousel-slide.active {
+    transform: translateX(-100%); /* Move to the left */
+    left: 0;
+}
+
+.carousel-slide.previous {
+    transform: translateX(-200%); /* Move off-screen to the left */
+}
+
+.carousel-slide.next {
+    transform: translateX(0); /* Move into view */
+}
+
+.carousel-slide img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+
+
+
+/* Buttons */
+.button {
+    background: #48d4e7;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 5px;
+    color: #fff;
+    text-transform: uppercase;
+    font-weight: bold;
+    cursor: pointer;
+    transition: background 0.3s;
+}
+
+.button:hover {
+    background: #3cbac5;
+}
+
+
+
+/* Section Styling */
+.section {
+    padding: 60px 20px;
+    text-align: center;
+}
+
+.section h2 {
+    font-size: 3.8rem;
+    color: rgb(91, 52, 10);
+}
+
+.section p {
+    max-width: 800px;
+    margin: 0 auto 40px auto;
+    font-size: 1.3rem;
+    color: rgb(91, 52, 10);
+}
+
+/* Story Cards */
+.story-card-container {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 20px;
+    justify-content: center;
+    padding-bottom: 20px;
+}
+
+.story-content{
+    display: flex; /* Enable Flexbox */
+    flex-direction: column; /* Align items vertically (default is row) */
+    justify-content: center; /* Center items vertically */
+    align-items: center;
+}
+
+.story-card {
+    display: flex; /* Enable Flexbox */
+    flex-direction: row; /* Align items vertically (default is row) */
+    justify-content: center; /* Center items vertically */
+    align-items: center; /* Center items horizontally */
+    background: rgba(255, 255, 255, 0.1);
+    max-width: 900px;
+    border-radius: 10px;
+    overflow: hidden;
+    width: 300px;
+    text-align: left;
+    color: #fff;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+    transition: transform 0.3s;
+}
+
+.story-card:hover {
+    transform: translateY(-10px);
+}
+
+.story-card img {
+    width: 50%;
+    max-width: 350px; /* Maximum width of 600px */
+    min-width: 200px; /* Minimum width of 200px */
+    object-fit: cover; /* Ensure the image is properly cropped */
+    border-radius: 20px; /* Rounded corners for images */
+    margin-right: 50px solid #48d4e7;
+}
+
+.story-card h3 {
+    /* padding: 20px; */
+    font-size: 3.5vw;
+    line-height: 1.1;
+}
+
+.story-card p {
+    padding: 0 20px 20px;
+    font-size: 1.5vw;
+    line-height: 1.6;
+    color: rgb(91, 52, 10);
+}
+
+/* Map Section */
+.map-section {
+    /*padding: 60px 0;*/
+    background: linear-gradient(#280b38, #000000);
+}
+
+.map-section h2 {
+    color: #fff;
+    margin-bottom: 20px;
+}
+
+.map {
+    max-width: 100%;
+    height: auto;
+    margin: 0 auto;
+}
+
+.map-image {
+    border: #000000;
+    border-style: solid;
+    border-width: medium;
+}
+
+/* Footer */
+footer {
+    background: rgba(0, 0, 0, 0.9);
+    padding: 20px 0;
+    text-align: center;
+    color: #ccc;
+}
+
+footer .social-icons a {
+    color: #48d4e7;
+    margin: 0 10px;
+    font-size: 1.5rem;
+    transition: color 0.3s;
+}
+
+footer .social-icons a:hover {
+    color: #3cbac5;
+}
+
+footer p {
+    font-size: 0.875rem;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .section h2 {
+        font-size: 2rem;
+    }
+
+    .story-card-container {
+        flex-direction: column;
+        align-items: center;
+    }
+
+    .story-card {
+        width: 90%;
+    }
+}
+
+/* About Section Styling */
+.about-content {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 20px;
+    padding: 0px 8%;
+  }
+  
+  .about-text {
+    width: 70%; /* Text occupies 60% of the width */
+  }
+  
+  .about-image {
+    width: 30%; /* Image occupies 40% of the width */
+  }
+  
+  .about-image img {
+    width: 100%;
+    height: auto;
+    object-fit: cover; /* Ensures the image scales proportionally */
+    border-radius: 10px; /* Optional: Adds rounded corners to the image */
+  }
+
+  .block-align {
+    text-align: justify;
+    line-height: 1.6; /* Adjust spacing between lines */
+  }
