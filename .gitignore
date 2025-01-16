@@ -51,3 +51,4 @@ frontend/build/
 # Ignore backend-specific files
 backend/.env
 backend/node_modules/
+node_modules
