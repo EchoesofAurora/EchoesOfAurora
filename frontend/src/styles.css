@@ -1,11 +1,11 @@
-/* General Reset */
+
 body, h1, h2, h3, p, a {
     margin: 0;
     padding: 0;
     font-family: 'Poppins', sans-serif;
 }
 
-/* Body and Background */
+
 body {
     background: linear-gradient(180deg, #141414, #32054a);
     color: #fff;
@@ -19,20 +19,20 @@ p {
 
 
 
-/* Header */
+
 header {
-    background: linear-gradient(135deg, rgba(76, 41, 82, 0.8), rgba(34, 34, 34, 0.8)); /* ADDED: RGBA FOR TRANSPARENCY */
+    background: linear-gradient(135deg, rgba(76, 41, 82, 0.8), rgba(34, 34, 34, 0.8));  
     padding: 0px 3% 0px 3%;
-    position: sticky; /* Keep navbar at top of screen */
+    position: sticky;  
     top: 0;
-    z-index: 10; /* Keep navbar in front of other elements */
+    z-index: 10; 
 }
 
 header .container {
-    display: flex; /* Enables Flexbox for horizontal alignment */
-    justify-content: space-between; /* Pushes logo and navigation to opposite ends */
-    align-items: center; /* Vertically aligns items */
-    margin: 0 auto; /* Centers the container horizontally */
+    display: flex;  
+    justify-content: space-between;  
+    align-items: center; 
+    margin: 0 auto;  
 }
 
 header .logo {
@@ -41,7 +41,7 @@ header .logo {
     text-transform: uppercase;
     margin-top: 10px;
     color: #fff;
-    flex: 0; /* Ensure the logo stays on the left */
+    flex: 0;  
 }
 
 .logo img {
@@ -50,9 +50,9 @@ header .logo {
 }
 
 header nav {
-    flex: 1; /* Take up remaining space */
-    display: flex; /* Enables Flexbox */
-    justify-content: center; /* Center navigation items */
+    flex: 1;  
+    display: flex;  
+    justify-content: center; 
 }
 
 header nav a {
@@ -68,20 +68,20 @@ header nav a:hover {
 }
 
 .nav-bar {
-    position: absolute; /* Allows independent styling */
-    left: 50%; /* Center horizontally */
-    transform: translateX(-50%); /* Adjust position to truly center the nav */
-    display: flex; /* Arrange nav links in a row */
-    gap: 35px; /* Add spacing between links */
-    white-space: nowrap; /* Prevent text from wrapping */
-    align-items: center; /* Vertically align items */
-    border-radius: 12px; /* ADDED: ROUNDED EDGES FOR DROPDOWN */
+    position: absolute;
+    left: 50%;  
+    transform: translateX(-50%);  
+    display: flex;  
+    gap: 35px;  
+    white-space: nowrap; 
+    align-items: center;  
+    border-radius: 12px;  
     padding: 10px 0;
     z-index: 1000;
 }
 
 .hamburger {
-    display: none; /* Hidden by default */
+    display: none;  
     background: none;
     border: none;
     font-size: 24px;
@@ -92,27 +92,27 @@ header nav a:hover {
 
 @media (max-width: 768px) {
     .logo img {
-        width: 40px; /* Smaller size for tablets and mobile devices */
-        height: 40px; /* Maintain aspect ratio */
+        width: 40px;  
+        height: 40px;  
     }
 
     .hamburger {
-        display: block; /* Show hamburger icon */
+        display: block;
     }
 
     .nav-bar {
-        display: none; /* Hide the navbar initially */
-        flex-direction: column; /* Stack items vertically */
+        display: none; 
+        flex-direction: column;  
         position: absolute;
-        left: 75%; /* Center horizontally */
-        transform: translateX(-50%); /* Adjust position to truly center the nav */
-        top: 60px; /* Position below the header */
+        left: 75%;  
+        transform: translateX(-50%); 
+        top: 60px; 
         right: 0px;
         gap: 0px;
-        background: rgb(55, 47, 58, 1); /* Add a background for the dropdown */
+        background: rgb(55, 47, 58, 1);  
         opacity: 1;
-        transition: transform 0.3s ease, opacity 0.3s ease; /* Smooth animation */
-        border-radius: 12px; /* Rounded corners */
+        transition: transform 0.3s ease, opacity 0.3s ease; 
+        border-radius: 12px;  
         width: 45%;
         padding: 10px 0;
         z-index: 1000;
@@ -125,21 +125,20 @@ header nav a:hover {
     }
 
     .nav-bar.show {
-        display: flex; /* Show the navbar when active */
-        opacity: 1; /* Fully visible */ 
+        display: flex;  
+        opacity: 1; 
     }
 }
 
 @media (max-width: 480px) {
     .logo img {
-        width: 30px; /* Even smaller size for small mobile devices */
-        height: 30px; /* Maintain aspect ratio */
+        width: 30px; 
+        height: 30px;  
     }
 }
 
 
 
-/* Hero Section */
 .hero {
     text-align: center;
     background: url('images/hero_image.jpg') no-repeat center center/cover;
@@ -156,7 +155,7 @@ header nav a:hover {
     margin-bottom: 20px;
     text-shadow: 2px 2px 5px rgba(0, 0, 0, 0.8);
     padding: 0% 15% 0% 15%;
-    /*line-height: 1.2; /* ADJUST LINE HEIGHT */
+    line-height: 1.2;  
 }
 
 .hero p {
@@ -171,7 +170,7 @@ header nav a:hover {
     .hero h1 {
         font-size: 2.5rem;
         padding: 0% 10% 0% 10%;
-        line-height: 1.1; /* ADJUST LINE HEIGHT */
+        line-height: 1.1;  
     }
 }
 
@@ -179,12 +178,12 @@ header nav a:hover {
     .hero h1 {
         font-size: 2rem;
         padding: 0% 10% 0% 10%;
-        line-height: 1.1; /* ADJUST LINE HEIGHT */
+        line-height: 1.1;  
     }
     
     .hero p {
         font-size: 0.9rem;
-        line-height: 1.2; /* ADJUST LINE HEIGHT */
+        line-height: 1.2;  
         padding: 0% 10% 0% 10%;
     }
 }
@@ -218,7 +217,7 @@ header nav a:hover {
 
 
 
-/* Buttons */
+
 .button {
     background: #48d4e7;
     padding: 10px 20px;
@@ -237,7 +236,6 @@ header nav a:hover {
 
 
 
-/* Section Styling */
 .section {
     padding: 60px 20px;
     text-align: center;
@@ -256,7 +254,6 @@ header nav a:hover {
     color: #ddd;
 }
 
-/* Story Cards */
 .story-card-container {
     display: flex;
     flex-wrap: wrap;
@@ -298,9 +295,8 @@ header nav a:hover {
     color: #ccc;
 }
 
-/* Map Section */
 .map-section {
-    /*padding: 60px 0;*/
+    padding: 60px 0;
     background: linear-gradient(#280b38, #000000);
 }
 
@@ -321,7 +317,7 @@ header nav a:hover {
     border-width: medium;
 }
 
-/* Footer */
+
 footer {
     background: rgba(0, 0, 0, 0.9);
     padding: 20px 0;
@@ -344,7 +340,7 @@ footer p {
     font-size: 0.875rem;
 }
 
-/* Responsive Design */
+
 @media (max-width: 768px) {
     .section h2 {
         font-size: 2rem;
@@ -358,4 +354,4 @@ footer p {
     .story-card {
         width: 90%;
     }
-}
+} 
