@@ -1,14 +1,15 @@
-const { Client } = require('pg');
- 
-// Database connection configuration (hardcoded credentials)
+require('dotenv').config(); // Load environment variables
+const { Client } = require('pg'); // PostgreSQL client
+
+// Database connection configuration
 const client = new Client({
-    host: 'localhost',
-    user: 'devakodali', // Replace with your database username
-    password: 'admin123', // Replace with your database password
-    database: 'echoes_of_aurora', // Replace with your database name
-    port: 5432, // Default PostgreSQL port
+    host: process.env.DB_HOST, // Use environment variable
+    user: process.env.DB_USER, // Use environment variable
+    password: process.env.DB_PASSWORD, // Use environment variable
+    database: process.env.DB_NAME, // Use environment variable
+    port: process.env.DB_PORT, // Use environment variable
 });
- 
+
 // Connect to the database
 client.connect((err) => {
     if (err) {
@@ -17,5 +18,5 @@ client.connect((err) => {
         console.log('Connected to the database');
     }
 });
- 
+
 module.exports = client;

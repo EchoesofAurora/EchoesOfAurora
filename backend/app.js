@@ -23,4 +23,3 @@ app.get('/', (req, res) => {
 });
  
 module.exports = app; // Export the app instance
- 
