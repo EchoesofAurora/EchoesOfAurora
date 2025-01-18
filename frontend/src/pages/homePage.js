@@ -31,7 +31,7 @@ const HeroSection = () => {
 
   return (
     <section
-      className="hero"
+      className="hero hero-section "
       style={{
         background: `url(${images[currentImageIndex]}) no-repeat center center/cover`,
       }}

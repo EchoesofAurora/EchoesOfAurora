@@ -1,32 +1,5 @@
 .tribe-hero {
-    text-align: center;
     background: url('../images/tribes/bg-tribe.png') no-repeat center center/cover;
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
-    color: #fff;
-    margin-bottom: 70px;
-}
-
-.hero h1 {
-    font-size: 3rem;
-    margin: 10px 0;
-}
-
-.hero p {
-    font-size: 1.2rem;
-    margin: 10px 0 20px;
-}
-
-.explore-button {
-    padding: 10px 20px;
-    font-size: 1rem;
-    background-color: #ffcb42;
-    color: #120048;
-    border: none;
-    border-radius: 5px;
-    cursor: pointer;
 }
 
 .description {
