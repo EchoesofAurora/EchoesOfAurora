@@ -1,0 +1,68 @@
+.AdminHeader {
+  display: flex;
+  align-items: center;
+  box-shadow: 0px 4px 4px #00000040;
+  /* margin: auto; */
+}
+
+.logo-img {
+  width: 90px !important;
+  height: auto !important;
+  align-items: left;
+}
+
+.container {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  margin: 0 50px;
+}
+
+.WF-button {
+  align-items: center;
+  border-radius: 6px;
+  display: flex;
+  gap: 8px;
+  height: 40px;
+  width: 150px;
+  justify-content: center;
+  overflow: hidden;
+  position: relative;
+  background-color: transparent; 
+  border: 1px solid #A49CBE; 
+  color: #a49cbe;
+  cursor: pointer; 
+  transition: all 0.3s ease; 
+  text-decoration: none;
+
+}
+
+.WF-button:hover {
+  background-color: #e4e1ee; 
+  color: rgb(255, 255, 255); 
+  border-color: rgb(255, 255, 255); 
+}
+
+.icon-left-wrapper {
+  height: 20px;
+  margin-bottom: -2.00px;
+  margin-top: -2.00px;
+  position: relative;
+  width: 13px;
+}
+
+.label {
+  color: #a49cbe;
+  font-size: 16px;
+  position: relative;
+  white-space: nowrap;
+}
+
+.icon {
+  height: 19px;
+  margin-bottom: -1.50px;
+  margin-top: -1.50px;
+  position: relative;
+  width: 19px;
+}

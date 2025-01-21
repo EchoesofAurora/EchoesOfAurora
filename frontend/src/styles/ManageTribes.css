@@ -1,0 +1,287 @@
+/* General Styles */
+.ManageTribes {
+  background-color: #000000;
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  width: 100%;
+}
+
+.div {
+  background-color: #ffffff;
+  height: 1289px;
+  overflow: hidden;
+  position: relative;
+  width: 1438px;
+}
+
+.overlap {
+  height: 1028px;
+  left: 0;
+  position: absolute;
+  top: 177px;
+  width: 1436px;
+}
+
+.rightFrame-5 {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  left: 356px;
+  position: absolute;
+  top: 26px;
+  width: 1040px;
+}
+
+.manage-Tribe-header {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 1rem;
+}
+
+.Tribes-table {
+  border: 1px solid #ddd;
+  border-radius: 5px;
+  overflow: hidden;
+  height: 944px;
+  display: flex;
+  flex-direction: column;
+  box-shadow: 0px 4px 4px #00000040;
+}
+
+.Tribes-table-header {
+  background-color: #f0f0f0;
+  padding: 0.5rem;
+  font-weight: bold;
+  padding: 8px 50px 8px 20px;
+
+}
+.Tribes-table-header,
+.Tribes-table-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+
+}
+
+.Tribes-table-body {
+  flex: 1; 
+  overflow-y: auto; 
+  padding-right: 0.5rem; 
+}
+.Tribes-table-body .Tribes-table-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin: 2px 5px;
+  padding: 1rem;
+  padding-right: 10px;
+  border-bottom: 1px solid #ddd;
+  height: 80px;
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  position: relative;
+  border-radius: 30px;
+  color: #fff;
+  text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.7);
+}
+
+.Tribes-table-body .Tribes-table-row:last-child {
+  border-bottom: none;
+}
+
+.Tribes-table-body .Tribes-table-row span,
+.Tribes-table-body .Tribes-table-row a {
+  z-index: 1;
+}
+
+.Tribes-table-row::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.5);
+  z-index: 1;
+  border-radius: 30px;
+}
+
+.Tribes-table-row > * {
+  position: relative;
+  z-index: 2;
+}
+
+.manage-Tribe-header .back-btn,
+.manage-Tribe-header .new-Tribe-btn {
+  color: white;
+  border: none;
+  padding: 10px 20px;
+  border-radius: 5px;
+  cursor: pointer;
+  box-shadow: 0px 4px 4px #00000040;
+  width: 169px;
+}
+.manage-Tribe-header .back-btn{
+  width: 140px;
+}
+
+.manage-Tribe-header .back-btn:hover,
+.manage-Tribe-header .new-Tribe-btn:hover {
+  background-color: #c7c5da;
+}
+
+.status.editing {
+  color: #9b51e0;
+}
+
+.status.published {
+  color: #4caf50;
+}
+
+.actions button {
+  margin-right: 0.5rem;
+  background: none;
+  border: none;
+  padding: 8px 12px;
+  border-radius: 5px;
+  cursor: pointer;
+  border: 1px solid #fff;
+  color: #fff;
+  padding: 0.5rem 1rem;
+}
+
+.actions button:hover {
+  text-decoration: underline;
+  text-decoration: none;
+  background: rgba(255, 255, 255, 0.1);
+}
+
+/* Back and New Tribe Buttons */
+.manage-Tribe-header .back-btn,
+.manage-Tribe-header .new-Tribe-btn {
+  padding: 8px 16px;
+  border-radius: 4px;
+  font-size: 16px;
+  cursor: pointer;
+}
+
+.manage-Tribe-header .back-btn {
+  border: 1px solid #a49cbe;
+  background-color: white;
+  color: #a49cbe;
+}
+
+.manage-Tribe-header .new-Tribe-btn {
+  background-color: #a49cbe;
+  color: white;
+}
+
+
+.Tribes-table-header span,
+.Tribes-table-row > * {
+  flex: 1; 
+  text-align: center; 
+}
+
+.Tribes-table-header span:nth-child(1),
+.Tribes-table-row > *:nth-child(1) {
+  flex: 2;
+}
+
+.Tribes-table-header span:nth-child(4),
+.Tribes-table-row > *:nth-child(4) {
+  flex: 1.5; 
+}
+
+.Tribes-table-row > a {
+  text-decoration: none;
+  color: inherit;
+  word-wrap: break-word; 
+}
+
+.actions {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.actions button {
+  flex: 0.5; 
+}
+
+
+
+
+/* adding new tribe style */
+
+.form-section {
+  flex: 1;
+  padding: 2rem;
+}
+
+.form-section h1 {
+  font-size: 1.5rem;
+  margin-bottom: 0.5rem;
+}
+
+.form-section p {
+  color: #b2b2b2;
+  margin-bottom: 2rem;
+}
+
+.tribe-form {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+}
+
+.form-group label {
+  margin-bottom: 0.5rem;
+  font-size: 0.875rem;
+  color: #00000099;
+}
+.form-group img {
+  width: 40px;
+}
+
+.calendar-form-group {
+  display: flex;
+  gap: 50px;
+}
+
+
+
+.input-with-icon {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.input-with-icon img {
+  width: 20px;
+  height: 20px;
+}
+
+.upload-button {
+  background-color: #a49cbe;
+  color: #ffffff;
+  border: none;
+  border-radius: 4px;
+  padding: 0.5rem 1rem;
+  cursor: pointer;
+}
+
+.submit-button {
+  background-color: #a49cbe;
+  color: #ffffff;
+  border: none;
+  border-radius: 4px;
+  padding: 0.75rem 1.5rem;
+  cursor: pointer;
+}

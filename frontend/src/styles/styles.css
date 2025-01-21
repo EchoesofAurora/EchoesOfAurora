@@ -1,21 +1,21 @@
 /* General Reset */
-body, h1, h2, h3, p, a {
+/* body, h1, h2, h3, p, a {
     margin: 0;
     padding: 0;
     font-family: 'Poppins', sans-serif;
-}
+} */
 
 /* Body and Background */
-body {
+/* body {
     background: url('../images/general/background.png') repeat-y, rgba(250, 181, 246, 0.7);
-    background-size: 100% auto; /* Contain the image horizontally */
-    background-position: center top; /* Align image to the top center */
-    background-repeat: repeat-y; /* Keep the vertical repeat */
+    background-size: 100% auto; 
+    background-position: center top; 
+    background-repeat: repeat-y; 
     background-blend-mode: overlay;
     color: #000;
     line-height: 1.6;
     overflow-x: hidden;
-}
+} */
 
 p {
     padding: 0px 5% 0px 5%;
