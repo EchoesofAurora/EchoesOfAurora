@@ -9,7 +9,7 @@ const client = new Client({
     database: process.env.DB_NAME, // Use environment variable
     port: process.env.DB_PORT, // Use environment variable
 });
-
+//sdfasdfasd
 // Connect to the database
 client.connect((err) => {
     if (err) {
