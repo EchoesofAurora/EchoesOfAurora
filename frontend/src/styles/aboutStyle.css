@@ -1,0 +1,275 @@
+
+.About-stories-page-container {
+  font-family: Arial, sans-serif;
+  background: linear-gradient(135deg, #f0c7ff, #a2cffe);
+  
+}
+
+.About-hero-section {
+  text-align: center;
+  position: relative; /* To position the overlay properly */
+  background: url('../images/stories/hero.png') no-repeat center/cover;
+  padding: 50px 20px;
+  color: white;
+  height: 70vh;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}
+
+.About-hero-section::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.2); /* Adjust opacity (0.5 in this case) */
+  z-index: 1; /* Ensure the overlay is behind the content */
+}
+
+.About-hero-section * {
+  position: relative; /* Ensure text and other elements appear above the overlay */
+  z-index: 2;
+}
+
+.About-top-heading{
+  margin-bottom: 20px;
+}
+
+.About-hero-title {
+  font-size: 3rem; /* Adjust size to match */
+  margin-bottom: 20px; /* Space below the text */
+  font-weight: 1000; /* Extra bold text */
+  font-style: italic; /* Adds italic style */
+  color: white; /* Ensure text is white */
+  text-shadow: 2px 2px 0px black,  /* Black outline effect */
+               -2px -2px 0px black,
+               2px -2px 0px black,
+               -2px 2px 0px black,
+               0px 2px 0px black,
+               0px -2px 0px black,
+               2px 0px 0px black,
+               -2px 0px 0px black;
+  text-align: center; /* Ensure text is centered */
+  line-height: 1.5; /* Adjust line height for better readability */
+  letter-spacing: 1px; /* Slightly increase spacing for impact */
+  max-width: 800px; /* Limit the width to enforce line wrapping */
+  word-wrap: break-word; /* Allow breaking if necessary */
+  margin: 0 auto; /* Center the text horizontally */
+}
+
+.About-explore-button {
+  background-color: #a2ff00;
+  color: #000;
+  padding: 10px 20px;
+  border: none;
+  border-radius: 8px;
+  font-size: 1.2rem;
+  cursor: pointer;
+  margin-top: 20px;
+}
+
+.About-explore-button:hover {
+  background-color: #8bdb00;
+}
+
+
+  .title-In-lines{
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #000;
+    gap: 30px;
+    margin:150px auto;
+    font-style: italic;
+    font-size:larger;
+  }
+
+
+  
+  .story-card-func {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin-top: 50px;
+    padding: 0 20px;
+    gap: 40px; /* Space between image and text */
+    transition: transform 0.3s ease;
+    padding: 20px; /* Internal padding */
+    width: 100%
+  }
+  
+  .features-card-func {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 100px; /* Space between image and text */
+    transition: transform 0.3s ease;
+  }
+  .commitment-card-func {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 100px; /* Space between image and text */
+    transition: transform 0.3s ease;
+    margin-bottom: 20px;
+  }
+  .story-card-func.image-left,
+  .features-card-func.image-left,
+  .commitment-card-func.image-left {
+    flex-direction: row; /* Default: image on the left */
+  }
+  .story-card-func.image-left img{
+    border-top-right-radius: 50px;
+    border-bottom-right-radius: 50px;
+    margin: -20px;
+  }
+  .features-card-func.image-left img{
+    border-radius: 50%;
+  }
+
+  
+  .story-card-func.image-right,
+  .features-card-func.image-right,
+  .commitment-card-func.image-right {
+    flex-direction: row-reverse; /* Reverse: image on the right */
+
+  }
+  .story-card-func.image-right img{
+    border-top-left-radius: 50px;
+    border-bottom-left-radius: 50px;
+    margin: -20px;
+  }
+  .features-card-func.image-right img{
+    border-radius: 50%;
+  }
+
+  
+  .story-card-func:hover,
+  .features-card-func:hover,
+  .commitment-card-func:hover {
+    transform: translateY(-5px); /* Lift effect on hover */
+  }
+  
+  .story-img {
+    width: 850px !important; /* Fixed width for images */
+    height: 400px;
+    /*height: 100px; /* Fixed height */
+    object-fit: cover; /* Ensure the image is properly cropped */
+    /* border-radius: 20px; Rounded corners for images */
+    margin-right: 50px;
+    border: 15px solid black;
+  }
+  .features-img {
+    width: 500px !important; /* Fixed width for images */
+    height: 500px;
+    /*height: 100px; /* Fixed height */
+    object-fit: cover; /* Ensure the image is properly cropped */
+    /* border-radius: 20px; Rounded corners for images */
+    margin-right: 50px;
+    border: 15px solid black;
+  }
+  .commitment-img {
+    width: 500px !important; /* Fixed width for images */
+    height: 500px;
+    /*height: 100px; /* Fixed height */
+    object-fit: cover; /* Ensure the image is properly cropped */
+    /* border-radius: 20px; Rounded corners for images */
+    margin-right: 50px;
+    border: 5px solid black;
+    border-top-left-radius: 100px;
+    border-bottom-right-radius: 100px;
+  }
+  
+  .story-content,
+  .features-content,
+  .commitment-content {
+    display: flex;
+    flex-direction: column;
+    justify-content: center; /* Align content to the top */
+    max-width: 700px; /* Limit text width */
+    gap: 5px; /* Optional: Add spacing between child elements */
+    text-align: center;
+    padding: 20px;
+  }
+  
+  .story-title,
+  .features-title,
+  .commitment-title {
+    font-size: 2rem; /* Larger title */
+    font-weight: bold;
+    margin-bottom: 10px;
+    text-align: center;
+    justify-content: center;
+
+    margin-bottom: 20px; /* Space below the text */
+    font-weight: 1000; /* Extra bold text */
+    font-style: italic; /* Adds italic style */
+    color: white; /* Ensure text is white */
+    text-shadow: 2px 2px 0px black,  /* Black outline effect */
+                 -2px -2px 0px black,
+                 2px -2px 0px black,
+                 -2px 2px 0px black,
+                 0px 2px 0px black,
+                 0px -2px 0px black,
+                 2px 0px 0px black,
+                 -2px 0px 0px black;
+    line-height: 1.5; /* Adjust line height for better readability */
+    letter-spacing: 1px; /* Slightly increase spacing for impact */
+    word-wrap: break-word; /* Allow breaking if necessary */
+    margin: 10 auto; /* Center the text horizontally */
+  }
+  
+  .story-description,
+  .features-description,
+  .commitment-description {
+    font-size: 1.5rem; /* Adjust size to match */
+    margin-bottom: 20px; /* Space below the text */
+    font-weight: 1000; /* Extra bold text */
+    font-style: italic; /* Adds italic style */
+    color: rgb(0, 0, 0); /* Ensure text is white */
+    text-shadow: 1px 1px 0px black;  /* Black outline effect */
+    text-align: center; /* Ensure text is centered */
+    line-height: 1.5; /* Adjust line height for better readability */
+    letter-spacing: 1px; /* Slightly increase spacing for impact */
+    text-align: center;
+
+  }
+  
+  
+  
+  .learn-more-button {
+    background-color: #7b61ff;
+    color: white;
+    padding: 12px 20px;
+    border: none;
+    border-radius: 10px;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+  }
+  
+  .learn-more-button:hover {
+    background-color: #6448e8; /* Darker hover effect */
+  }
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

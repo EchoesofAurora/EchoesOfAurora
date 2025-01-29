@@ -7,6 +7,7 @@ import TribeLandingPage from "./pages/tribeLandingPage";
 import StoryLandingPage from './pages/StoryLandingPage';
 import MapPage from './pages/mapPage';
 import ContactPage from './pages/contactPage';
+import About from './pages/About';
  
  
 const App = () => {
@@ -18,9 +19,10 @@ const App = () => {
                 <Route path="/tribes" element={<TribesPage />} />
                 <Route path="/map" element={<MapPage />} />
                 <Route path="/contactus" element={<ContactPage />} />
-                <Route path="/about" element={<StoriesPage />} />
+                <Route path="/about" element={<About />} />
                 <Route path="/tribe/:tribeId" element={<TribeLandingPage />} />
                 <Route path="/story/:storyId" element={<StoryLandingPage />} />
+                
             </Routes>
         </Router>
     );
