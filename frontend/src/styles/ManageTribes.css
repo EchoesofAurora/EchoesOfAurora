@@ -7,32 +7,6 @@
   width: 100%;
 }
 
-.div {
-  background-color: #ffffff;
-  height: 1289px;
-  overflow: hidden;
-  position: relative;
-  width: 1438px;
-}
-
-.overlap {
-  height: 1028px;
-  left: 0;
-  position: absolute;
-  top: 177px;
-  width: 1436px;
-}
-
-.rightFrame-5 {
-  display: flex;
-  flex-direction: column;
-  gap: 14px;
-  left: 356px;
-  position: absolute;
-  top: 26px;
-  width: 1040px;
-}
-
 .manage-Tribe-header {
   display: flex;
   justify-content: space-between;
@@ -51,7 +25,6 @@
 
 .Tribes-table-header {
   background-color: #f0f0f0;
-  padding: 0.5rem;
   font-weight: bold;
   padding: 8px 50px 8px 20px;
 
@@ -106,11 +79,6 @@
   background-color: rgba(0, 0, 0, 0.5);
   z-index: 1;
   border-radius: 30px;
-}
-
-.Tribes-table-row > * {
-  position: relative;
-  z-index: 2;
 }
 
 .manage-Tribe-header .back-btn,
@@ -187,7 +155,7 @@
 
 .Tribes-table-header span:nth-child(1),
 .Tribes-table-row > *:nth-child(1) {
-  flex: 2;
+  flex: 1;
 }
 
 .Tribes-table-header span:nth-child(4),

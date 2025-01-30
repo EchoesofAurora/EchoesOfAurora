@@ -5,6 +5,7 @@ import "../styles/styles.css";
 import Header from "../components/Header";
 import Footer from "../components/Footer";
 
+
 function StoriesPage() {
   const [stories, setStories] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -30,9 +31,17 @@ function StoriesPage() {
     fetchStories();
   }, []);
 
+  const imagesContext = require.context("../images/stories", false, /\.png$/);
+
   const getImageUrl = (storyId) => {
-    return require(`../images/stories/${storyId}.png`);
+    try {
+      return imagesContext(`./${storyId}.png`);
+    } catch (e) {
+      console.error(`Image not found: ${storyId}.png`);
+      return null;
+    }
   };
+  
 
   const handleLearnMore = (story) => {
     navigate(`/story/${story.story_id}`, { state: { story } });
@@ -41,7 +50,7 @@ function StoriesPage() {
   return (
     <div className="stories-page">
       <Header />
-      <div className="hero hero-section">
+      <div className="hero hero-section stories-hero">
         <h1 className="hero-title">
           Aurora Stories
         </h1>
@@ -52,12 +61,12 @@ function StoriesPage() {
         <button className="explore-button">Explore</button>
       </div>
       <div className="description">
-        {/* <h2>Timeless Tales of Sky and Spirit</h2>
+        <h2>Timeless Tales of Sky and Spirit</h2>
         <p>
           Each story holds a profound connection to the celestial wonders of the
           aurora borealis, illuminating the heritage, beliefs, and spiritual
           insights of diverse cultures.
-        </p> */}
+        </p>
       </div>
       <div className="stories-list">
         {loading ? (

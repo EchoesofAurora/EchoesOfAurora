@@ -4,26 +4,7 @@
     flex-direction: row;
     justify-content: center;
     width: 100%;
-  }
-  
-   .div {
-    background-color:  #ffffff;
-    height: 1289px;
-    overflow: hidden;
-    position: relative;
-    width: 1438px;
-  }
-  
-   .overlap {
-    height: 1028px;
-    left: 0;
-    position: absolute;
-    top: 177px;
-    width: 1436px;
-  }
-  
-  
-  
+} 
   
    .frame-5 {
     align-items: flex-start;
