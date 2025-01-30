@@ -1,63 +1,8 @@
  
-  .hero-section {
-    text-align: center;
-    position: relative; /* To position the overlay properly */
+  .stories-hero {
     background: url('../images/stories/hero.png') no-repeat center/cover;
-    padding: 50px 20px;
-    color: white;
-    height: 70vh;
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
   }
   
-  .hero-section::before {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background-color: rgba(0, 0, 0, 0.2); 
-    z-index: 1; 
-  }
-  
-  .hero-section * {
-    position: relative;
-    z-index: 2;
-  }
-  
-  
-  .hero-title {
-    font-size: 3rem; /* Adjust size to match */
-    margin-bottom: 20px; /* Space below the text */
-    font-weight: 1000; /* Extra bold text */
-    font-style: italic; /* Adds italic style */
-    color: white; /* Ensure text is white */
-    text-shadow: 2px 2px 5px rgba(0, 0, 0, 0.8);
-    text-align: center; /* Ensure text is centered */
-    line-height: 1.5; /* Adjust line height for better readability */
-    letter-spacing: 1px; /* Slightly increase spacing for impact */
-    max-width: 800px; /* Limit the width to enforce line wrapping */
-    word-wrap: break-word; /* Allow breaking if necessary */
-    margin: 0 auto; /* Center the text horizontally */
-  }
-  
-  .explore-button {
-    background-color: #a2ff00;
-    color: #000;
-    padding: 10px 20px;
-    border: none;
-    border-radius: 8px;
-    font-size: 1.2rem;
-    cursor: pointer;
-    margin-top: 20px;
-  }
-  
-  .explore-button:hover {
-    background-color: #8bdb00;
-  }
   .stories-container {
     display: flex;
     flex-direction: column; /* Stack cards vertically */
@@ -78,7 +23,8 @@
     transition: transform 0.3s ease;
     padding: 20px; /* Internal padding */
     width: 80%; /* Percentage width of the container */
-    margin: 0 auto; /* Center-align the card horizontally */
+    max-width: 800px;
+    margin: 30px auto; /* Center-align the card horizontally */
   }
   
   
@@ -120,7 +66,6 @@
   .story-description {
     font-size: 1rem;
     color: #000 !important; /* Ensure black color */
-    margin-bottom: 20px;
     line-height: 1.5; /* Add line height for better readability */
   }
 
@@ -138,13 +83,20 @@
     transition: background-color 0.3s ease;
     align-items: center;
   }
+
+  /* Responsive Design */
+@media (max-width: 768px) {
+  .story-card {
+      flex-direction: column;
+      align-items: center;
+  }
+
+  .story-card {
+      width: 80%;
+  }
+}
   
   .learn-more-button:hover {
     background-color: #9673EE; /* Darker shade for hover */
   }
-  
-  
-  /* .learn-more-button:hover {
-    background-color: #6448e8; /* Darker hover effect */
-  /*} */
   

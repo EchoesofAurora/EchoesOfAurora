@@ -12,7 +12,7 @@ function ContactPage() {
   return (
     <div className="contact-page">
       <Header />
-      <div className="contactus-page-hero-section">
+      <div className="hero hero-section contact-hero">
         <h1 className='hero-title'>Contact us</h1>
         <p>Have questions, feedback, or stories to share?</p>
       </div>

@@ -1,74 +1,111 @@
 .header {
-    background: linear-gradient(135deg, rgba(76, 41, 82, 0.95), rgba(34, 34, 34, 0.95)); /* ADDED: RGBA FOR TRANSPARENCY */
-    box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1); /* Add a subtle shadow */
-    padding: 10px 10px 10px 10px; /* Increase the vertical size */
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    position: sticky;
-    top: 0;
-    z-index: 1000;
-    font-family: 'Poppins', sans-serif;
-  }
-  
-  .container {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    width: 100%;
-    max-width: 1200px;
-    margin: 0 auto;
-  }
-  
-  .logo {
-    display: flex;
-    align-items: center;
-    justify-content: flex-start; /* Aligns logo to the left */
-    width: 80px;
-  height: auto;
-  }
-  
-  .logo-img {
-    width: 60px !important;
-    height: auto !important;
-    align-items: left;
-  }
-  
-  .nav-bar {
-    display: flex;
-    gap: 35px;
-  }
-  
-  .nav-bar a {
-    text-decoration: none;
-    color: rgb(254, 239, 255);
-    font-size: 1.2rem;
-    font-weight: 700;
-    transition: color 0.3s;
-  }
-  
-  .nav-bar a:hover {
-    color: #9d4edd; /* Change color on hover */
-  }
-  
-  .sign-in-button {
-    background-color: transparent; /* Transparent background */
-    color: rgba(255, 255, 255, 0.7); /* Semi-transparent white for the text */
-    border: 1px solid rgba(255, 255, 255, 0.7); /* Border matching the text color */
-    padding: 6px 14px; /* Smaller padding for a compact look */
-    border-radius: 5px; /* Slightly rounded corners */
-    font-size: 0.9rem; /* Slightly smaller font size */
-    font-weight: normal; /* Normal weight for the font */
-    cursor: pointer; /* Pointer cursor for the button */
-    transition: all 0.3s ease; /* Smooth transition effect */
-  }
-  
-  .sign-in-button:hover {
-    background-color: rgba(255, 255, 255, 0.1); /* Slightly filled background on hover */
-    color: rgba(255, 255, 255, 1); /* Fully white text on hover */
-    border-color: rgba(255, 255, 255, 1); /* Fully white border on hover */
-  }
-  
+  background: linear-gradient(135deg, rgba(76, 41, 82, 0.95), rgba(34, 34, 34, 0.95));
+  box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+  padding: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  position: sticky;
+  top: 0;
+  z-index: 1000;
+  font-family: 'Poppins', sans-serif;
+}
 
+.container {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.logo {
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  width: 80px;
+  height: auto;
+}
+
+.logo-img {
+  width: 60px !important;
+  height: auto !important;
+}
+
+.nav-bar {
+  display: flex;
+  gap: 35px;
+}
+
+.nav-bar a {
+  text-decoration: none;
+  color: rgb(254, 239, 255);
+  font-size: 1.2rem;
+  font-weight: 700;
+  transition: color 0.3s;
+}
+
+.nav-bar a:hover {
+  color: #9d4edd;
+}
+
+.sign-in-button {
+  background-color: transparent;
+  color: rgba(255, 255, 255, 0.7);
+  border: 1px solid rgba(255, 255, 255, 0.7);
+  padding: 6px 14px;
+  border-radius: 5px;
+  font-size: 0.9rem;
+  font-weight: normal;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.sign-in-button:hover {
+  background-color: rgba(255, 255, 255, 0.1);
+  color: rgba(255, 255, 255, 1);
+  border-color: rgba(255, 255, 255, 1);
+}
+
+/* Hamburger Menu Styles */
+.hamburger {
+  display: none;
+  flex-direction: column;
+  gap: 5px;
+  cursor: pointer;
+}
+
+.hamburger div {
+  width: 25px;
+  height: 3px;
+  background: rgba(255, 255, 255, 0.7);
+  transition: all 0.3s ease;
+}
+
+@media (max-width: 768px) {
+  .nav-bar {
+    display: none;
+    flex-direction: column;
+    background: rgba(34, 34, 34, 0.90);
+    position: absolute;
+    top: 100%;
+    left: 10%;
+    width: 80%;
+    border-radius: 30px;
+    border-top-left-radius: 0px;
+    border-top-right-radius: 0px;    
+    text-align: center;
+    padding: 10px 0px;
+  }
+
+  .nav-bar.active {
+    display: flex;
+  }
+
+  .hamburger {
+    display: flex;
+  }
+}
 
   

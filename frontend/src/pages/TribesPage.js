@@ -41,7 +41,7 @@ function TribesSection() {
   return (
     <div className="tribes-section">
       <Header />
-      <div className="hero tribe-hero">
+      <div className="hero hero-section tribe-hero">
         <h1 className='hero-title'>Indigenous Tribes</h1>
         <p>
           “Discover the stories and heritage of indigenous tribes connected to
