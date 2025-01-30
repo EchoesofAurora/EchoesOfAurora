@@ -10,7 +10,7 @@
   left: 0;
   position: absolute;
   top: 0;
-  width: 1436px;
+  width: 100%;
 }
 
  .vector {
@@ -19,7 +19,7 @@
   object-fit: cover;
   position: absolute;
   top: 1026px;
-  width: 1436px;
+  width: 100%;
 }
 
 .frame {

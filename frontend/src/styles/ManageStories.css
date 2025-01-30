@@ -7,22 +7,6 @@
   width: 100%;
 }
 
-.div {
-  background-color: #ffffff;
-  height: 1289px;
-  overflow: hidden;
-  position: relative;
-  width: 1438px;
-}
-
-.overlap {
-  height: 1028px;
-  left: 0;
-  position: absolute;
-  top: 177px;
-  width: 1436px;
-}
-
 .rightFrame-5 {
   display: flex;
   flex-direction: column;
@@ -30,7 +14,7 @@
   left: 356px;
   position: absolute;
   top: 26px;
-  width: 1040px;
+  width: 68%;
 }
 
 .manage-header {

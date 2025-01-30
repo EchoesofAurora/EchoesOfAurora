@@ -9,9 +9,9 @@
  .div {
   background-color:  #ffffff;
   height: 1289px;
-  overflow: hidden;
+  /* overflow: hidden; */
   position: relative;
-  width: 1438px;
+  width: 100%;
 }
 
  .overlap {
@@ -19,7 +19,7 @@
   left: 0;
   position: absolute;
   top: 177px;
-  width: 1436px;
+  width: 100%;
 }
 
 
