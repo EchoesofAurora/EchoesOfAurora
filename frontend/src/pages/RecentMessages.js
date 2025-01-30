@@ -2,6 +2,7 @@
 import React from "react";
 import "../styles/Dashboard.css";
 
+
 const RecentMessages = ({ messages }) => {
   return (
     <div className="section-thank-you">
@@ -35,3 +36,25 @@ const messages = [
 export default function Messages() {
   return <RecentMessages messages={messages} />;
 }
+
+
+// RecentMessages.js
+// import React from "react";
+
+// const RecentMessages = () => {
+//   return (
+//     <div className="frame-7">
+//       {["Pending Stories", "Published Stories"].map((item, index) => (
+//         <div className="overlap-group-wrapper" key={index}>
+//           <div className="overlap-group-3">
+//             <div className="title-8">{[500, 20][index]}</div>
+//             <div className="title-9">{item}</div>
+//             <a className="title-10" href="#">View</a>
+//           </div>
+//         </div>
+//       ))}
+//     </div>
+//   );
+// };
+
+// export default RecentMessages;

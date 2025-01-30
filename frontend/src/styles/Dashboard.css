@@ -318,7 +318,7 @@
 
 
 
-
+/* 
 
 
  .frame-16 {
@@ -354,7 +354,7 @@
   width: 686px;
 }
 
- .table-head {
+ .table-head-1 {
   align-items: center;
   background-color: #00000000;
   display: flex;
@@ -625,7 +625,7 @@
   position: absolute;
   top: 432px;
   width: 636px;
-}
+} */
 
  .group-8 {
   height: 28px;

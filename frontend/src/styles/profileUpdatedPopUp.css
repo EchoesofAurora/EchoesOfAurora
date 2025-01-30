@@ -1,0 +1,299 @@
+/* Overlay style for the popup */
+.profile-update-popup-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100vh;
+  background: rgba(0, 0, 0, 0.6);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+}
+
+/* Main modal popup style */
+.profile-update-popup-modal {
+  background: white;
+  padding: 40px;
+  border-radius: 10px;
+  text-align: center;
+  width: 450px;
+  max-width: 90%;
+  box-shadow: 0px 5px 15px rgba(0, 0, 0, 0.2);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+/* Icon styling */
+.popup-icon-wrapper {
+  margin-bottom: 20px;
+}
+
+.popup-icon {
+  width: 50px;
+  height: 50px;
+  object-fit: contain;
+}
+
+/* Title styling */
+.popup-title {
+  font-size: 24px;
+  font-weight: 600;
+  color: #333;
+  margin-bottom: 15px;
+}
+
+/* Message text styling */
+.popup-message {
+  font-size: 16px;
+  color: #666;
+  margin-bottom: 25px;
+}
+
+/* Button for sending the PIN */
+.popup-send-pin-button {
+  background-color: #a49cbe;
+
+  color: white;
+  padding: 12px 25px;
+  border: none;
+  border-radius: 5px;
+  font-size: 16px;
+  cursor: pointer;
+  margin-bottom: 15px;
+  transition: background-color 0.3s;
+}
+
+.popup-send-pin-button:hover {
+  background-color: #928bb0;
+}
+
+/* Input styling for PIN entry */
+.popup-pin-input {
+  width: 100%;
+  padding: 12px;
+  margin-bottom: 15px;
+  border-radius: 5px;
+  border: 1px solid #ddd;
+  font-size: 16px;
+}
+
+/* Verify button styling */
+.popup-verify-button {
+  background-color: #28a745;
+  color: white;
+  padding: 12px 25px;
+  border: none;
+  border-radius: 5px;
+  font-size: 16px;
+  cursor: pointer;
+  transition: background-color 0.3s;
+
+}
+
+.popup-verify-button:hover {
+  background-color: #218838;
+}
+
+/* Timer text styling */
+.popup-timer {
+  font-size: 14px;
+  color: red;
+  font-weight: 600;
+  margin-top: 15px;
+}
+
+/* Close button styling */
+.popup-close-button {
+  background-color: #dc3545;
+  color: white;
+  padding: 12px 25px;
+  border: none;
+  border-radius: 5px;
+  font-size: 16px;
+  cursor: pointer;
+  transition: background-color 0.3s;
+  width: 161.7px;
+
+}
+
+.popup-close-button:hover {
+  background-color: #c82333;
+}
+
+.buttons-in-flex{
+  width: 470px;
+  display: flex;
+  justify-content: space-around;
+
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+/* .profile-popup-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100vh;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.profile-popup-modal {
+  background: white;
+  padding: 30px;
+  border-radius: 8px;
+  text-align: center;
+  width: 400px;
+}
+
+.profile-popup-title {
+  font-size: 20px;
+  font-weight: bold;
+}
+
+.profile-popup-message {
+  margin: 10px 0;
+  font-size: 14px;
+  color: #555;
+}
+
+.profile-popup-input-container {
+  margin: 10px 0;
+  text-align: left;
+}
+
+.profile-popup-input {
+  width: 100%;
+  padding: 8px;
+  margin-top: 5px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+}
+
+.profile-popup-timer {
+  margin-top: 10px;.profile-popup-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100vh;
+    background: rgba(0, 0, 0, 0.5);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+  }
+  
+  .profile-popup-modal {
+    background: white;
+    padding: 30px;
+    border-radius: 8px;
+    text-align: center;
+    width: 400px;
+    box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.2);
+  }
+  
+  .profile-popup-title {
+    font-size: 20px;
+    font-weight: bold;
+    margin-bottom: 10px;
+  }
+  
+  .profile-popup-message {
+    font-size: 14px;
+    color: #555;
+    margin-bottom: 15px;
+  }
+  
+  .profile-popup-input-container {
+    text-align: left;
+    margin: 10px 0;
+  }
+  
+  .profile-popup-input-container label {
+    display: block;
+    font-size: 14px;
+    font-weight: 600;
+    margin-bottom: 5px;
+  }
+  
+  .profile-popup-input {
+    width: 100%;
+    padding: 10px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    font-size: 16px;
+  }
+  
+  .profile-popup-timer {
+    margin-top: 10px;
+    font-size: 14px;
+    color: red;
+    font-weight: bold;
+  }
+  
+  .profile-popup-buttons {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 15px;
+  }
+  
+  .profile-popup-button {
+    width: 48%;
+    padding: 10px;
+    font-size: 14px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+  }
+  
+  .profile-popup-button.continue {
+    background-color: #007bff;
+    color: white;
+  }
+  
+  .profile-popup-button.close {
+    background-color: #dc3545;
+    color: white;
+  }
+  
+  .profile-popup-button:hover {
+    opacity: 0.8;
+  }
+  
+  font-size: 14px;
+  color: red;
+}
+
+.profile-popup-button {
+  background: #007bff;
+  color: white;
+  padding: 10px;
+  border: none;
+  cursor: pointer;
+  width: 100%;
+  margin-top: 10px;
+} */

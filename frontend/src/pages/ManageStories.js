@@ -110,7 +110,7 @@ const HeroManageStories = () => {
       <Sidebar />
       <main className="rightFrame-5">
         <div className="manage-header">
-          <button className="back-btn" onClick={() => window.location.href = "/Dashboard"}>Back</button>
+          <button className="back-btn" onClick={() => window.location.href = "/Admin/Dashboard"}>Back</button>
           <button className="new-story-btn" onClick={() => window.location.href = "/ManageTribe/AddingTribe"}>+ New Story</button>
         </div>
 

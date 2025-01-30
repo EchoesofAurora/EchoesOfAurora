@@ -1,0 +1,105 @@
+/* Container for the entire table */
+.stories-table-container {
+    background-color: #f9f9f9;
+    border: 1px solid #cbd2e0;
+    border-radius: 10px;
+    height: 613px;
+    width: 686px;
+    position: absolute;
+    top: 275px;
+    left: 708px;
+    overflow: hidden;
+  }
+  
+  /* Header for the table */
+  .table-header {
+    display: flex;
+    background-color: #f0f0f0;
+    padding: 16px;
+    gap: 11px;
+    justify-content: space-between;
+  }
+  
+  /* Styling for each table header cell */
+  .table-header-cell {
+    font-family: "Poppins-Bold", Helvetica;
+    font-size: 14px;
+    font-weight: 700;
+    color: #000000de;
+    text-align: center;
+    width: 157px;
+  }
+  
+  /* Styling for each story row */
+  .story-row {
+    display: flex;
+    justify-content: space-between;
+    padding: 16px;
+    border-top: 1px solid #cbd2e0;
+  }
+  
+  .story-row:hover {
+    background-color: #f0f0f0;
+  }
+  
+  /* Styling for the Story ID */
+  .story-id {
+    font-family: "Poppins-Medium", Helvetica;
+    font-size: 14px;
+    color: #000000de;
+    width: 157px;
+    text-align: center;
+  }
+  
+  /* Styling for the Tribe */
+  .story-tribe {
+    font-family: "Poppins-Medium", Helvetica;
+    font-size: 14px;
+    color: #000000de;
+    text-decoration: underline;
+    width: 157px;
+    text-align: center;
+  }
+  
+  /* Styling for the Timeline */
+  .story-timeline {
+    font-family: "Inter-Regular", Helvetica;
+    font-size: 15.4px;
+    color: #000000;
+    width: 157px;
+    text-align: center;
+  }
+  
+  /* Styling for the Status */
+  .story-status {
+    font-family: "Poppins-Medium", Helvetica;
+    font-size: 14px;
+    font-weight: 500;
+    letter-spacing: 0.17px;
+    line-height: 24px;
+    width: 157px;
+    text-align: center;
+    cursor: pointer;
+  }
+  
+  /* Specific styling for Editing status */
+  .story-status-editing {
+    color: #9b51e0de;
+  }
+  
+  /* Specific styling for Published status */
+  .story-status-published {
+    color: #a49cbede;
+  }
+  
+  /* Title for recent stories */
+  .recent-stories-title {
+    color: #000000;
+    font-family: "Inter-SemiBold", Helvetica;
+    font-size: 16px;
+    font-weight: 600;
+    position: absolute;
+    top: 28px;
+    left: 57px;
+  }
+  

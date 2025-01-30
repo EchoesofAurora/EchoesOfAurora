@@ -43,7 +43,7 @@
 .rectangle {
   
   background-color: #000000;
-  height: 85px;
+  height: 52px;
   position: relative;
   width: 5px;
 }
@@ -56,7 +56,7 @@
   border-radius: 0px 10px 10px 0px;
   display: flex;
   gap: 10px;
-  height: 52px;
+  /* height: 52px; */
   padding: 16px 39px 16px 15px;
   position: relative;
   width: 100%;

@@ -14,7 +14,7 @@ const sidebarItems = [
   { icon: bookmark, label: "Manage Stories", link: "/Admin/ManageStories" },
   { icon: people, label: "Manage Tribes", link: "/Admin/ManageTribes" },
   { icon: mail, label: "User Submissions", link: "/Admin/UserSubmissions" },
-  { icon: settings, label: "Settings", link: "/Admin/Settings" },
+  { icon: settings, label: "Settings", link: "/Admin/EditProfile" },
 ];
 
 const Sidebar = () => {

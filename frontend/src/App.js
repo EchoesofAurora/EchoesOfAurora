@@ -19,6 +19,7 @@ import ManageTribes from './pages/ManageTribes';
 import UserSubmissions from './pages/UserSubmissions';
 import Settings from './pages/Settings';
 import AddingTribe from './pages/AddingTribe';
+import EditProfile from './pages/profileEdit';
  
  
 const App = () => {
@@ -44,6 +45,7 @@ const App = () => {
                 <Route path="/Admin/UserSubmissions" element={<UserSubmissions />} />
                 <Route path="/Admin/Settings" element={<Settings />} />
                 <Route path='/ManageTribe/AddingTribe' element={<AddingTribe/>}/> 
+                <Route path="/Admin/EditProfile" element={<EditProfile />} />
                 
             </Routes>
         </Router>
