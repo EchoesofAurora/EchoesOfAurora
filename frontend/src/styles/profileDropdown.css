@@ -1,0 +1,34 @@
+.admin-dropdown {
+    position: relative;
+  }
+  
+  .admin-dropdown-wrapper {
+    padding: 0;
+  }
+  
+  .admin-dropdown-list {
+    list-style-type: none;
+    margin: 0;
+    padding: 0;
+  }
+  
+  .admin-dropdown-item {
+    padding: 12px 15px;
+    cursor: pointer;
+    color: #333333;
+    font-size: 14px;
+    transition: background-color 0.3s ease;
+  }
+  
+  .admin-dropdown-item:hover {
+    background-color: #e4e1ee;
+  }
+  
+  .admin-dropdown-logout {
+    color: #E51616;
+  }
+  
+  .admin-dropdown-logout:hover {
+    background-color: #fce4e4;
+  }
+  
