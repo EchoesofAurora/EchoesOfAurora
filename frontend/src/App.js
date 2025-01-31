@@ -34,7 +34,7 @@ const App = () => {
                 <Route path="/about" element={<About />} />
                 <Route path="/tribe/:tribeId" element={<TribeLandingPage />} />
                 <Route path="/story/:storyId" element={<StoryLandingPage />} />
-                <Route path="/adminSignIn" element={<SignIn />} />
+                <Route path="/Admin/SignIn" element={<SignIn />} />
                 <Route path="/Admin/ForgotPassword" element={<ForgotPassword />} />
                 <Route path="/Admin/PasswordChanged" element={<PasswordChanged />} />
                 <Route path="/Admin/SetNewPassword" element={<SetNewPassword />} />

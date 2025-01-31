@@ -24,7 +24,7 @@ const ProfileDropdown = () => {
           </li>
           <li
             className="admin-dropdown-item admin-dropdown-logout"
-            onClick={() => handleItemClick("/adminSignIn")}
+            onClick={() => handleItemClick("/Admin/SignIn")}
           >
             Logout
           </li>

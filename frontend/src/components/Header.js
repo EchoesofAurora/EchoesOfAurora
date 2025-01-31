@@ -29,7 +29,9 @@ const Header = () => {
           <Link to="/about">About</Link>
           <Link to="/contactus">Contact Us</Link>
         </nav>
-        <button className="sign-in-button">Sign In</button>
+        <Link to="/Admin/SignIn" className="sign-in-button-link">
+          <button className="sign-in-button">Sign In</button>
+        </Link>
       </div>
     </header>
   );
