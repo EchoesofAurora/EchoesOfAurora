@@ -13,14 +13,7 @@
   width: 100%;
 }
 
- .vector {
-  height: 1px;
-  left: 0;
-  object-fit: cover;
-  position: absolute;
-  top: 1026px;
-  width: 100%;
-}
+
 
 .frame {
   align-items: flex-start;

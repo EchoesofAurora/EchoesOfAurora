@@ -24,23 +24,23 @@ const stories = [
 
 const StoriesTable = () => {
   return (
-    <div className="stories-table-container">
-      <div className="table-header">
-        <div className="table-header-cell">Story ID</div>
-        <div className="table-header-cell">Tribe</div>
-        <div className="table-header-cell">Timeline</div>
-        <div className="table-header-cell">Status</div>
+    <div className="stories-dashboard-table-container">
+      <div className="dashboard-table-header">
+        <div className="dashboard-table-header-cell">dashboard-Story ID</div>
+        <div className="dashboard-table-header-cell">Tribe</div>
+        <div className="dashboard-table-header-cell">Timeline</div>
+        <div className="dashboard-table-header-cell">Status</div>
       </div>
 
       
 
       {stories.map((story, index) => (
-        <div className={`story-row story-row-${story.status.toLowerCase()}`} key={index}>
-          <div className="story-id">{story.id}</div>
-          <a className="story-tribe" href={story.link} target="_blank" rel="noopener noreferrer">{story.tribe}</a>
-          <div className="story-timeline">{story.timeline}</div>
+        <div className={`dashboard-story-row dashboard-story-row-${story.status.toLowerCase()}`} key={index}>
+          <div className="dashboard-story-id">{story.id}</div>
+          <a className="dashboard-story-tribe" href={story.link} target="_blank" rel="noopener noreferrer">{story.tribe}</a>
+          <div className="dashboard-story-timeline">{story.timeline}</div>
           <a
-            className={`story-status story-status-${story.status.toLowerCase()}`}
+            className={`dashboard-story-status dashboard-story-status-${story.status.toLowerCase()}`}
             href={story.link}
             target="_blank"
             rel="noopener noreferrer"
@@ -72,7 +72,7 @@ export default StoriesTable;
 
 
 
-// // StoriesTable.js
+// // Storiesdashboard-Table.js
 // import React from "react";
 // import vector155 from "../images/vector-155.svg";
 // import "../styles/Dashboard.css";
@@ -90,14 +90,14 @@ export default StoriesTable;
 
 // ];
 
-// const StoriesTable = () => {
+// const Storiesdashboard-Table = () => {
 //   return (
 //     <div className="frame-16">
 //       <div className="frame-17">
 //         <div className="frame-18">
             
-//           {["Story ID", "Tribe", "Timeline", "Status"].map((head, index) => (
-//             <div className={`table-head-${index + 1}`} key={index}>
+//           {["dashboard-Story ID", "Tribe", "Timeline", "Status"].map((head, index) => (
+//             <div className={`dashboard-table-head-${index + 1}`} key={index}>
 //               <div className="head">{head}</div>
 //             </div>
 //           ))}
@@ -119,13 +119,13 @@ export default StoriesTable;
 
 //       <div className="text-wrapper-7">Recent stories</div>
       
-//       {stories.map((story, index) => (
+//       {stories.map((dashboard-story, index) => (
 //         <div className={`group-${index + 2}`} key={index}>
-//           <div className="head-3">{story.id}</div>
-//           <a className="head-4" href={story.link} target="_blank" rel="noopener noreferrer">{story.tribe}</a>
-//           <div className="head-5">{story.timeline}</div>
-//           <div className={`table-head-${story.status === "Editing" ? "5" : "6"}`}>
-//             <div className={`head-${story.status === "Editing" ? "6" : "7"}`}>{story.status}</div>
+//           <div className="head-3">{dashboard-story.id}</div>
+//           <a className="head-4" href={dashboard-story.link} target="_blank" rel="noopener noreferrer">{dashboard-story.tribe}</a>
+//           <div className="head-5">{dashboard-story.timeline}</div>
+//           <div className={`dashboard-table-head-${dashboard-story.status === "Editing" ? "5" : "6"}`}>
+//             <div className={`head-${dashboard-story.status === "Editing" ? "6" : "7"}`}>{dashboard-story.status}</div>
 //             </div>
 
 //         </div>
@@ -134,26 +134,26 @@ export default StoriesTable;
 //   );
 // };
 
-// export default StoriesTable;
+// export default Storiesdashboard-Table;
 
 
 
 {/* <div className="frame-16">
         <div className="frame-17">
           <div className="frame-18">
-            <div className="table-head-1">
-              <div className="head">Story ID</div>
+            <div className="dashboard-table-head-1">
+              <div className="head">dashboard-Story ID</div>
             </div>
 
-            <div className="table-head-2">
+            <div className="dashboard-table-head-2">
               <div className="head">Tribe</div>
             </div>
 
-            <div className="table-head-3">
+            <div className="dashboard-table-head-3">
               <div className="head">Timeline</div>
             </div>
 
-            <div className="table-head-4">
+            <div className="dashboard-table-head-4">
               <div className="head">Status</div>
             </div>
           </div>
@@ -189,7 +189,7 @@ export default StoriesTable;
 
           <div className="head-5">1600s</div>
 
-          <div className="table-head-5">
+          <div className="dashboard-table-head-5">
             <div className="head-6">Editing</div>
           </div>
         </div>
@@ -208,7 +208,7 @@ export default StoriesTable;
 
           <div className="head-5">1500s</div>
 
-          <div className="table-head-6">
+          <div className="dashboard-table-head-6">
             <div className="head-7">published</div>
           </div>
         </div>
@@ -227,7 +227,7 @@ export default StoriesTable;
 
           <div className="head-5">1750s</div>
 
-          <div className="table-head-6">
+          <div className="dashboard-table-head-6">
             <div className="head-7">published</div>
           </div>
         </div>
@@ -246,7 +246,7 @@ export default StoriesTable;
 
           <div className="head-5">1790s</div>
 
-          <div className="table-head-5">
+          <div className="dashboard-table-head-5">
             <div className="head-6">Editing</div>
           </div>
         </div>
@@ -265,7 +265,7 @@ export default StoriesTable;
 
           <div className="head-5">1680s</div>
 
-          <div className="table-head-6">
+          <div className="dashboard-table-head-6">
             <div className="head-7">published</div>
           </div>
         </div>
@@ -284,7 +284,7 @@ export default StoriesTable;
 
           <div className="head-5">1940s</div>
 
-          <div className="table-head-5">
+          <div className="dashboard-table-head-5">
             <div className="head-6">Editing</div>
           </div>
         </div>
@@ -303,7 +303,7 @@ export default StoriesTable;
 
           <div className="head-5">1800s</div>
 
-          <div className="table-head-6">
+          <div className="dashboard-table-head-6">
             <div className="head-8">published</div>
           </div>
         </div>
@@ -322,7 +322,7 @@ export default StoriesTable;
 
           <div className="head-5">1200s</div>
 
-          <div className="table-head-6">
+          <div className="dashboard-table-head-6">
             <div className="head-7">published</div>
           </div>
         </div>

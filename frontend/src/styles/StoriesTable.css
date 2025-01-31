@@ -1,5 +1,5 @@
-/* Container for the entire table */
-.stories-table-container {
+/* Container for the entire dashboard-table */
+.stories-dashboard-table-container {
     background-color: #f9f9f9;
     border: 1px solid #cbd2e0;
     border-radius: 10px;
@@ -11,8 +11,8 @@
     overflow: hidden;
   }
   
-  /* Header for the table */
-  .table-header {
+  /* Header for the dashboard-table */
+  .dashboard-table-header {
     display: flex;
     background-color: #f0f0f0;
     padding: 16px;
@@ -20,8 +20,8 @@
     justify-content: space-between;
   }
   
-  /* Styling for each table header cell */
-  .table-header-cell {
+  /* Styling for each dashboard-table header cell */
+  .dashboard-table-header-cell {
     font-family: "Poppins-Bold", Helvetica;
     font-size: 14px;
     font-weight: 700;
@@ -30,20 +30,20 @@
     width: 157px;
   }
   
-  /* Styling for each story row */
-  .story-row {
+  /* Styling for each dashboard-story row */
+  .dashboard-story-row {
     display: flex;
     justify-content: space-between;
     padding: 16px;
     border-top: 1px solid #cbd2e0;
   }
   
-  .story-row:hover {
+  .dashboard-story-row:hover {
     background-color: #f0f0f0;
   }
   
-  /* Styling for the Story ID */
-  .story-id {
+  /* Styling for the dashboard-Story ID */
+  .dashboard-story-id {
     font-family: "Poppins-Medium", Helvetica;
     font-size: 14px;
     color: #000000de;
@@ -52,7 +52,7 @@
   }
   
   /* Styling for the Tribe */
-  .story-tribe {
+  .dashboard-story-tribe {
     font-family: "Poppins-Medium", Helvetica;
     font-size: 14px;
     color: #000000de;
@@ -62,7 +62,7 @@
   }
   
   /* Styling for the Timeline */
-  .story-timeline {
+  .dashboard-story-timeline {
     font-family: "Inter-Regular", Helvetica;
     font-size: 15.4px;
     color: #000000;
@@ -71,7 +71,7 @@
   }
   
   /* Styling for the Status */
-  .story-status {
+  .dashboard-story-status {
     font-family: "Poppins-Medium", Helvetica;
     font-size: 14px;
     font-weight: 500;
@@ -83,12 +83,12 @@
   }
   
   /* Specific styling for Editing status */
-  .story-status-editing {
+  .dashboard-story-status-editing {
     color: #9b51e0de;
   }
   
   /* Specific styling for Published status */
-  .story-status-published {
+  .dashboard-story-status-published {
     color: #a49cbede;
   }
   

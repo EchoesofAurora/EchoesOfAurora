@@ -6,7 +6,7 @@ import category from "../images/category.svg";
 import mail from "../images/mail.svg";
 import people from "../images/people.svg";
 import settings from "../images/settings.svg";
-import vector145 from "../images/vector-145.svg";
+
 import vector148 from "../images/vector-148.svg";
 
 const sidebarItems = [
@@ -28,7 +28,7 @@ const Sidebar = () => {
   return (
     <div className="frame">
       <div className="overlap-group">
-        <img className="vector" alt="Vector" src={vector145} />
+        
 
         <img className="img" alt="Vector" src={vector148} />
       </div>
