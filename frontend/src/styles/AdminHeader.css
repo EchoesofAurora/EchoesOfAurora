@@ -78,3 +78,10 @@
   opacity: 1;
   transform: translateX(50px);
 }  
+
+.admin-header-left-flower-img,
+.admin-header-right-flower-img {
+  height: 20vh;
+  max-height: 200px;
+  min-height: 100px;
+}

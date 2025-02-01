@@ -1,6 +1,6 @@
 .img {
   height: 1027px;
-  left: 323px;
+  left: 110%;
   position: absolute;
   top: 0;
   width: 1px;
@@ -13,8 +13,6 @@
   width: 100%;
 }
 
-
-
 .frame {
   align-items: flex-start;
   display: flex;
@@ -23,7 +21,7 @@
   padding-left: 10px;
   position: absolute;
   top: 15px;
-  width: 300px;
+  width: 20%;
 }
 
 .frame-2 {
@@ -50,7 +48,7 @@
   display: flex;
   gap: 10px;
   /* height: 52px; */
-  padding: 16px 39px 16px 15px;
+  padding: 16px;
   position: relative;
   width: 100%;
 }
