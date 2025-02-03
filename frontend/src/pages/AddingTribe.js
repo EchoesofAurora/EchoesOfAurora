@@ -1,86 +1,232 @@
-import React from "react";
-import "../styles/ManageTribes.css";
+import React, { useState } from "react";
+import DatePicker from "react-datepicker";
+import "react-datepicker/dist/react-datepicker.css";
+import "../styles/AddingTribe.css";
 import Sidebar from "../components/Sidebar";
-import calendar from "../images/calendar.svg"
-import upload from "../images/Upload.svg";
 import Header from "../components/AdminHeader";
 import Footer from "../components/AdminFooter";
+import { MapContainer, TileLayer, useMapEvents } from "react-leaflet";
+import "leaflet/dist/leaflet.css";
 
 const HeroAddingTribe = () => {
+  const [startDate, setStartDate] = useState(null);
+  const [endDate, setEndDate] = useState(null);
+
   return (
     <div className="overlap">
       <Sidebar />
       <main className="rightFrame-5">
-      <section className="form-section">
-          <h1>Add Tribe</h1>
-          <p>You are adding a new tribe.</p>
-          <form className="tribe-form">
-            <div className="form-group">
-              <label htmlFor="tribeName">Tribe Name *</label>
-              <input
-                id="tribeName"
-                type="text"
-                placeholder="Tribe Name"
-                required
-              />
+        <div className="adding-tribe-frame">
+          <h1 className="adding-tribe-title">Add Tribe</h1>
+          <p className="adding-tribe-subtitle">You are adding a new tribe.</p>
+          <form className="adding-tribe-form">
+            <div className="adding-tribe-form-group">
+              <label htmlFor="tribeName" className="adding-tribe-label">
+                Tribe name *
+              </label>
+              <input type="text" id="tribeName" className="adding-tribe-input" placeholder="Tribe Name" />
             </div>
-            <div className="form-group">
-              <label htmlFor="nationName">Nation</label>
-              <input id="nationName" type="text" placeholder="Nation Name" />
+            
+            <div className="adding-tribe-form-group">
+              <div className="tribeRange">
+                <div className="year-range">
+                  <label className="adding-tribe-label">Start Year</label>
+                  <DatePicker selected={startDate} onChange={(date) => setStartDate(date)} showYearPicker dateFormat="yyyy" className="adding-tribe-input" placeholderText="Select start year" />
+                </div>
+                <div className="year-range">
+                  <label className="adding-tribe-label">End Year</label>
+                  <DatePicker selected={endDate} onChange={(date) => setEndDate(date)} showYearPicker dateFormat="yyyy" className="adding-tribe-input" placeholderText="Select end year" />
+                </div>
+              </div>
             </div>
 
-            <div className="calendar-form-group"> 
-            <div className="form-group">
-              <label htmlFor="startYear">Start Year</label>
-              <div className="input-with-icon">
-                <input
-                  id="startYear"
-                  type="text"
-                  placeholder="Select start year"
-                />
-                <img src={calendar} alt="Calendar Icon" />
-              </div>
-            </div>
-            <div className="form-group">
-              <label htmlFor="endYear">End Year</label>
-              <div className="input-with-icon">
-                <input id="endYear" type="text" placeholder="Select end year" />
-                <img src={calendar} alt="Calendar Icon" />
-              </div>
-            </div>
+            <div className="adding-tribe-form-group">
+              <label htmlFor="description" className="adding-tribe-label">Description</label>
+              <textarea id="description" className="adding-tribe-textarea" placeholder="Enter description" />
             </div>
 
-            <div className="form-group">
-              <label htmlFor="uploadImages">Upload Images</label>
-              <div>
-              <button type="button" className="upload-button">
-                Upload Images
-              </button>
-              <img src={upload} alt="upload Icon" />
-              </div>
-              <small>Support format JPG, PNG</small>
+            <div className="adding-tribe-map-section">
+              <p className="adding-tribe-map-instruction">Select tribe area in the map</p>
+              <MapContainer center={[40.736, -74.172]} zoom={5} scrollWheelZoom={true} className="adding-tribe-map">
+                <TileLayer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" />
+              </MapContainer>
             </div>
-            <button type="submit" className="submit-button">
-              Submit
-            </button>
+
+            <div className="adding-tribe-form-group">
+              <label htmlFor="uploadImages" className="adding-tribe-label">Upload images</label>
+              <button type="button" className="adding-tribe-upload-button">Upload images</button>
+              <p className="adding-tribe-upload-instruction">Support format JPG, PNG</p>
+            </div>
+
+            <button type="submit" className="adding-tribe-submit-button">Submit</button>
           </form>
-        </section>
+        </div>
       </main>
     </div>
   );
 };
 
-
 const AddingTribe = () => {
-return (
-  <div className="ManageTribes">
-    <div className="div">
-      <Header />
-      <HeroAddingTribe />
-      <Footer />
+  return (
+    <div className="ManageTribes">
+      <div className="div">
+        <Header />
+        <HeroAddingTribe />
+        <Footer />
+      </div>
     </div>
-  </div>
-);
+  );
 };
 
 export default AddingTribe;
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+// import React from "react";
+// import "../styles/AddingTribe.css";
+// import Sidebar from "../components/Sidebar";
+// import calendar from "../images/calendar.svg"
+// import upload from "../images/Upload.svg";
+// import Header from "../components/AdminHeader";
+// import Footer from "../components/AdminFooter";
+
+// const HeroAddingTribe = () => {
+//   return (
+//     <div className="overlap">
+//       <Sidebar />
+//       <main className="rightFrame-5">
+//       <div className="adding-tribe-frame">
+//       <h1 className="adding-tribe-title">Add Tribe</h1>
+//       <p className="adding-tribe-subtitle">You are adding a new tribe.</p>
+//       <form className="adding-tribe-form">
+//         {/* Tribe Name Input */}
+//         <div className="adding-tribe-form-group">
+//           <label htmlFor="tribeName" className="adding-tribe-label">
+//             Tribe name *
+//           </label>
+//           <input
+//             type="text"
+//             id="tribeName"
+//             className="adding-tribe-input"
+//             placeholder="Tribe Name"
+//           />
+//         </div>
+
+//         {/* Start Year Input */}
+//         <div className="adding-tribe-form-group">
+//           <div className="tribeRange">
+//             <div className="year-range">
+//           <label htmlFor="startYear" className="adding-tribe-label">
+//             Start Year
+//           </label>
+//           <div className="adding-tribe-input-wrapper">
+//             <input
+//               type="text"
+//               id="startYear"
+//               className="adding-tribe-input"
+//               placeholder="Select start year"
+//             />
+//             <img className="adding-tribe-icon" alt="Calendar icon" src={calendar} />
+//           </div>
+//           </div>
+//           <div className="year-range">
+//           <label htmlFor="endYear" className="adding-tribe-label">
+//             End Year
+//           </label>
+//           <div className="adding-tribe-input-wrapper">
+//             <input
+//               type="text"
+//               id="endYear"
+//               className="adding-tribe-input"
+//               placeholder="Select end year"
+//             />
+//             <img className="adding-tribe-icon" alt="Calendar icon" src={calendar} />
+//           </div>
+//           </div>
+//           </div>
+//         </div>
+
+//         {/* End Year Input */}
+//         <div className="adding-tribe-form-group">
+          
+//         </div>
+
+//         {/* Description Input */}
+//         <div className="adding-tribe-form-group">
+//           <label htmlFor="description" className="adding-tribe-label">
+//             Description
+//           </label>
+//           <textarea
+//             id="description"
+//             className="adding-tribe-textarea"
+//             placeholder="Enter description"
+//           />
+//         </div>
+
+//         {/* Map Section */}
+//         <div className="adding-tribe-map-section">
+//           <p className="adding-tribe-map-instruction">Select tribe area in the map</p>
+//           <div className="adding-tribe-map"></div>
+//         </div>
+
+//         {/* Upload Images */}
+//         <div className="adding-tribe-form-group">
+//           <label htmlFor="uploadImages" className="adding-tribe-label">
+//             Upload images
+//           </label>
+//           <button type="button" className="adding-tribe-upload-button">
+//             Upload images
+//           </button>
+//           <p className="adding-tribe-upload-instruction">Support format JPG, PNG</p>
+//         </div>
+
+//         {/* Submit Button */}
+//         <button type="submit" className="adding-tribe-submit-button">
+//           Submit
+//         </button>
+//       </form>
+//     </div>
+//       </main>
+//     </div>
+//   );
+// };
+
+
+// const AddingTribe = () => {
+// return (
+//   <div className="ManageTribes">
+//     <div className="div">
+//       <Header />
+//       <HeroAddingTribe />
+//       <Footer />
+//     </div>
+//   </div>
+// );
+// };
+
+// export default AddingTribe;
+
+
+
+
+
+
+
+
+
+
+
+
+

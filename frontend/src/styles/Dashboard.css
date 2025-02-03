@@ -9,13 +9,13 @@
  .div {
   background-color:  #ffffff;
   height: 1289px;
-  /* overflow: hidden; */
-  position: relative;
+  position: sticky;
   width: 100%;
 }
 
  .overlap {
-  height: 1028px;
+  display: flex;
+  height: 900px;
   left: 0;
   position: absolute;
   top: 177px;

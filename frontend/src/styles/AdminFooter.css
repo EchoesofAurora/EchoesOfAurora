@@ -13,22 +13,18 @@
 .Admin-Footer__vector {
   position: absolute;
   top: 0; /* Ensure it starts at the top of the Admin-footer */
-
   width: 100%;
   height: auto;
   object-fit: cover;
-  /* z-index: 10; Higher value to keep it above other elements */
 }
 
   
 .Admin-Footer__credits {
-  align-items: flex-start;
   display: inline-flex;
-  flex: 0 0 auto;
-  gap: 879px;
   position: relative;
   top: 15px;
-  /* z-index: 5; Lower than vector to stay underneath */
+  justify-content: space-around;
+  width: 100%;
 }
 
 

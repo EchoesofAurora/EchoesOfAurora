@@ -110,7 +110,7 @@ const ContactForm = () => {
           <label htmlFor="message">Your message</label>
           <textarea id="message" name="message" placeholder="Type your message here..."></textarea>
         </div>
-        <button type="submit">Send Message</button>
+        <button type="submit" className='sendMessage-submit-button'>Send Message</button>
       </form>
     </div>
   );
