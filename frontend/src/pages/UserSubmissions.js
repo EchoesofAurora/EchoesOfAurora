@@ -37,7 +37,7 @@ const HeroUserSubmissions = () => {
             <div className="overlap-group-2">
               <div className="title">85</div>
 
-              <div className="title-2">Total Location</div>
+              <div className="title-2">Total Locations</div>
             </div>
           </div>
 
@@ -49,11 +49,11 @@ const HeroUserSubmissions = () => {
             </div>
           </div>
 
-          <div className="overlap-wrapper">
+          <div className="group">
             <div className="overlap-group-2">
               <div className="title">40</div>
 
-              <div className="title-2">unread&nbsp;&nbsp;Messages</div>
+              <div className="title-2">Unread Messages</div>
             </div>
           </div>
         </div>

@@ -31,7 +31,7 @@ const MyProfile = () => {
   };
 
   return (
-    <div className="profile-overlap">
+    <div className="overlap">
       <Sidebar />
       <main className="profile-right-frame">
         <div className="left-profile-fields">

@@ -119,7 +119,7 @@
 /* Back and New Tribe Buttons */
 .manage-Tribe-header .back-btn,
 .manage-Tribe-header .new-Tribe-btn {
-  padding: 8px 16px;
+  padding: 10px 20px;
   border-radius: 4px;
   font-size: 16px;
   cursor: pointer;
@@ -148,10 +148,12 @@
   flex: 1;
 }
 
+/*
 .Tribes-table-header span:nth-child(4),
 .Tribes-table-row > *:nth-child(4) {
   flex: 1.5; 
 }
+*/
 
 .Tribes-table-row > a {
   text-decoration: none;

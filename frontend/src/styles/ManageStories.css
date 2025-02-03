@@ -36,6 +36,7 @@
 .table-header {
   background-color: #f0f0f0;
   padding: 0.5rem;
+  padding-right: 4.5rem;
   font-weight: bold;
 
 }
@@ -102,6 +103,7 @@
   cursor: pointer;
   box-shadow: 0px 4px 4px #00000040;
   width: 169px;
+  font-size: 16px;
 }
 
 .manage-header .back-btn {
