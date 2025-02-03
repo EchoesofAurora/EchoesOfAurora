@@ -15,10 +15,7 @@
 }
 
  .overlap {
-  height: 1028px;
-  left: 0;
   position: absolute;
-  top: 177px;
   width: 100%;
 }
 
@@ -28,10 +25,10 @@
   display: flex;
   flex-direction: column;
   gap: 14px;
-  left: 356px;
+  left: 25%;
   position: absolute;
   top: 26px;
-  width: 1042px;
+  width: 73%;
 }
 
  .frame-6 {
@@ -39,16 +36,14 @@
   align-self: stretch;
   display: flex;
   flex: 0 0 auto;
-  gap: 57px;
+  gap: 2.5%;
   justify-content: center;
   position: relative;
-  width: 100%;
 }
 
  .group {
-  height: 158px;
   position: relative;
-  width: 166px;
+  width: 18%;
 }
 
  .overlap-group-2 {
@@ -58,7 +53,6 @@
   border-radius: 10px;
   height: 158px;
   position: relative;
-  width: 162px;
 }
 
  .title {
@@ -66,12 +60,12 @@
   font-family: "Poppins-SemiBold", Helvetica;
   font-size: 24px;
   font-weight: 600;
-  left: 56px;
   letter-spacing: 0;
   line-height: 20px;
   position: absolute;
-  top: 58px;
-  white-space: nowrap;
+  top: 40%;
+  text-align: center;
+  width: 100%;
 }
 
  .title-2 {
@@ -79,12 +73,13 @@
   font-family: "Poppins-Medium", Helvetica;
   font-size: 16px;
   font-weight: 500;
-  left: 21px;
   letter-spacing: 0;
   line-height: 20px;
   position: absolute;
-  top: 117px;
-  white-space: nowrap;
+  top: 65%;
+  text-align: center;
+  padding: 5%;
+  width: 90%;
 }
 
  .title-3 {
@@ -93,32 +88,6 @@
   font-size: 24px;
   font-weight: 600;
   left: 52px;
-  letter-spacing: 0;
-  line-height: 20px;
-  position: absolute;
-  top: 58px;
-  white-space: nowrap;
-}
-
- .title-4 {
-  color: #000000;
-  font-family: "Poppins-Medium", Helvetica;
-  font-size: 16px;
-  font-weight: 500;
-  left: 30px;
-  letter-spacing: 0;
-  line-height: 20px;
-  position: absolute;
-  top: 117px;
-  white-space: nowrap;
-}
-
- .title-5 {
-  color: #593b00;
-  font-family: "Poppins-SemiBold", Helvetica;
-  font-size: 24px;
-  font-weight: 600;
-  left: 64px;
   letter-spacing: 0;
   line-height: 20px;
   position: absolute;
@@ -164,7 +133,7 @@
   align-self: stretch;
   display: flex;
   flex: 0 0 auto;
-  gap: 39px;
+  gap: 2%;
   justify-content: center;
   position: relative;
   width: 100%;
@@ -173,7 +142,7 @@
  .overlap-group-wrapper {
   height: 59px;
   position: relative;
-  width: 506px;
+  width: 49%;
 }
 
  .overlap-group-3 {
@@ -183,7 +152,6 @@
   border-radius: 10px;
   height: 59px;
   position: relative;
-  width: 500px;
 }
 
  .title-8 {
@@ -192,12 +160,11 @@
   font-size: 24px;
   font-weight: 600;
   height: 20px;
-  left: 292px;
+  left: 60%;
   letter-spacing: 0;
   line-height: 20px;
   position: absolute;
   top: 20px;
-  width: 70px;
 }
 
  .title-9 {
@@ -219,48 +186,19 @@
   font-family: "Poppins-Medium", Helvetica;
   font-size: 16px;
   font-weight: 500;
-  left: 412px;
+  left: 85%;
   letter-spacing: 0;
   line-height: 20px;
   position: absolute;
   text-decoration: underline;
   top: 18px;
-  width: 58px;
 }
 
  .div-wrapper {
   height: 59px;
   margin-right: -4.50px;
   position: relative;
-  width: 506px;
-}
-
- .title-11 {
-  color: #593b00;
-  font-family: "Poppins-SemiBold", Helvetica;
-  font-size: 24px;
-  font-weight: 600;
-  height: 20px;
-  left: 324px;
-  letter-spacing: 0;
-  line-height: 20px;
-  position: absolute;
-  top: 20px;
-  width: 44px;
-}
-
- .title-12 {
-  color: #000000;
-  font-family: "Poppins-Medium", Helvetica;
-  font-size: 16px;
-  font-weight: 500;
-  left: 30px;
-  letter-spacing: 0;
-  line-height: 20px;
-  position: absolute;
-  top: 20px;
-  white-space: nowrap;
-  width: 251px;
+  width: 49%;
 }
 
 .section-thank-you {
@@ -269,10 +207,10 @@
   border-color: #cbd2e0;
   border-radius: 10px;
   height: 613px;
-  left: 356px;
+  left: 25%;
   position: absolute;
   top: 275px;
-  width: 338px;
+  width: 25%;
 }
 
 
