@@ -119,7 +119,7 @@ const MapSection = () => (
 );
 
 const HomePage = () => (
-  <div>
+  <div className="user-frontend">
     <Header />
     <HeroSection />
     <AboutSection />

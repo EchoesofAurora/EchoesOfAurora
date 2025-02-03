@@ -10,7 +10,7 @@ const Header = () => (
   <header className="Aheader">
     <div className="left-Flowers">
         
-        <img src={leftFlower} alt="NavLeftFlower" className="NavLeftFlowerImg" />
+        <img src={leftFlower} alt="NavLeftFlower" className="admin-header-left-flower-img" />
     </div>
     <div className="container">
       <div className="logo">
@@ -20,7 +20,7 @@ const Header = () => (
 
     </div>
     <div className="right-Flowers">
-        <img src={rightFlower} alt="NavRightFlower" className="NavRightFlowerImg" />
+        <img src={rightFlower} alt="NavRightFlower" className="admin-header-right-flower-img" />
         
     </div>
   </header>
