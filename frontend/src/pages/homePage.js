@@ -36,8 +36,8 @@ const HeroSection = () => {
         background: `url(${images[currentImageIndex]}) no-repeat center center/cover`,
       }}
     >
-      <h1 className="hero-title">Explore the Mystical World of Aurora Borealis</h1>
-      <p className="hero-text">
+      <h1 className="user-hero-title">Explore the Mystical World of Aurora Borealis</h1>
+      <p className="user-hero-subtext">
         Welcome to the Indigenous Stories and Space Weather Platform, where we merge North American indigenous storytelling about the aurora borealis with historical space weather data.
       </p>
       <button className="button">Learn More</button>

@@ -97,8 +97,8 @@ const About = () => {
       <div className="About-stories-page-container">
           <Header/>
         <div className="About-hero-section">
-          <h1 className="About-top-heading">About Our Platform</h1>
-          <h1 className="About-hero-title">
+          <h1 className="user-hero-title">About Our Platform</h1>
+          <h1 className="user-hero-subtext">
             "Bridging Indigenous Knowledge and Scientific Exploration to Educate and Inspire."
           </h1>
           <button className="About-explore-button">See More</button>

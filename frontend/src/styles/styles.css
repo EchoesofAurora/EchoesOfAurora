@@ -1,6 +1,3 @@
-
-
-
 .user-frontend {
     background: url('../images/general/background.png') repeat-y, rgba(250, 181, 246, 0.7);
     background-size: 100% auto; 
@@ -42,7 +39,7 @@
     z-index: 1; /* Ensure the overlay is behind the content */
   }
 
-.hero-title {
+.user-hero-title {
     font-size: 3.5rem; /* Adjust size to match */
     font-weight: 1000; /* Extra bold text */
     font-style: italic; /* Adds italic style */
@@ -57,7 +54,7 @@
     margin-bottom: 20px;
   }
 
-.hero p {
+.user-hero-subtext {
     font-size: 1rem;
     margin-bottom: 30px;
     padding: 0 20%;

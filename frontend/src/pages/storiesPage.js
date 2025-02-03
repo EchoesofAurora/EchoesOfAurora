@@ -48,13 +48,13 @@ function StoriesPage() {
   };
 
   return (
-    <div className="stories-page">
+    <div className="user-frontend stories-page">
       <Header />
       <div className="hero hero-section stories-hero">
-        <h1 className="hero-title">
+        <h1 className="user-hero-title">
           Aurora Stories
         </h1>
-        <p>
+        <p className="user-hero-subtext">
           Explore a collection of ancient stories that reveal the celestial
           connections of indigenous cultures to the northern lights.
         </p>

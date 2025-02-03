@@ -42,8 +42,8 @@ function TribesSection() {
     <div className="tribes-section">
       <Header />
       <div className="hero hero-section tribe-hero">
-        <h1 className='hero-title'>Indigenous Tribes</h1>
-        <p>
+        <h1 className='user-hero-title'>Indigenous Tribes</h1>
+        <p className="user-hero-subtext">
           “Discover the stories and heritage of indigenous tribes connected to
           the aurora borealis.”
         </p>
