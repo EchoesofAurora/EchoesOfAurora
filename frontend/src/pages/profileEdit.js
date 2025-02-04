@@ -115,7 +115,7 @@ const MyProfile = () => {
 const EditProfile = () => {
   return (
     <div className="EditProfile-container">
-      <div className="EditProfile-wrapper">
+      <div className="div">
         <Header />
         <MyProfile />
         <Footer />

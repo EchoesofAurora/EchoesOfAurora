@@ -17,7 +17,6 @@ import Dashboard from './pages/Dashboard';
 import ManageStories from './pages/ManageStories';
 import ManageTribes from './pages/ManageTribes';
 import UserSubmissions from './pages/UserSubmissions';
-import Settings from './pages/Settings';
 import AddingTribe from './pages/AddingTribe';
 import EditProfile from './pages/profileEdit';
  
@@ -43,7 +42,6 @@ const App = () => {
                 <Route path="/Admin/ManageStories" element={<ManageStories />} />
                 <Route path="/Admin/ManageTribes" element={<ManageTribes />} />
                 <Route path="/Admin/UserSubmissions" element={<UserSubmissions />} />
-                <Route path="/Admin/Settings" element={<Settings />} />
                 <Route path='/ManageTribe/AddingTribe' element={<AddingTribe/>}/> 
                 <Route path="/Admin/EditProfile" element={<EditProfile />} />
                 
