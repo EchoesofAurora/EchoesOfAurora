@@ -209,6 +209,30 @@
   margin: 100px auto auto auto;
   text-decoration: none;
 }
+
+.signIn-button-link {
+  background-color: #A49CBE; /* Button color */
+  display: block;
+  text-align: center;
+  padding: 10px 20px;
+  border-radius: 4px;
+  text-decoration: none;
+  color: white; /* Text color */
+  width: 100%; /* Ensures the link covers the button area */
+  cursor: pointer;
+}
+
+.button-style {
+  width: 100%;
+  background: transparent;
+  border: none;
+  color: inherit; /* Inherits color from the Link */
+  padding: inherit; /* Inherits padding from the Link */
+  height: 100%; /* Ensure it covers the whole Link area */
+  cursor: pointer;
+}
+
+
 .reset-link-button {
   margin-top: 20px;
   padding: 8px 22px;
