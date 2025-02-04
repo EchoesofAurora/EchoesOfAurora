@@ -27,33 +27,33 @@ const HeroUserSubmissions = () => {
 
           <div className="group">
             <div className="overlap-group-2">
-              <div className="title-3">1400</div>
+              <div className="title">1400</div>
 
-              <div className="title-4">Total Stories</div>
+              <div className="title-2">Total Stories</div>
             </div>
           </div>
 
           <div className="group">
             <div className="overlap-group-2">
-              <div className="title-5">85</div>
+              <div className="title">85</div>
 
-              <div className="title-2">Total Location</div>
+              <div className="title-2">Total Locations</div>
             </div>
           </div>
 
           <div className="group">
             <div className="overlap-group-2">
-              <div className="title-6">60</div>
+              <div className="title">60</div>
 
               <div className="title-2">Total Messages</div>
             </div>
           </div>
 
-          <div className="overlap-wrapper">
+          <div className="group">
             <div className="overlap-group-2">
-              <div className="title-5">40</div>
+              <div className="title">40</div>
 
-              <div className="title-7">unread&nbsp;&nbsp;Messages</div>
+              <div className="title-2">Unread Messages</div>
             </div>
           </div>
         </div>
@@ -71,9 +71,9 @@ const HeroUserSubmissions = () => {
 
           <div className="div-wrapper">
             <div className="overlap-group-3">
-              <div className="title-11">20</div>
+              <div className="title-8">20</div>
 
-              <div className="title-12">Published Stories</div>
+              <div className="title-9">Published Stories</div>
 
               <div className="title-10">View</div>
             </div>

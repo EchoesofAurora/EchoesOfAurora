@@ -26,7 +26,7 @@ const StoriesTable = () => {
   return (
     <div className="stories-dashboard-table-container">
       <div className="dashboard-table-header">
-        <div className="dashboard-table-header-cell">dashboard-Story ID</div>
+        <div className="dashboard-table-header-cell">Story ID</div>
         <div className="dashboard-table-header-cell">Tribe</div>
         <div className="dashboard-table-header-cell">Timeline</div>
         <div className="dashboard-table-header-cell">Status</div>

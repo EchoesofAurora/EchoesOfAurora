@@ -30,9 +30,9 @@ const Statistics = () => {
 
           <div className="div-wrapper">
             <div className="overlap-group-3">
-              <div className="title-11">20</div>
+              <div className="title-8">20</div>
 
-              <div className="title-12">Published Stories</div>
+              <div className="title-9">Published Stories</div>
 
               <div className="title-10">View</div>
             </div>
