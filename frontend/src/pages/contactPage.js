@@ -15,6 +15,7 @@ function ContactPage() {
       <div className="hero hero-section contact-hero">
         <h1 className='user-hero-title'>Contact us</h1>
         <p className="user-hero-subtext">Have questions, feedback, or stories to share?</p>
+
       </div>
       <div className="contactus-page-body-section">
         <div className="contact-details">
