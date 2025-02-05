@@ -62,7 +62,7 @@
   
   .adding-tribe-textarea {
     resize: none;
-    height: 100px;
+    height: 300px;
   }
   
   .adding-tribe-input-wrapper {
@@ -95,6 +95,30 @@
     font-size: 16px;
     color: #b2b2b2;
     margin-bottom: 10px;
+  }
+
+  .adding-tribe-map-button {
+    background-color: #a49cbe;
+    color: #fff;
+    border: none;
+    border-radius: 4px;
+    padding: 10px 20px;
+    margin-right: 20px;
+    margin-bottom: 15px;
+    cursor: pointer;
+    align-self: flex-start;
+  }
+
+  .adding-tribe-map-reset-button {
+    background-color: #f94449;
+    color: #fff;
+    border: none;
+    border-radius: 4px;
+    padding: 10px 20px;
+    margin-right: 20px;
+    margin-bottom: 15px;
+    cursor: pointer;
+    align-self: flex-start;
   }
   
   .adding-tribe-upload-button {

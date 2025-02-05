@@ -5,12 +5,50 @@ import "../styles/AddingTribe.css";
 import Sidebar from "../components/Sidebar";
 import Header from "../components/AdminHeader";
 import Footer from "../components/AdminFooter";
-import { MapContainer, TileLayer, useMapEvents } from "react-leaflet";
+import { MapContainer, TileLayer, Polygon, Polyline, Circle, useMapEvents } from "react-leaflet";
 import "leaflet/dist/leaflet.css";
+
+const MapWithDrawing = ({ isDrawingEnabled, onShapeUpdate, drawnShape, tempMarkers, setTempMarkers }) => {
+  useMapEvents({
+    click: (e) => {
+      if (!isDrawingEnabled) return;
+      const { lat, lng } = e.latlng;
+      setTempMarkers([...tempMarkers, [lat, lng]]);
+      onShapeUpdate([...drawnShape, [lat, lng]]);
+    },
+  });
+
+  return (
+    <>
+      {isDrawingEnabled && drawnShape.length > 1 && (
+        <Polyline positions={drawnShape} color="blue" />
+      )}
+      {!isDrawingEnabled && drawnShape.length > 2 && (
+        <Polygon positions={[...drawnShape, drawnShape[0]]} color="blue" fillColor="blue" fillOpacity={0.4} />
+      )}
+      {tempMarkers.map((pos, idx) => (
+        <Circle key={idx} center={pos} radius={5000} color="blue" fillColor="blue" fillOpacity={0.6} />
+      ))}
+    </>
+  );
+};
 
 const HeroAddingTribe = () => {
   const [startDate, setStartDate] = useState(null);
   const [endDate, setEndDate] = useState(null);
+  const [isDrawingEnabled, setIsDrawingEnabled] = useState(false);
+  const [drawnShape, setDrawnShape] = useState([]);
+  const [tempMarkers, setTempMarkers] = useState([]);
+
+  const toggleDrawing = () => {
+    if (!isDrawingEnabled) {
+      setDrawnShape([]);
+      setTempMarkers([]);
+    } else {
+      setDrawnShape((prevShape) => (prevShape.length > 2 ? [...prevShape, prevShape[0]] : prevShape));
+    }
+    setIsDrawingEnabled(!isDrawingEnabled);
+  };
 
   return (
     <div className="overlap">
@@ -47,9 +85,21 @@ const HeroAddingTribe = () => {
 
             <div className="adding-tribe-map-section">
               <p className="adding-tribe-map-instruction">Select tribe area in the map</p>
+              <div className="adding-tribe-map-button-container">
+                <button
+                  type="button"
+                  className="adding-tribe-map-button"
+                  onClick={toggleDrawing}
+                  style={{ backgroundColor: isDrawingEnabled ? "red" : "" }}
+                >
+                  {isDrawingEnabled ? "Disable Drawing" : "Enable Drawing"}
+                </button>
+              </div>
               <MapContainer center={[40.736, -74.172]} zoom={5} scrollWheelZoom={true} className="adding-tribe-map">
                 <TileLayer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" />
+                <MapWithDrawing isDrawingEnabled={isDrawingEnabled} onShapeUpdate={setDrawnShape} drawnShape={drawnShape} tempMarkers={tempMarkers} setTempMarkers={setTempMarkers} />
               </MapContainer>
+              <p>Drawn Shape Coordinates: {JSON.stringify(drawnShape)}</p>
             </div>
 
             <div className="adding-tribe-form-group">
@@ -79,6 +129,8 @@ const AddingTribe = () => {
 };
 
 export default AddingTribe;
+
+
 
 
 
