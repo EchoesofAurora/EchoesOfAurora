@@ -1,6 +1,6 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-import '../styles/AHeader.css'; 
+import '../styles/AdminHeader.css'; 
 import logo from '../images/logo.png';
 import leftFlower from '../images/left-flower.png'
 import rightFlower from '../images/right-flower.png'

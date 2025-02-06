@@ -1,3 +1,5 @@
+/*footer styling After loging In */
+
 .Admin-Footer {
   align-items: center;
   display: flex;
@@ -67,6 +69,94 @@
   text-decoration: underline;
   white-space: nowrap;
   width: fit-content;
+}
+
+
+
+/*footer styling before loging in*/
+
+.Afooter {
+  background-color: #1e1e1e;
+  width: 100%;
+  padding: 50px 0;
+  color: #fff;
+  font-family: 'Poppins', sans-serif;
+}
+
+.Afooter-content {
+  display: flex;
+  justify-content: space-around;
+  align-items: flex-start;
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 60px;
+  gap: 130px;
+}
+
+.AfooterLogo img {
+  object-fit: contain;
+  margin: 20px 0;
+}
+
+.Afooter-section {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+}
+
+.section-title {
+  font-size: 20px;
+  font-weight: 600;
+  line-height: 30px;
+  margin-bottom: 16px;
+}
+
+.social-icons {
+  display: flex;
+  gap: 16px;
+}
+
+.social-icons img {
+  cursor: pointer;
+}
+
+.Afooter-links {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  font-size: 15px;
+  font-weight: 400;
+  /* line-height: 22.5px; */
+}
+
+/* .Afooter-links li {
+  margin-bottom: 10px;
+  cursor: pointer;
+} */
+
+.contact-info {
+  font-size: 15px;
+  font-weight: 400;
+  line-height: 22.5px;
+}
+
+.contact-info p {
+  margin: 0 0 10px;
+}
+
+.copyright {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  font-size: 15px;
+  font-weight: 400;
+  line-height: 22.5px;
+  margin-top: 20px;
+}
+
+.copyright img {
+  object-fit: contain;
 }
 
 
