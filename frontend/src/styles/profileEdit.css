@@ -1,0 +1,207 @@
+.EditProfile-container {
+  background-color: #000000;
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  width: 100%;
+}
+
+.EditProfile-wrapper {
+  background-color: #ffffff;
+  height: 1289px;
+  overflow: hidden;
+  position: relative;
+  width: 100vw;
+}
+
+.profile-right-frame {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  left: 25%;
+  position: absolute;
+  top: 26px;
+  width: 73%;
+}
+
+.left-profile-fields {
+width: 100%;
+}
+
+.text-note{
+  align-content: center;
+  padding: 10px;
+  color: red;
+  text-align: justify
+}
+
+.profile-card-container {
+  display: flex;
+  align-items: center;
+  gap: 30px;
+}
+
+.profile-image {
+  width: 155px; 
+  height: 155px; 
+  border-radius: 50%;
+  object-fit: cover;
+}
+
+.profile-info {
+  display: flex;
+  flex-direction: column;
+  gap: 17px;
+  width: 245px;
+}
+
+.profile-details {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+
+.profile-name {
+  font-family: "Poppins-Bold", Helvetica, sans-serif; 
+  font-size: 20px;
+  font-weight: 700; 
+  color: #313638; 
+  margin: 0;
+}
+
+.profile-email,
+.profile-phone {
+  font-family: "Poppins-Medium", Helvetica, sans-serif; 
+  font-size: 16px; 
+  font-weight: 500; 
+  color: #313638;
+  margin: 0;
+}
+
+.profile-edit-button{
+  display: flex;
+  align-items: center; 
+  justify-content: center; 
+  background-color: #a49cbe;
+  color: white;
+  border: none; 
+  border-radius: 4px; 
+  padding: 8px 22px; 
+  cursor: pointer;
+  box-shadow: var(--elevation-4);
+  transition: background-color 0.3s ease;
+}
+
+.profile-edit-button:hover {
+  background-color: #928bb0;
+}
+
+.profile-button-content { 
+  display: flex; 
+  align-items: center;
+  gap: 8px;
+}
+
+.profile-edit-icon { 
+  width: 24px; 
+  height: 24px;
+}
+
+.profile-button-text {
+  font-family: "Poppins-Regular", Helvetica, sans-serif;
+  font-size: 16px; 
+  font-weight: 400; 
+  color: #ffffff;
+}
+
+
+
+.profile-container {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  padding-top: 30px;
+  box-sizing: border-box;
+}
+
+.label {
+  font-family: 'Nunito, sans-serif';
+  font-weight: 600;
+  font-size: 18px;
+  line-height: 16px;
+  color: #E5E5E5;
+}
+
+.input-wrapper {
+  margin-top: 4px;
+  display: flex;
+  border-bottom: 1px solid #E5E5E5;
+  padding: 12px 0px;
+  gap: 10px;
+  border-radius: 4px;
+}
+
+.input {
+  width: 100%;
+  font-family: 'Texturina, serif';
+  font-weight: 400;
+  font-size: 16px;
+  line-height: 24px;
+  color: #787878;
+  border: none;
+  outline: none;
+  background: transparent;
+}
+
+
+.signIn-button,
+.reset-link-button {
+  width: 100%;
+  padding: 8px 22px;
+  background: #A49CBE;
+  border-radius: 4px;
+  border: none;
+  cursor: pointer;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin: 100px auto auto auto;
+  text-decoration: none;
+}
+.reset-link-button {
+  margin-top: 20px;
+  padding: 8px 22px;
+  
+}
+
+
+.button-text {
+  font-family: 'Texturina, serif';
+  font-weight: 400;
+  font-size: 16px;
+  line-height: 150%;
+  color: #FFFFFF;
+  text-decoration: none;
+}
+
+.login-button {
+  width: 447px;
+  height: 39px;
+  background: #A49CBE;
+  border: none;
+  border-radius: 4px;
+  padding: 8px 22px;
+  cursor: pointer;
+  font-family: 'Texturina', serif;
+  font-size: 16px;
+  font-weight: 400;
+  color: #FFFFFF;
+  line-height: 150%;
+  text-align: center;
+}
+
+.login-button:hover {
+  opacity: 0.9;
+}
+

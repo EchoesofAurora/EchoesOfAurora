@@ -76,6 +76,6 @@ router.delete('/:tribeId', async (req, res) => {
   }
 });
 
-// new implementations in tribes after this
+
 
 module.exports = router;

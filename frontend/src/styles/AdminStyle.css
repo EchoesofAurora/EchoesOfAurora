@@ -1,0 +1,332 @@
+/* * {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+} */
+
+
+.hero-container {
+  position: relative; /* Set up a containing block for positioning */
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 211px 53px;
+  min-height: 647px;
+  width: 100%;
+  max-width: 754px;
+  gap: 64px;
+  text-align: center;
+  overflow: hidden; /* Ensure no content spills out */
+}
+
+.hero-container::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-image: url('../images/img\ 9.png'); /* Replace with your image path */
+  background-size: cover;
+  background-position: center;
+  z-index: -2; /* Place it at the bottom layer */
+}
+
+.hero-container::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.4); /* Black overlay with opacity */
+  z-index: -1; /* Layer above the background image but below content */
+}
+
+
+
+.hero-logo {
+  width: 399px;
+  height: 390px;
+}
+
+.hero-title {
+  font-family: 'Texturina, serif';
+  font-size: 64px;
+  font-weight: 700;
+  line-height: 120%;
+  color: #FFFFFF;
+  text-align: center;
+  margin: 0;
+  position: relative; /* Ensure content is layered above the background */
+  z-index: -1; /* Explicitly place it above the background pseudo-element */
+  text-align: center; /* Center align text */
+}
+
+.hero-description {
+  font-family: 'Texturina, serif';
+  font-size: 18px;
+  font-weight: 400;
+  line-height: 150%;
+  color: #FFFFFF;
+  text-align: center;
+  max-width: 569px;
+  margin: 0;
+  position: relative; /* Ensure content is layered above the background */
+  z-index: -1; /* Explicitly place it above the background pseudo-element */
+  text-align: center; /* Center align text */
+}
+
+/* .login-container-text{
+  margin-top: -250px;
+} */
+
+.login-container {
+  width: 600px;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  /* padding: 20px; */
+  box-sizing: border-box;
+}
+
+.Login-title {
+  font-family: 'Merriweather, serif';
+  font-weight: bold;
+  width: 100%;
+  font-size: 52px;
+  font-weight: 700;
+  line-height: 120%;
+  color: #000000;
+  margin: 20px auto;
+}
+
+.Login-description {
+  font-family: 'Texturina';
+  font-size: 18px;
+  font-weight: 400;
+  line-height: 100%;
+  color: #929AAA;
+  min-width: 569px;
+  width: 100%;
+  margin: 0;
+  padding-bottom: 200px;
+  
+}
+
+.input-container {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  width: 100%;
+}
+
+.label {
+  font-family: 'Nunito, sans-serif';
+  font-weight: 600;
+  font-size: 18px;
+  line-height: 16px;
+  color: #E5E5E5;
+}
+
+.input-wrapper {
+  margin-top: 4px;
+  display: flex;
+  border-bottom: 1px solid #E5E5E5;
+  padding: 12px 0px;
+  gap: 10px;
+  border-radius: 4px;
+}
+
+.input {
+  width: 100%;
+  font-family: 'Texturina, serif';
+  font-weight: 400;
+  font-size: 16px;
+  line-height: 24px;
+  color: #787878;
+  border: none;
+  outline: none;
+  background: transparent;
+}
+
+.password-label {
+  font-family: 'Nunito, sans-serif';
+  font-weight: 600;
+  font-size: 16px;
+  line-height: 16px;
+  color: #CDCDCD;
+}
+
+.password-wrapper {
+  margin-top: 4px;
+  display: flex;
+  gap: 10px;
+  border-bottom: 1px solid #E5E5E5;
+  padding: 12px 0px;
+  border-radius: 4px;
+}
+
+.password-input {
+  width: 100%;
+  font-family: 'Nunito, sans-serif';
+  font-weight: 400;
+  font-size: 16px;
+  line-height: 24px;
+  color: #959595;
+  border: none;
+  outline: none;
+  background: transparent;
+}
+
+.forgot-password {
+  text-align: right;
+  margin-top: 8px;
+  font-size: 14px;
+  color: #000000;
+  text-decoration: none;
+}
+
+.Password-reset-note{
+  font-size: 12px;
+  color: #706969;
+  font-family: 'Nunito';
+  padding-top: 0px
+}
+
+.signIn-button,
+.reset-link-button {
+  width: 100%;
+  padding: 8px 22px;
+  background: #A49CBE;
+  border-radius: 4px;
+  border: none;
+  cursor: pointer;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin: 100px auto auto auto;
+  text-decoration: none;
+}
+
+.signIn-button-link {
+  background-color: #A49CBE; /* Button color */
+  display: block;
+  text-align: center;
+  padding: 10px 20px;
+  border-radius: 4px;
+  text-decoration: none;
+  color: white; /* Text color */
+  width: 100%; /* Ensures the link covers the button area */
+  cursor: pointer;
+}
+
+.button-style {
+  width: 100%;
+  background: transparent;
+  border: none;
+  color: inherit; /* Inherits color from the Link */
+  padding: inherit; /* Inherits padding from the Link */
+  height: 100%; /* Ensure it covers the whole Link area */
+  cursor: pointer;
+}
+
+
+.reset-link-button {
+  margin-top: 20px;
+  padding: 8px 22px;
+  
+}
+
+
+.button-text {
+  font-family: 'Texturina, serif';
+  font-weight: 400;
+  font-size: 16px;
+  line-height: 150%;
+  color: #FFFFFF;
+  text-decoration: none;
+}
+
+.sign-up-text {
+  font-family: 'Roboto, sans-serif';
+  font-weight: 400;
+  font-size: 20.77px;
+  line-height: 24.34px;
+  color: #000000;
+  text-align: center;
+  margin-top: 30px;
+}
+
+.sign-up-link {
+  text-decoration: none;
+  font-weight: bold;
+  color: #000000;
+}
+
+.sign-in-wrapper {
+  display: flex;
+  /* justify-content: center; */
+  align-items: center;
+  gap: 100px;
+}
+
+
+.password-changed-container {
+  width: 686px;
+  height: 1075px;
+  background: #FFFFFF;
+  display: flex;
+  flex-direction: column;
+  /* align-items: center; */
+  justify-content: center;
+  padding: 0 85px;
+  box-sizing: border-box;
+}
+
+.check-icon {
+  margin-bottom: 46px;
+}
+
+.content {
+  /* text-align: center; */
+  margin-bottom: 200px;
+}
+
+.title {
+  font-family: 'Texturina', serif;
+  font-size: 51.92px;
+  font-weight: 700;
+  color: #313638;
+  margin-bottom: 20px;
+}
+
+.description {
+  font-family: 'Texturina', serif;
+  font-size: 25.96px;
+  font-weight: 400;
+  color: #929AAA;
+  line-height: 1.5;
+}
+
+.login-button {
+  width: 447px;
+  height: 39px;
+  background: #A49CBE;
+  border: none;
+  border-radius: 4px;
+  padding: 8px 22px;
+  cursor: pointer;
+  font-family: 'Texturina', serif;
+  font-size: 16px;
+  font-weight: 400;
+  color: #FFFFFF;
+  line-height: 150%;
+  text-align: center;
+}
+
+.login-button:hover {
+  opacity: 0.9;
+}
+

@@ -1,0 +1,215 @@
+.adding-tribe-frame * {
+    box-sizing: border-box;
+  }
+  
+  .adding-tribe-frame {
+    max-width: 100%;
+
+    padding: 20px;
+    font-family: "Poppins", sans-serif;
+  }
+  
+  .adding-tribe-title {
+    font-size: 24px;
+    font-weight: 600;
+    color: #313638;
+    margin-bottom: 10px;
+  }
+  
+  .adding-tribe-subtitle {
+    font-size: 14px;
+    color: #b2b2b2;
+    margin-bottom: 20px;
+  }
+  
+  .adding-tribe-form {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+  }
+  
+  .adding-tribe-form-group {
+    display: flex;
+    flex-direction: column;
+  }
+  .tribeRange{
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+  }
+  .year-range{
+    display: flex;
+    flex-direction: column;
+    width: 50%;
+  }
+  .adding-tribe-label {
+    font-size: 12px;
+    color: rgba(0, 0, 0, 0.6);
+    margin-bottom: 5px;
+  }
+  
+  .adding-tribe-input,
+  .adding-tribe-textarea {
+    width: 100%;
+    border: 1px solid rgba(0, 0, 0, 0.23);
+    border-radius: 4px;
+    padding: 10px;
+    font-size: 16px;
+    color: #313638;
+  }
+  
+  .adding-tribe-textarea {
+    resize: none;
+    height: 300px;
+  }
+  
+  .adding-tribe-input-wrapper {
+    position: relative;
+  }
+  
+  .adding-tribe-input-wrapper .adding-tribe-icon {
+    position: absolute;
+    right: 10px;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 20px;
+    height: 20px;
+  }
+  
+  .adding-tribe-map-section {
+    margin-top: 20px;
+  }
+  
+  .adding-tribe-map {
+    width: 100%;
+    height: 300px;
+    /* background: url("./map-maker-montclair-new-jersey-united-states.png") no-repeat center center; */
+    background-size: cover;
+    border: 1px solid #b2b2b2;
+    border-radius: 8px;
+  }
+  
+  .adding-tribe-map-instruction {
+    font-size: 16px;
+    color: #b2b2b2;
+    margin-bottom: 10px;
+  }
+
+  .adding-tribe-map-button {
+    background-color: #a49cbe;
+    color: #fff;
+    border: none;
+    border-radius: 4px;
+    padding: 10px 20px;
+    margin-right: 20px;
+    margin-bottom: 15px;
+    cursor: pointer;
+    align-self: flex-start;
+  }
+
+  .adding-tribe-map-reset-button {
+    background-color: #f94449;
+    color: #fff;
+    border: none;
+    border-radius: 4px;
+    padding: 10px 20px;
+    margin-right: 20px;
+    margin-bottom: 15px;
+    cursor: pointer;
+    align-self: flex-start;
+  }
+  
+  .adding-tribe-upload-button {
+    background-color: #a49cbe;
+    color: #fff;
+    border: none;
+    border-radius: 4px;
+    padding: 10px 20px;
+    cursor: pointer;
+    align-self: flex-start;
+  }
+  
+  .adding-tribe-upload-instruction {
+    font-size: 9px;
+    color: #313638;
+    margin-top: 5px;
+  }
+  
+  .adding-tribe-submit-button {
+    background-color: #a49cbe;
+    color: #fff;
+    border: none;
+    border-radius: 4px;
+    padding: 10px 20px;
+    font-size: 16px;
+    cursor: pointer;
+
+}
+/* Tribe Color Picker */
+.adding-tribe-color-picker {
+width: 100px;
+height: 40px;
+border: none;
+cursor: pointer;
+border-radius: 5px;
+margin-top: 5px;
+}
+
+.color-code-display {
+margin-left: 10px;
+font-size: 14px;
+color: #333;
+font-weight: bold;
+}
+/* Reference Field */
+.adding-tribe-input {
+  width: 50%;
+  border: 1px solid rgba(0, 0, 0, 0.23);
+  border-radius: 4px;
+  padding: 10px;
+  font-size: 16px;
+  color: #313638;
+}
+
+.adding-tribe-input::placeholder {
+  color: #b2b2b2;
+}
+/* Button Container to Align Buttons in Center */
+.adding-tribe-button-group {
+  display: flex;
+  justify-content: center; /* Centers the buttons */
+  gap: 20px; /* Creates spacing between buttons */
+  margin-top: 40px;
+  padding-bottom: 50px;
+}
+
+/* Save Button */
+.adding-tribe-save-button {
+  background-color: #b0a4c4;
+  color: white;
+  border: none;
+  padding: 12px 24px;
+  border-radius: 5px;
+  cursor: pointer;
+  font-size: 16px;
+  font-weight: bold;
+  
+}
+
+/* Save & Publish Button */
+.adding-tribe-publish-button {
+  background-color: #7b6d96;
+  color: white;
+  border: none;
+  padding: 12px 24px;
+  border-radius: 5px;
+  cursor: pointer;
+  font-size: 16px;
+  font-weight: bold;
+}
+
+/* Hover Effect */
+.adding-tribe-save-button:hover,
+.adding-tribe-publish-button:hover {
+  opacity: 0.9;
+}

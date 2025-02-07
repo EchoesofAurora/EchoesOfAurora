@@ -1,0 +1,124 @@
+.edit-tribe-frame * {
+    box-sizing: border-box;
+  }
+  
+  .edit-tribe-frame {
+    max-width: 100%;
+    padding: 20px;
+    font-family: "Poppins", sans-serif;
+  }
+  
+  .edit-tribe-title {
+    font-size: 24px;
+    font-weight: 600;
+    color: #313638;
+    margin-bottom: 10px;
+  }
+  
+  .edit-tribe-subtitle {
+    font-size: 14px;
+    color: #b2b2b2;
+    margin-bottom: 20px;
+  }
+  
+  .edit-tribe-form {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+  }
+  
+  .edit-tribe-form-group {
+    display: flex;
+    flex-direction: column;
+  }
+  
+  .tribeRange {
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+  }
+  
+  .year-range {
+    display: flex;
+    flex-direction: column;
+    width: 50%;
+  }
+  
+  .edit-tribe-label {
+    font-size: 12px;
+    color: rgba(0, 0, 0, 0.6);
+    margin-bottom: 5px;
+  }
+  
+  .edit-tribe-input,
+  .edit-tribe-textarea {
+    width: 100%;
+    border: 1px solid rgba(0, 0, 0, 0.23);
+    border-radius: 4px;
+    padding: 10px;
+    font-size: 16px;
+    color: #313638;
+  }
+  
+  .edit-tribe-textarea {
+    resize: none;
+    height: 100px;
+  }
+  
+  .edit-tribe-map {
+    width: 100%;
+    height: 300px;
+    background-size: cover;
+    border: 1px solid #b2b2b2;
+    border-radius: 8px;
+  }
+  
+  .edit-tribe-button-group {
+    display: flex;
+    justify-content: center;
+    gap: 20px;
+    margin-top: 40px;
+    padding-bottom: 50px;
+  }
+  
+  .edit-tribe-save-button {
+    background-color: #b0a4c4;
+    color: white;
+    border: none;
+    padding: 12px 24px;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 16px;
+    font-weight: bold;
+  }
+  
+  .edit-tribe-publish-button {
+    background-color: #7b6d96;
+    color: white;
+    border: none;
+    padding: 12px 24px;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 16px;
+    font-weight: bold;
+  }
+  
+  .edit-tribe-save-button:hover,
+  .edit-tribe-publish-button:hover {
+    opacity: 0.9;
+  }
+  .edit-tribe-upload-button {
+    background-color: #a49cbe;
+    color: #fff;
+    border: none;
+    border-radius: 4px;
+    padding: 10px 20px;
+    cursor: pointer;
+    align-self: flex-start;
+  }
+  
+  .edit-tribe-upload-instruction {
+    font-size: 9px;
+    color: #313638;
+    margin-top: 5px;
+  }

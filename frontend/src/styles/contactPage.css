@@ -146,8 +146,8 @@
     resize: none;
   }
   
-  button[type="submit"] {
-    width: 105.3%;
+  .sendMessage-submit-button {
+    width: 100%;
     padding: 15px;
     background: #498cff;
     color: white;

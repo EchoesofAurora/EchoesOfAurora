@@ -1,0 +1,122 @@
+.edit-story-frame * {
+    box-sizing: border-box;
+  }
+  
+  .edit-story-frame {
+    max-width: 100%;
+    padding: 20px;
+    font-family: "Poppins", sans-serif;
+  }
+  
+  .edit-story-title {
+    font-size: 24px;
+    font-weight: 600;
+    color: #313638;
+    margin-bottom: 10px;
+  }
+  
+  .edit-story-subtitle {
+    font-size: 14px;
+    color: #b2b2b2;
+    margin-bottom: 20px;
+  }
+  
+  .edit-story-form {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+  }
+  
+  .edit-story-form-group {
+    display: flex;
+    flex-direction: column;
+  }
+  
+  .storyRange {
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+  }
+  
+  .year-range {
+    display: flex;
+    flex-direction: column;
+    width: 50%;
+  }
+  
+  .edit-story-label {
+    font-size: 12px;
+    color: rgba(0, 0, 0, 0.6);
+    margin-bottom: 5px;
+  }
+  
+  .edit-story-input,
+  .edit-story-textarea {
+    width: 100%;
+    border: 1px solid rgba(0, 0, 0, 0.23);
+    border-radius: 4px;
+    padding: 10px;
+    font-size: 16px;
+    color: #313638;
+  }
+  
+  .edit-story-textarea {
+    resize: none;
+    height: 100px;
+  }
+  
+  .edit-story-upload-button {
+    background-color: #a49cbe;
+    color: #fff;
+    border: none;
+    border-radius: 4px;
+    padding: 10px 20px;
+    cursor: pointer;
+    align-self: flex-start;
+  }
+  
+  .edit-story-upload-instruction {
+    font-size: 9px;
+    color: #313638;
+    margin-top: 5px;
+  }
+  
+  /* Button Container */
+  .edit-story-button-group {
+    display: flex;
+    justify-content: center;
+    gap: 20px;
+    margin-top: 40px;
+    padding-bottom: 50px;
+  }
+  
+  /* Save Button */
+  .edit-story-save-button {
+    background-color: #b0a4c4;
+    color: white;
+    border: none;
+    padding: 12px 24px;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 16px;
+    font-weight: bold;
+  }
+  
+  /* Save & Publish Button */
+  .edit-story-publish-button {
+    background-color: #7b6d96;
+    color: white;
+    border: none;
+    padding: 12px 24px;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 16px;
+    font-weight: bold;
+  }
+  
+  /* Hover Effect */
+  .edit-story-save-button:hover,
+  .edit-story-publish-button:hover {
+    opacity: 0.9;
+  }
+  

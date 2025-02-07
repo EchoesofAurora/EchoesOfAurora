@@ -8,12 +8,14 @@ import map from '../images/contactus/map.png';
 import emailjs from '@emailjs/browser';
 
 function ContactPage() {
+
     return (
         <div className="contact-page">
             <Header />
             <div className="hero hero-section contact-hero">
                 <h1 className='hero-title'>Contact us</h1>
                 <p>Have questions, feedback, or stories to share?</p>
+
             </div>
             <div className="contactus-page-body-section">
                 <div className="contact-details">
@@ -127,6 +129,8 @@ const ContactForm = () => {
                 <button type="submit">Send Message</button>
             </form>
         </div>
+
+
     );
 };
 

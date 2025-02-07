@@ -28,6 +28,7 @@ const HeroSection = () => {
   }, [images.length]);
 
   return (
+
     <section className="hero hero-section"
              style={{
                background: `url(${images[currentImageIndex]}) no-repeat center center/cover`,
@@ -158,6 +159,7 @@ const MapSection = () => (
     </Link>
   </section>
 );
+
 
 // Home Page Component
 const HomePage = () => {

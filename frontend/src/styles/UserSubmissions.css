@@ -1,0 +1,58 @@
+.UserSubmissions {
+    background-color:#000000 ;
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    width: 100%;
+  } 
+  
+   .text-wrapper-5 {
+    color: #000000;
+    font-family: "Inter-SemiBold", Helvetica;
+    font-size: 16px;
+    font-weight: 600;
+    left: 27px;
+    letter-spacing: 0;
+    line-height: 20.8px;
+    position: absolute;
+    top: 23px;
+    white-space: nowrap;
+  }
+  
+   .frame-wrapper {
+    align-items: center;
+    display: inline-flex;
+    gap: 226px;
+    left: 28px;
+    position: absolute;
+    top: 70px;
+  }
+  
+   .frame-8 {
+    align-items: center;
+    display: inline-flex;
+    flex: 0 0 auto;
+    gap: 10px;
+    position: relative;
+  }
+  
+   .ellipse {
+    height: 46px;
+    object-fit: cover;
+    position: relative;
+    width: 46px;
+  }
+  
+   .text-wrapper-6 {
+    color: #000000;
+    font-family: "Inter-Regular", Helvetica;
+    font-size: 16px;
+    font-weight: 400;
+    letter-spacing: 0;
+    line-height: 20.8px;
+    position: relative;
+    white-space: nowrap;
+    width: fit-content;
+  }
+  
+  
