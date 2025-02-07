@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import "../styles/ManageTribes.css";
 import TribeBackground1 from "../images/stories/story-background1.png";
 import TribeBackground2 from "../images/stories/story-background2.png";
@@ -9,6 +9,9 @@ import Footer from "../components/AdminFooter";
 
 
 const HeroManageTribes = () => {
+  const [showDeletePopup, setShowDeletePopup] = useState(false);
+  const [selectedTribe, setSelectedTribe] = useState(null);
+
   const Tribes = [
     {
       tribe: "Ababco",
@@ -97,6 +100,18 @@ const HeroManageTribes = () => {
     },
   ];
 
+  const handleDeleteClick = (tribe) => {
+    setSelectedTribe(tribe);
+    setShowDeletePopup(true);
+  };
+
+  const confirmDelete = () => {
+    console.log(`Deleted Tribe: ${selectedTribe.tribe}`);
+    setShowDeletePopup(false);
+    setSelectedTribe(null);
+  };
+
+
   return (
     <div className="overlap">
       <Sidebar />
@@ -129,14 +144,27 @@ const HeroManageTribes = () => {
                   {Tribe.status}
                 </span>
                 <div className="actions">
-                  <button onClick={() => window.location.href = `/edit-Tribe/${index}`}>Edit</button>
-                  <button onClick={() => window.location.href = `/delete-Tribe/${index}`}>Delete</button>
+                  <button onClick={() => window.location.href = `/EditTribe/${index}`}>Edit</button>
+                  <button onClick={() => handleDeleteClick(Tribe)}>Delete</button>
+                  
                 </div>
               </div>
             ))}
           </div>
         </div>
       </main>
+      {/* Delete Confirmation Popup */}
+      {showDeletePopup && (
+        <div className="delete-popup-overlay">
+          <div className="delete-popup">
+            <p>Are you sure you want to delete <strong>{selectedTribe.tribe}</strong>?</p>
+            <div className="delete-popup-buttons">
+              <button className="cancel-button" onClick={() => setShowDeletePopup(false)}>Cancel</button>
+              <button className="confirm-button" onClick={confirmDelete}>Delete</button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

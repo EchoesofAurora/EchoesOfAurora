@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import "../styles/ManageStories.css";
 import storyBackground1 from "../images/stories/story-background1.png";
 import storyBackground2 from "../images/stories/story-background2.png";
@@ -8,6 +8,9 @@ import Header from "../components/AdminHeader";
 import Footer from "../components/AdminFooter";
 
 const HeroManageStories = () => {
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
+  const [selectedStory, setSelectedStory] = useState(null);
+
   const stories = [
     {
       name: "The Dance of the Spirits",
@@ -105,13 +108,25 @@ const HeroManageStories = () => {
     },
   ];
 
+  const handleDeleteClick = (story) => {
+    setSelectedStory(story);
+    setShowDeleteModal(true);
+  };
+
+  const confirmDelete = () => {
+    console.log(`Story Deleted: ${selectedStory.name}`);
+    setShowDeleteModal(false);
+    setSelectedStory(null);
+  };
+
+
   return (
     <div className="overlap">
       <Sidebar />
       <main className="rightFrame-5">
         <div className="manage-header">
           <button className="back-btn" onClick={() => window.location.href = "/Admin/Dashboard"}>Back</button>
-          <button className="new-story-btn" onClick={() => window.location.href = "/ManageTribe/AddingTribe"}>+ New Story</button>
+          <button className="new-story-btn" onClick={() => window.location.href = "/ManageStories/AddingStory"}>+ New Story</button>
         </div>
 
         <div className="stories-table">
@@ -139,13 +154,29 @@ const HeroManageStories = () => {
                   {story.status}
                 </span>
                 <div className="actions">
-                  <button onClick={() => window.location.href = `/edit-story/${index}`}>Edit</button>
-                  <button onClick={() => window.location.href = `/delete-story/${index}`}>Delete</button>
+                  <button onClick={() => window.location.href = `/EditStory/${index}`}>Edit</button>
+                  <button onClick={() => handleDeleteClick(story)}>Delete</button>
+                  
                 </div>
               </div>
             ))}
           </div>
         </div>
+        
+        {/* Delete Confirmation Popup */}
+        {showDeleteModal && (
+          <div className="delete-modal">
+            <div className="delete-modal-content">
+              <p>Are you sure you want to delete <strong>{selectedStory.name}</strong>?</p>
+              <div className="modal-buttons">
+                <button className="cancel-btn" onClick={() => setShowDeleteModal(false)}>Cancel</button>
+                <button className="delete-btn" onClick={confirmDelete}>Delete</button>
+              </div>
+            </div>
+          </div>
+        )}
+
+        
       </main>
     </div>
   );

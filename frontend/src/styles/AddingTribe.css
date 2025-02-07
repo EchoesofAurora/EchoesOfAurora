@@ -1,5 +1,3 @@
-
-
 .adding-tribe-frame * {
     box-sizing: border-box;
   }
@@ -146,4 +144,72 @@
     font-size: 16px;
     cursor: pointer;
 
-  }
+}
+/* Tribe Color Picker */
+.adding-tribe-color-picker {
+width: 100px;
+height: 40px;
+border: none;
+cursor: pointer;
+border-radius: 5px;
+margin-top: 5px;
+}
+
+.color-code-display {
+margin-left: 10px;
+font-size: 14px;
+color: #333;
+font-weight: bold;
+}
+/* Reference Field */
+.adding-tribe-input {
+  width: 50%;
+  border: 1px solid rgba(0, 0, 0, 0.23);
+  border-radius: 4px;
+  padding: 10px;
+  font-size: 16px;
+  color: #313638;
+}
+
+.adding-tribe-input::placeholder {
+  color: #b2b2b2;
+}
+/* Button Container to Align Buttons in Center */
+.adding-tribe-button-group {
+  display: flex;
+  justify-content: center; /* Centers the buttons */
+  gap: 20px; /* Creates spacing between buttons */
+  margin-top: 40px;
+  padding-bottom: 50px;
+}
+
+/* Save Button */
+.adding-tribe-save-button {
+  background-color: #b0a4c4;
+  color: white;
+  border: none;
+  padding: 12px 24px;
+  border-radius: 5px;
+  cursor: pointer;
+  font-size: 16px;
+  font-weight: bold;
+  
+}
+
+/* Save & Publish Button */
+.adding-tribe-publish-button {
+  background-color: #7b6d96;
+  color: white;
+  border: none;
+  padding: 12px 24px;
+  border-radius: 5px;
+  cursor: pointer;
+  font-size: 16px;
+  font-weight: bold;
+}
+
+/* Hover Effect */
+.adding-tribe-save-button:hover,
+.adding-tribe-publish-button:hover {
+  opacity: 0.9;
+}

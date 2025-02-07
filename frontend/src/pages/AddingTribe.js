@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 import "../styles/AddingTribe.css";
+import "../styles/ManageTribes.css";
 import Sidebar from "../components/Sidebar";
 import Header from "../components/AdminHeader";
 import Footer from "../components/AdminFooter";
@@ -49,22 +50,45 @@ const HeroAddingTribe = () => {
     }
     setIsDrawingEnabled(!isDrawingEnabled);
   };
+  const [tribeColor, setTribeColor] = useState("#8732a8"); // Default tribe color
+  const [referenceLinks, setReferenceLinks] = useState(""); // State for reference links
+
+  // State for GeoJSON fields
+  const [geojson, setGeojson] = useState({
+    type: "Feature",
+    geometry: {
+      type: "Polygon",
+      coordinates: "",
+    },
+    properties: {
+      name: "",
+      description: "",
+    },
+  });
+
+  // Handle GeoJSON input change
+  const handleGeojsonChange = (e, field) => {
+    setGeojson({
+      ...geojson,
+      geometry: { ...geojson.geometry, [field]: e.target.value },
+    });
+  };
 
   return (
     <div className="overlap">
       <Sidebar />
-      <main className="rightFrame-5">
+      <main className="rightFrame-5" style={{ minHeight: "calc(100vh - 80px)", paddingBottom: "80px" }}>
         <div className="adding-tribe-frame">
           <h1 className="adding-tribe-title">Add Tribe</h1>
           <p className="adding-tribe-subtitle">You are adding a new tribe.</p>
           <form className="adding-tribe-form">
             <div className="adding-tribe-form-group">
               <label htmlFor="tribeName" className="adding-tribe-label">
-                Tribe name *
+                Tribe Name 
               </label>
               <input type="text" id="tribeName" className="adding-tribe-input" placeholder="Tribe Name" />
             </div>
-            
+
             <div className="adding-tribe-form-group">
               <div className="tribeRange">
                 <div className="year-range">
@@ -81,6 +105,19 @@ const HeroAddingTribe = () => {
             <div className="adding-tribe-form-group">
               <label htmlFor="description" className="adding-tribe-label">Description</label>
               <textarea id="description" className="adding-tribe-textarea" placeholder="Enter description" />
+            </div>
+
+            {/* Choose Tribe Color Section */}
+            <div className="adding-tribe-form-group">
+              <label htmlFor="tribeColor" className="adding-tribe-label">Choose Tribe Color</label>
+              <input
+                type="color"
+                id="tribeColor"
+                className="adding-tribe-color-picker"
+                value={tribeColor}
+                onChange={(e) => setTribeColor(e.target.value)}
+              />
+              <span className="color-code-display">{tribeColor}</span>
             </div>
 
             <div className="adding-tribe-map-section">
@@ -102,13 +139,54 @@ const HeroAddingTribe = () => {
               <p>Drawn Shape Coordinates: {JSON.stringify(drawnShape)}</p>
             </div>
 
+            {/* GeoJSON Fields Below Map */}
+            <div className="adding-tribe-form-group">
+              <label className="adding-tribe-label">GeoJSON Data</label>
+
+              <label className="adding-tribe-label">Geometry Type</label>
+              <input
+                type="text"
+                className="adding-tribe-input"
+                placeholder="e.g., Polygon"
+                value={geojson.geometry.type}
+                onChange={(e) => handleGeojsonChange(e, "type")}
+              />
+
+              <label className="adding-tribe-label">Coordinates</label>
+              <textarea
+                className="adding-tribe-textarea"
+                placeholder='Enter coordinates (e.g., [[[-74, 40], [-73, 40], [-73, 41], [-74, 40]]])'
+                value={geojson.geometry.coordinates}
+                onChange={(e) => handleGeojsonChange(e, "coordinates")}
+              />
+            </div>
+
             <div className="adding-tribe-form-group">
               <label htmlFor="uploadImages" className="adding-tribe-label">Upload images</label>
               <button type="button" className="adding-tribe-upload-button">Upload images</button>
               <p className="adding-tribe-upload-instruction">Support format JPG, PNG</p>
             </div>
 
-            <button type="submit" className="adding-tribe-submit-button">Submit</button>
+            {/* Reference Field */}
+            <div className="adding-tribe-form-group">
+              <label htmlFor="referenceLinks" className="adding-tribe-label">Reference</label>
+              <input
+                type="text"
+                id="referenceLinks"
+                className="adding-tribe-input"
+                placeholder="Enter reference links"
+                value={referenceLinks}
+                onChange={(e) => setReferenceLinks(e.target.value)}
+              />
+            </div>
+            {/* Save and Save & Publish Buttons */}
+            <div className="adding-tribe-button-group">
+              <button type="button" className="adding-tribe-save-button">Save</button>
+              <button type="submit" className="adding-tribe-publish-button">Save & Publish</button>
+            </div>
+
+
+            
           </form>
         </div>
       </main>
@@ -118,17 +196,19 @@ const HeroAddingTribe = () => {
 
 const AddingTribe = () => {
   return (
-    <div className="ManageTribes">
-      <div className="div">
+    <div className="ManageTribes" style={{ minHeight: "100vh", display: "flex", flexDirection: "column" }}>
+      <div className="div" style={{ flexGrow: 1 }}>
         <Header />
         <HeroAddingTribe />
-        <Footer />
       </div>
+      <Footer />
     </div>
   );
 };
 
 export default AddingTribe;
+
+
 
 
 

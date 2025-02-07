@@ -16,11 +16,14 @@ import SignUp from './pages/SignUp';
 import Dashboard from './pages/Dashboard';
 import ManageStories from './pages/ManageStories';
 import ManageTribes from './pages/ManageTribes';
+import EditTribe from "./pages/EditTribe";
 import UserSubmissions from './pages/UserSubmissions';
 import AddingTribe from './pages/AddingTribe';
 import EditProfile from './pages/profileEdit';
- 
- 
+import AddingStory from "./pages/AddingStory";
+import EditStory from "./pages/EditStory";
+
+
 const App = () => {
     return (
         <Router>
@@ -43,6 +46,10 @@ const App = () => {
                 <Route path="/Admin/ManageTribes" element={<ManageTribes />} />
                 <Route path="/Admin/UserSubmissions" element={<UserSubmissions />} />
                 <Route path='/ManageTribe/AddingTribe' element={<AddingTribe/>}/> 
+                <Route path="/ManageStories/AddingStory" element={<AddingStory />} />
+                <Route path="/EditTribe/:id" element={<EditTribe />} />
+                <Route path="/EditStory/:id" element={<EditStory />} />
+                <Route path="/ManageTribes" element={<ManageTribes />} />
                 <Route path="/Admin/EditProfile" element={<EditProfile />} />
                 
             </Routes>

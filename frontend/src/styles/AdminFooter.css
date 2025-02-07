@@ -1,15 +1,15 @@
 /*footer styling After loging In */
 
 .Admin-Footer {
-  align-items: center;
   display: flex;
-  gap: 64px;
-  justify-content: space-around;
-  position: absolute;
-  bottom: 20px;
+  justify-content: space-between;
+  align-items: center;
   width: 100%;
+  position: fixed; /* Fix it to bottom */
+  bottom: 0;
   background-color: rgb(255, 255, 255);
-
+  padding: 10px 0;
+  box-shadow: 0 -2px 5px rgba(0, 0, 0, 0.1);
 }
 
 .Admin-Footer__vector {
