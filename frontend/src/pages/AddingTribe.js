@@ -56,12 +56,19 @@ const HeroAddingTribe = () => {
     },
   });
 
+  const [selectedImages, setSelectedImages] = useState([]); // State for selected images
+
   // Handle GeoJSON input changes
   const handleGeojsonChange = (e, field) => {
     setGeojson({
       ...geojson,
       geometry: { ...geojson.geometry, [field]: e.target.value },
     });
+  };
+
+  // Handle image selection
+  const handleImageChange = (e) => {
+    setSelectedImages(e.target.files);
   };
 
   // Form submission handler using fetch
@@ -91,7 +98,8 @@ const HeroAddingTribe = () => {
     };
 
     try {
-      const response = await fetch("/api/admin/tribes", {
+      // Send tribe data
+      const tribeResponse = await fetch("/api/admin/tribes", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -99,13 +107,42 @@ const HeroAddingTribe = () => {
         body: JSON.stringify(requestData),
       });
 
-      if (response.ok) {
-        const data = await response.json();
-        alert(`Tribe "${data.tribe_name}" added successfully!`);
-      } else {
-        const errorData = await response.json();
+      if (!tribeResponse.ok) {
+        const errorData = await tribeResponse.json();
         alert(`Error: ${errorData.error}`);
+        return;
       }
+
+      const tribeData = await tribeResponse.json();
+      alert(`Tribe "${tribeData.tribe_name}" added successfully!`);
+
+      // Upload images after tribe is successfully added
+      if (selectedImages.length > 0) {
+        const formData = new FormData();
+        for (let i = 0; i < selectedImages.length; i++) {
+          formData.append('images', selectedImages[i]);
+        }
+        formData.append('tribe_id', tribeData.tribe_id);  // Send the tribe_id to associate the images
+      
+        try {
+          const imageResponse = await fetch("http://localhost:5001/api/images/upload", {
+            method: "POST",
+            body: formData,
+          });
+      
+          if (imageResponse.ok) {
+            alert("Images uploaded successfully!");
+          } else {
+            const errorData = await imageResponse.json();
+            console.error("Upload error:", errorData);
+            alert("Failed to upload images.");
+          }
+        } catch (error) {
+          console.error("Network error:", error);
+          alert("Network error during image upload.");
+        }
+      }
+      
     } catch (error) {
       console.error("Error adding tribe:", error);
       alert("Failed to add tribe. Please try again.");
@@ -208,7 +245,7 @@ const HeroAddingTribe = () => {
             {/* Image Upload Section */}
             <div className="adding-tribe-form-group">
               <label htmlFor="uploadImages" className="adding-tribe-label">Upload Images</label>
-              <button type="button" className="adding-tribe-upload-button">Upload Images</button>
+              <input type="file" multiple onChange={handleImageChange} />
               <p className="adding-tribe-upload-instruction">Supported formats: JPG, PNG</p>
             </div>
 
@@ -246,149 +283,6 @@ const AddingTribe = () => {
       <Footer />
     </div>
   );
-};  
+};
 
 export default AddingTribe;
-
-
-
-
-
-
-
-// import React from "react";
-// import "../styles/AddingTribe.css";
-// import Sidebar from "../components/Sidebar";
-// import calendar from "../images/calendar.svg"
-// import upload from "../images/Upload.svg";
-// import Header from "../components/AdminHeader";
-// import Footer from "../components/AdminFooter";
-
-// const HeroAddingTribe = () => {
-//   return (
-//     <div className="overlap">
-//       <Sidebar />
-//       <main className="rightFrame-5">
-//       <div className="adding-tribe-frame">
-//       <h1 className="adding-tribe-title">Add Tribe</h1>
-//       <p className="adding-tribe-subtitle">You are adding a new tribe.</p>
-//       <form className="adding-tribe-form">
-//         {/* Tribe Name Input */}
-//         <div className="adding-tribe-form-group">
-//           <label htmlFor="tribeName" className="adding-tribe-label">
-//             Tribe name *
-//           </label>
-//           <input
-//             type="text"
-//             id="tribeName"
-//             className="adding-tribe-input"
-//             placeholder="Tribe Name"
-//           />
-//         </div>
-
-//         {/* Start Year Input */}
-//         <div className="adding-tribe-form-group">
-//           <div className="tribeRange">
-//             <div className="year-range">
-//           <label htmlFor="startYear" className="adding-tribe-label">
-//             Start Year
-//           </label>
-//           <div className="adding-tribe-input-wrapper">
-//             <input
-//               type="text"
-//               id="startYear"
-//               className="adding-tribe-input"
-//               placeholder="Select start year"
-//             />
-//             <img className="adding-tribe-icon" alt="Calendar icon" src={calendar} />
-//           </div>
-//           </div>
-//           <div className="year-range">
-//           <label htmlFor="endYear" className="adding-tribe-label">
-//             End Year
-//           </label>
-//           <div className="adding-tribe-input-wrapper">
-//             <input
-//               type="text"
-//               id="endYear"
-//               className="adding-tribe-input"
-//               placeholder="Select end year"
-//             />
-//             <img className="adding-tribe-icon" alt="Calendar icon" src={calendar} />
-//           </div>
-//           </div>
-//           </div>
-//         </div>
-
-//         {/* End Year Input */}
-//         <div className="adding-tribe-form-group">
-          
-//         </div>
-
-//         {/* Description Input */}
-//         <div className="adding-tribe-form-group">
-//           <label htmlFor="description" className="adding-tribe-label">
-//             Description
-//           </label>
-//           <textarea
-//             id="description"
-//             className="adding-tribe-textarea"
-//             placeholder="Enter description"
-//           />
-//         </div>
-
-//         {/* Map Section */}
-//         <div className="adding-tribe-map-section">
-//           <p className="adding-tribe-map-instruction">Select tribe area in the map</p>
-//           <div className="adding-tribe-map"></div>
-//         </div>
-
-//         {/* Upload Images */}
-//         <div className="adding-tribe-form-group">
-//           <label htmlFor="uploadImages" className="adding-tribe-label">
-//             Upload images
-//           </label>
-//           <button type="button" className="adding-tribe-upload-button">
-//             Upload images
-//           </button>
-//           <p className="adding-tribe-upload-instruction">Support format JPG, PNG</p>
-//         </div>
-
-//         {/* Submit Button */}
-//         <button type="submit" className="adding-tribe-submit-button">
-//           Submit
-//         </button>
-//       </form>
-//     </div>
-//       </main>
-//     </div>
-//   );
-// };
-
-
-// const AddingTribe = () => {
-// return (
-//   <div className="ManageTribes">
-//     <div className="div">
-//       <Header />
-//       <HeroAddingTribe />
-//       <Footer />
-//     </div>
-//   </div>
-// );
-// };
-
-// export default AddingTribe;
-
-
-
-
-
-
-
-
-
-
-
-
-

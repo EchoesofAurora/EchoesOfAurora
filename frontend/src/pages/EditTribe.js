@@ -22,13 +22,13 @@ const HeroEditTribe = () => {
       type: "Polygon",
       coordinates: "",
     },
-    uploadedImages: [],
+    uploadedImages: [], // Array of base64 image strings for preview
   });
 
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
-  // Fetch existing tribe data when the component loads
+  // Fetch existing tribe data and associated images
   useEffect(() => {
     const fetchTribe = async () => {
       try {
@@ -37,6 +37,22 @@ const HeroEditTribe = () => {
           throw new Error(`Error fetching tribe data: ${response.statusText}`);
         }
         const data = await response.json();
+
+        // Fetch associated images
+        const imagesResponse = await fetch(`/api/images/tribe/${id}`);
+        let imagePreviews = [];
+        if (imagesResponse.ok) {
+          const images = await imagesResponse.json();
+          imagePreviews = images.map((image) =>
+            `data:${image.media_type};base64,${btoa(
+              new Uint8Array(image.image_data.data).reduce(
+                (data, byte) => data + String.fromCharCode(byte),
+                ""
+              )
+            )}`
+          );
+        }
+
         setTribeData({
           tribe_name: data.tribe_name || "",
           tribe_text: data.tribe_text || "",
@@ -45,7 +61,7 @@ const HeroEditTribe = () => {
           map_color: data.map_color || "#8732a8",
           tribe_references: data.tribe_references || "",
           geojson_data: data.geojson_data || { type: "Polygon", coordinates: "" },
-          uploadedImages: data.tribe_images || [],
+          uploadedImages: imagePreviews, // Set the base64 image previews
         });
         setLoading(false);
       } catch (err) {
@@ -58,7 +74,6 @@ const HeroEditTribe = () => {
     fetchTribe();
   }, [id]);
 
-  // Handle form field changes
   const handleInputChange = (e) => {
     setTribeData({ ...tribeData, [e.target.name]: e.target.value });
   };
@@ -77,16 +92,15 @@ const HeroEditTribe = () => {
     });
   };
 
-  // Handle image upload (local handling only for now)
   const handleImageUpload = (e) => {
     const files = Array.from(e.target.files);
+    const filePreviews = files.map((file) => URL.createObjectURL(file)); // Create preview URLs for local files
     setTribeData((prev) => ({
       ...prev,
-      uploadedImages: [...prev.uploadedImages, ...files],
+      uploadedImages: [...prev.uploadedImages, ...filePreviews],
     }));
   };
 
-  // Handle form submission for Save or Save & Publish
   const handleSubmit = async (e, publishStatus) => {
     e.preventDefault();
   
@@ -101,14 +115,13 @@ const HeroEditTribe = () => {
           tribe_text: tribeData.tribe_text,
           start_year: tribeData.start_year ? tribeData.start_year.getFullYear() : null,
           end_year: tribeData.end_year ? tribeData.end_year.getFullYear() : null,
-          published: publishStatus, // Correctly send the published field
+          published: publishStatus,
         }),
       });
     } catch (err) {
       console.error("Error updating tribe:", err);
     }
   };
-  
 
   if (loading) return <p>Loading tribe data...</p>;
   if (error) return <p>{error}</p>;
@@ -218,6 +231,16 @@ const HeroEditTribe = () => {
                 value={tribeData.geojson_data.coordinates}
                 onChange={(e) => handleGeojsonChange(e, "coordinates")}
               />
+            </div>
+
+            {/* Uploaded Image Previews */}
+            <div className="edit-tribe-form-group">
+              <label className="edit-tribe-label">Uploaded Images</label>
+              <div className="image-preview-container">
+                {tribeData.uploadedImages.map((imageSrc, index) => (
+                  <img key={index} src={imageSrc} alt={`Uploaded Preview ${index + 1}`} width="100" height="100" />
+                ))}
+              </div>
             </div>
 
             {/* Image Upload */}
