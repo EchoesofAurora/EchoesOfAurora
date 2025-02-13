@@ -152,8 +152,8 @@ const EditTribe = () => {
       <div className="div" style={{ flexGrow: 1 }}>
         <Header />
         <HeroEditTribe />
+        <Footer />
       </div>
-      <Footer />
     </div>
   );
 };

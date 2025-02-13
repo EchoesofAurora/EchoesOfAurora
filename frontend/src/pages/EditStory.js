@@ -91,8 +91,8 @@ const EditStory = () => {
       <div className="div" style={{ flexGrow: 1 }}>
         <Header />
         <HeroEditStory />
+        <Footer />
       </div>
-      <Footer />
     </div>
   );
 };
