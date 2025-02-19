@@ -62,7 +62,7 @@
   
   .edit-tribe-textarea {
     resize: none;
-    height: 100px;
+    height: 300px;
   }
   
   .edit-tribe-map {
@@ -122,3 +122,98 @@
     color: #313638;
     margin-top: 5px;
   }
+  /* Back Button */
+.editt-tribe-back-button {
+  background-color: #9d499a;
+  color: white;
+  border: none;
+  padding: 12px 24px;
+  border-radius: 5px;
+  cursor: pointer;
+  font-size: 16px;
+  font-weight: bold;
+}
+
+/* Hover Effect */
+.edit-tribe-back-button:hover {
+  background-color: #b0b0b0;
+}
+
+.edit-tribe-map-section {
+  margin-top: 20px;
+}
+.edit-tribe-map-instruction {
+  font-size: 16px;
+  color: #b2b2b2;
+  margin-bottom: 10px;
+}
+
+.edit-tribe-map-button {
+  background-color: #a49cbe;
+  color: #fff;
+  border: none;
+  border-radius: 4px;
+  padding: 10px 20px;
+  margin-bottom: 15px;
+  cursor: pointer;
+}
+
+.edit-tribe-map-button:hover {
+  background-color: #7b6d96;
+}
+
+/* Modal Overlay */
+.custom-modal .modal-dialog {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 100vh;
+}
+
+/* Modal Content */
+.custom-modal .modal-content {
+  background: #fff;
+  border-radius: 8px;
+  padding: 20px;
+  box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+  text-align: center;
+  width: 400px;
+}
+
+/* Modal Header */
+.custom-modal .modal-header {
+  border-bottom: none;
+  font-size: 18px;
+  font-weight: bold;
+}
+
+/* Modal Body */
+.custom-modal .modal-body {
+  font-size: 16px;
+  color: #004d6b;
+  font-family: sans-serif;
+  font-weight: 700;
+}
+
+/* Modal Footer */
+.custom-modal .modal-footer {
+  border-top: none;
+  display: flex;
+  justify-content: center;
+}
+
+/* Close Button */
+.custom-modal .btn-secondary {
+  background-color: #7b6d96;
+  border: none;
+  padding: 10px 20px;
+  border-radius: 5px;
+  font-size: 16px;
+}
+
+.custom-modal .btn-secondary:hover {
+  opacity: 0.9;
+}
+
+
+
