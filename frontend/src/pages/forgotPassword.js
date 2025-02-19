@@ -2,7 +2,6 @@ import React from 'react';
 import "../styles/AdminStyle.css"
 import envelope from '../images/envelope.png';
 import Header from '../components/AHeader.js';
-import Footer from '../components/AFooter.js';
 import HeroContainer from '../components/HeroContainer.js';
 import { Link } from 'react-router-dom';
 
@@ -54,7 +53,6 @@ const ForgotPassword = () => {
     <div>
       <Header />
       <HeroSection />
-      <Footer />
     </div>
   );
 };

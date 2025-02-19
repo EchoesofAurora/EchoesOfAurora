@@ -2,7 +2,6 @@ import React, { useState } from "react";
 import "../styles/profileEdit.css";
 import Sidebar from "../components/Sidebar";
 import Header from "../components/AdminHeader";
-import Footer from "../components/AdminFooter";
 import ProfileUpdatedPopUp from "../components/profileUpdatedPopUp"; // Updated to match component name
 import lynn1 from "../images/lynn.png";
 import envelope from "../images/envelope.png";
@@ -118,7 +117,6 @@ const EditProfile = () => {
       <div className="div">
         <Header />
         <MyProfile />
-        <Footer />
       </div>
     </div>
   );

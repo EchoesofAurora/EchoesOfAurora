@@ -3,7 +3,6 @@ import React from 'react';
 import "../styles/AdminStyle.css"
 import successImg from '../images/successImg.png'
 import Header from '../components/AHeader.js';
-import Footer from '../components/AFooter.js';
 import { Link } from 'react-router-dom';
 import HeroContainer from '../components/HeroContainer.js';
 
@@ -50,7 +49,6 @@ const PasswordChanged = () => {
     <div>
       <Header />
       <HeroSection />
-      <Footer />
     </div>
   );
 };

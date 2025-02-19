@@ -5,6 +5,7 @@ import Sidebar from "../components/Sidebar";
 import Header from "../components/AdminHeader";
 import Footer from "../components/AdminFooter";
 
+
 const HeroManageTribes = () => {
   const [tribes, setTribes] = useState([]);
   const [loading, setLoading] = useState(true);
