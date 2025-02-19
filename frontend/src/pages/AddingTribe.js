@@ -8,6 +8,9 @@ import Header from "../components/AdminHeader";
 import Footer from "../components/AdminFooter";
 import { MapContainer, TileLayer, Polygon, Polyline, Circle, useMapEvents } from "react-leaflet";
 import "leaflet/dist/leaflet.css";
+import { Modal, Button } from "react-bootstrap";
+import { useNavigate } from "react-router-dom"; // Import useNavigate
+
 
 const MapWithDrawing = ({ isDrawingEnabled, onShapeUpdate, drawnShape, tempMarkers, setTempMarkers }) => {
   useMapEvents({
@@ -44,6 +47,7 @@ const HeroAddingTribe = () => {
   const [tempMarkers, setTempMarkers] = useState([]);
   const [tribeColor, setTribeColor] = useState("#8732a8");
   const [referenceLinks, setReferenceLinks] = useState("");
+  const navigate = useNavigate(); // Initialize useNavigate
   const [geojson, setGeojson] = useState({
     type: "Feature",
     geometry: {
@@ -56,9 +60,18 @@ const HeroAddingTribe = () => {
     },
   });
 
-  const [selectedImages, setSelectedImages] = useState([]); // State for selected images
 
-  // Handle GeoJSON input changes
+const [selectedImages, setSelectedImages] = useState([]); // State for selected images
+
+// State for modal
+const [showModal, setShowModal] = useState(false);
+const [modalMessage, setModalMessage] = useState("");
+  
+const handleClose = () => setShowModal(false); // Function to close modal
+
+
+
+// Handle GeoJSON input changes
   const handleGeojsonChange = (e, field) => {
     setGeojson({
       ...geojson,
@@ -72,7 +85,7 @@ const HeroAddingTribe = () => {
   };
 
   // Form submission handler using fetch
-  const handleFormSubmit = async (e) => {
+  const handleFormSubmit = async (e, publishStatus) => {
     e.preventDefault();
 
     // Basic validation
@@ -95,11 +108,12 @@ const HeroAddingTribe = () => {
         type: "Polygon",
         coordinates: geoJsonCoordinates,
       },
+      published: publishStatus, // ✅ Key Fix: Determines if tribe is saved or published
     };
 
     try {
       // Send tribe data
-      const tribeResponse = await fetch("/api/admin/tribes", {
+      const response = await fetch("/api/admin/tribes", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -107,13 +121,21 @@ const HeroAddingTribe = () => {
         body: JSON.stringify(requestData),
       });
 
-      if (!tribeResponse.ok) {
-        const errorData = await tribeResponse.json();
+      if (response.ok) {
+        const data = await response.json();
+        setModalMessage(
+          publishStatus
+            ? ` "${data.tribe_name}" has been successfully Published.`
+            : ` "${data.tribe_name}" has been added in Editing mode.`
+        );
+        setShowModal(true); // ✅ Show modal after saving
+      } else {
+        const errorData = await response.json();
         alert(`Error: ${errorData.error}`);
         return;
       }
 
-      const tribeData = await tribeResponse.json();
+      const tribeData = await response.json();
       alert(`Tribe "${tribeData.tribe_name}" added successfully!`);
 
       // Upload images after tribe is successfully added
@@ -261,15 +283,39 @@ const HeroAddingTribe = () => {
                 onChange={(e) => setReferenceLinks(e.target.value)}
               />
             </div>
+
+
             {/* Save and Save & Publish Buttons */}
             <div className="adding-tribe-button-group">
-              <button type="button" className="adding-tribe-save-button">Save</button>
-              <button type="submit" className="adding-tribe-publish-button">Save & Publish</button>
+            <button type="button" className="adding-tribe-back-button" onClick={() => {
+              window.scrollTo(0, 0); // Scroll to top before navigating
+              navigate("/Admin/ManageTribes");
+              }}>
+              Back
+            </button>
+            <button type="button" className="adding-tribe-save-button" onClick={(e) => handleFormSubmit(e, false)}>
+              Save
+            </button>
+            <button type="button" className="adding-tribe-publish-button" onClick={(e) => handleFormSubmit(e, true)}>
+              Save & Publish
+            </button>
             </div>
           </form>
         </div>
+        <Modal show={showModal} onHide={handleClose} centered dialogClassName="modal-dialog-centered custom-modal">
+          <Modal.Header closeButton>
+            <Modal.Title>Tribe Status</Modal.Title>
+          </Modal.Header>
+          <Modal.Body>{modalMessage}</Modal.Body>
+          <Modal.Footer>
+            <Button variant="secondary" onClick={handleClose}>
+              Close
+            </Button>
+          </Modal.Footer>
+        </Modal>
       </main>
     </div>
+      
   );
 };
 
@@ -283,6 +329,149 @@ const AddingTribe = () => {
       <Footer />
     </div>
   );
-};
+};  
 
 export default AddingTribe;
+
+
+
+
+
+
+
+// import React from "react";
+// import "../styles/AddingTribe.css";
+// import Sidebar from "../components/Sidebar";
+// import calendar from "../images/calendar.svg"
+// import upload from "../images/Upload.svg";
+// import Header from "../components/AdminHeader";
+// import Footer from "../components/AdminFooter";
+
+// const HeroAddingTribe = () => {
+//   return (
+//     <div className="overlap">
+//       <Sidebar />
+//       <main className="rightFrame-5">
+//       <div className="adding-tribe-frame">
+//       <h1 className="adding-tribe-title">Add Tribe</h1>
+//       <p className="adding-tribe-subtitle">You are adding a new tribe.</p>
+//       <form className="adding-tribe-form">
+//         {/* Tribe Name Input */}
+//         <div className="adding-tribe-form-group">
+//           <label htmlFor="tribeName" className="adding-tribe-label">
+//             Tribe name *
+//           </label>
+//           <input
+//             type="text"
+//             id="tribeName"
+//             className="adding-tribe-input"
+//             placeholder="Tribe Name"
+//           />
+//         </div>
+
+//         {/* Start Year Input */}
+//         <div className="adding-tribe-form-group">
+//           <div className="tribeRange">
+//             <div className="year-range">
+//           <label htmlFor="startYear" className="adding-tribe-label">
+//             Start Year
+//           </label>
+//           <div className="adding-tribe-input-wrapper">
+//             <input
+//               type="text"
+//               id="startYear"
+//               className="adding-tribe-input"
+//               placeholder="Select start year"
+//             />
+//             <img className="adding-tribe-icon" alt="Calendar icon" src={calendar} />
+//           </div>
+//           </div>
+//           <div className="year-range">
+//           <label htmlFor="endYear" className="adding-tribe-label">
+//             End Year
+//           </label>
+//           <div className="adding-tribe-input-wrapper">
+//             <input
+//               type="text"
+//               id="endYear"
+//               className="adding-tribe-input"
+//               placeholder="Select end year"
+//             />
+//             <img className="adding-tribe-icon" alt="Calendar icon" src={calendar} />
+//           </div>
+//           </div>
+//           </div>
+//         </div>
+
+//         {/* End Year Input */}
+//         <div className="adding-tribe-form-group">
+          
+//         </div>
+
+//         {/* Description Input */}
+//         <div className="adding-tribe-form-group">
+//           <label htmlFor="description" className="adding-tribe-label">
+//             Description
+//           </label>
+//           <textarea
+//             id="description"
+//             className="adding-tribe-textarea"
+//             placeholder="Enter description"
+//           />
+//         </div>
+
+//         {/* Map Section */}
+//         <div className="adding-tribe-map-section">
+//           <p className="adding-tribe-map-instruction">Select tribe area in the map</p>
+//           <div className="adding-tribe-map"></div>
+//         </div>
+
+//         {/* Upload Images */}
+//         <div className="adding-tribe-form-group">
+//           <label htmlFor="uploadImages" className="adding-tribe-label">
+//             Upload images
+//           </label>
+//           <button type="button" className="adding-tribe-upload-button">
+//             Upload images
+//           </button>
+//           <p className="adding-tribe-upload-instruction">Support format JPG, PNG</p>
+//         </div>
+
+//         {/* Submit Button */}
+//         <button type="submit" className="adding-tribe-submit-button">
+//           Submit
+//         </button>
+//       </form>
+//     </div>
+//       </main>
+//     </div>
+//   );
+// };
+
+
+// const AddingTribe = () => {
+// return (
+//   <div className="ManageTribes">
+//     <div className="div">
+//       <Header />
+//       <HeroAddingTribe />
+//       <Footer />
+//     </div>
+//   </div>
+// );
+// };
+
+// export default AddingTribe;
+
+
+
+
+
+
+
+
+
+
+
+
+

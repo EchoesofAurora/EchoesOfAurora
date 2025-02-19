@@ -6,8 +6,34 @@ import "../styles/EditTribe.css";
 import Sidebar from "../components/Sidebar";
 import Header from "../components/AdminHeader";
 import Footer from "../components/AdminFooter";
-import { MapContainer, TileLayer } from "react-leaflet";
+import { MapContainer, TileLayer, Polygon, Polyline, Circle, useMapEvents } from "react-leaflet";
 import "leaflet/dist/leaflet.css";
+import { useNavigate } from "react-router-dom"; // Import useNavigate
+import { Modal, Button } from "react-bootstrap"; // ✅ Import Modal
+
+// Map Drawing Component
+const MapWithDrawing = ({ isDrawingEnabled, onShapeUpdate, drawnShape, tempMarkers, setTempMarkers }) => {
+  useMapEvents({
+    click: (e) => {
+      if (!isDrawingEnabled) return;
+      const { lat, lng } = e.latlng;
+      setTempMarkers([...tempMarkers, [lat, lng]]);
+      onShapeUpdate([...drawnShape, [lat, lng]]);
+    },
+  });
+
+  return (
+    <>
+      {isDrawingEnabled && drawnShape.length > 1 && <Polyline positions={drawnShape} color="blue" />}
+      {!isDrawingEnabled && drawnShape.length > 2 && (
+        <Polygon positions={[...drawnShape, drawnShape[0]]} color="blue" fillColor="blue" fillOpacity={0.4} />
+      )}
+      {tempMarkers.map((pos, idx) => (
+        <Circle key={idx} center={pos} radius={5000} color="blue" fillColor="blue" fillOpacity={0.6} />
+      ))}
+    </>
+  );
+};
 
 const HeroEditTribe = () => {
   const { id } = useParams(); // Get tribe ID from URL
@@ -25,16 +51,31 @@ const HeroEditTribe = () => {
     uploadedImages: [], // Array of base64 image strings for preview
   });
 
+const [showModal, setShowModal] = useState(false);
+const [modalMessage, setModalMessage] = useState("");
+
+// Function to close modal
+const handleClose = () => setShowModal(false);
+
+  // States for Drawing
+  const [isDrawingEnabled, setIsDrawingEnabled] = useState(false);
+  const [drawnShape, setDrawnShape] = useState([]);
+  const [tempMarkers, setTempMarkers] = useState([]);
+
+
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+
+  const navigate = useNavigate();
 
   // Fetch existing tribe data and associated images
   useEffect(() => {
     const fetchTribe = async () => {
       try {
+        console.log("Fetching tribe data...");
         const response = await fetch(`/api/admin/tribes/${id}`);
         if (!response.ok) {
-          throw new Error(`Error fetching tribe data: ${response.statusText}`);
+          throw new Error(`HTTP Error ${response.status}: ${response.statusText}`);
         }
         const data = await response.json();
 
@@ -53,6 +94,11 @@ const HeroEditTribe = () => {
           );
         }
 
+        console.log("Tribe Data Received:", data);
+
+        if (!data || Object.keys(data).length === 0) {
+          throw new Error("Received empty tribe data!");
+        }
         setTribeData({
           tribe_name: data.tribe_name || "",
           tribe_text: data.tribe_text || "",
@@ -63,16 +109,35 @@ const HeroEditTribe = () => {
           geojson_data: data.geojson_data || { type: "Polygon", coordinates: "" },
           uploadedImages: imagePreviews, // Set the base64 image previews
         });
-        setLoading(false);
+        if (data.geojson_data && data.geojson_data.coordinates.length) {
+          setDrawnShape(data.geojson_data.coordinates[0].map(([lng, lat]) => [lat, lng]));
+        }
       } catch (err) {
         console.error("Error loading tribe data:", err);
-        setError("Failed to load tribe data.");
-        setLoading(false);
+        setError(`Failed to load tribe data: ${err.message}`);
+      } finally {
+        setLoading(false); // ✅ Ensures that loading is always stopped
       }
     };
 
     fetchTribe();
   }, [id]);
+
+  // Show Loading or Errors
+if (loading) return <p>Loading tribe data...</p>;
+if (error) return <p style={{ color: "red", fontWeight: "bold" }}>{error}</p>;
+
+  // Toggle Drawing Mode
+  const toggleDrawing = () => {
+    if (!isDrawingEnabled) {
+      setDrawnShape([]);
+      setTempMarkers([]);
+    } else {
+      setDrawnShape((prevShape) => (prevShape.length > 2 ? [...prevShape, prevShape[0]] : prevShape));
+    }
+    setIsDrawingEnabled(!isDrawingEnabled);
+  };
+
 
   const handleInputChange = (e) => {
     setTribeData({ ...tribeData, [e.target.name]: e.target.value });
@@ -105,10 +170,10 @@ const HeroEditTribe = () => {
     e.preventDefault();
   
     try {
-      await fetch(`/api/admin/tribes/${id}`, {
+      const response = await fetch(`/api/admin/tribes/${id}`, {
         method: "PUT",
         headers: {
-          "Content-Type": "application/json",
+            "Content-Type": "application/json",
         },
         body: JSON.stringify({
           tribe_name: tribeData.tribe_name,
@@ -118,8 +183,19 @@ const HeroEditTribe = () => {
           published: publishStatus,
         }),
       });
+
+      if (response.ok) {
+        const successMessage = publishStatus
+            ? ` "${tribeData.tribe_name}" has been successfully Published.`
+            : `The changes have been saved successfully.`;
+        setModalMessage(successMessage);
+        setShowModal(true); // ✅ Show modal after saving
+    } else {
+        throw new Error("Failed to save tribe data.");
+    }
     } catch (err) {
       console.error("Error updating tribe:", err);
+      alert("An error occurred while saving. Please try again.");
     }
   };
 
@@ -133,6 +209,7 @@ const HeroEditTribe = () => {
         <div className="edit-tribe-frame">
           <h1 className="edit-tribe-title">Edit Tribe</h1>
           <p className="edit-tribe-subtitle">You are editing tribe ID: {id}</p>
+
 
           <form className="edit-tribe-form">
             {/* Tribe Name */}
@@ -202,13 +279,26 @@ const HeroEditTribe = () => {
               <span className="color-code-display">{tribeData.map_color}</span>
             </div>
 
-            {/* Map Section */}
-            <div className="edit-tribe-map-section">
-              <p className="edit-tribe-map-instruction">Select tribe area on the map</p>
-              <MapContainer center={[40.736, -74.172]} zoom={5} scrollWheelZoom={true} className="edit-tribe-map">
-                <TileLayer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" />
-              </MapContainer>
-            </div>
+         {/* Map Section with Enable/Disable Drawing */}
+          <div className="edit-tribe-map-section">
+            <p className="edit-tribe-map-instruction">Select tribe area on the map</p>
+            <button type="button" className="edit-tribe-map-button" onClick={toggleDrawing} 
+              style={{ backgroundColor: isDrawingEnabled ? "red" : "" }}>
+              {isDrawingEnabled ? "Disable Drawing" : "Enable Drawing"}
+            </button>
+            <MapContainer center={[40.736, -74.172]} zoom={5} scrollWheelZoom={true} className="edit-tribe-map">
+              <TileLayer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" />
+              <MapWithDrawing
+              key={drawnShape.length} // ✅ Fixes map rendering issue
+              isDrawingEnabled={isDrawingEnabled}
+              onShapeUpdate={setDrawnShape}
+              drawnShape={drawnShape}
+              tempMarkers={tempMarkers}
+              setTempMarkers={setTempMarkers}
+            />
+          </MapContainer>
+            <p>Drawn Shape Coordinates: {JSON.stringify(drawnShape)}</p>
+          </div>
 
             {/* GeoJSON Fields */}
             <div className="edit-tribe-form-group">
@@ -272,6 +362,12 @@ const HeroEditTribe = () => {
 
             {/* Submit Buttons */}
             <div className="edit-tribe-button-group">
+            <button type="button" className="editt-tribe-back-button" onClick={() => {
+              window.scrollTo(0, 0); // Scroll to top before navigating
+              navigate("/Admin/ManageTribes");
+              }}>
+              Back
+            </button>
               <button type="button" className="edit-tribe-save-button" onClick={(e) => handleSubmit(e, false)}>
                 Save
               </button>
@@ -279,6 +375,19 @@ const HeroEditTribe = () => {
                 Save & Publish
               </button>
             </div>
+            {/* Modal for Save & Publish Confirmation */}
+            <Modal show={showModal} onHide={handleClose} centered dialogClassName="modal-dialog-centered custom-modal">
+                <Modal.Header closeButton>
+                    <Modal.Title>Tribe Status</Modal.Title>
+                </Modal.Header>
+                <Modal.Body>{modalMessage}</Modal.Body>
+                <Modal.Footer>
+                    <Button variant="secondary" onClick={handleClose}>
+                        Close
+                    </Button>
+                </Modal.Footer>
+            </Modal>
+
           </form>
         </div>
       </main>

@@ -22,6 +22,8 @@ import AddingTribe from './pages/AddingTribe';
 import EditProfile from './pages/profileEdit';
 import AddingStory from "./pages/AddingStory";
 import EditStory from "./pages/EditStory";
+import "bootstrap/dist/css/bootstrap.min.css";
+
 
 
 const App = () => {

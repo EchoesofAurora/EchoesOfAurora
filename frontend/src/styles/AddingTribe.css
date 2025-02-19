@@ -213,3 +213,80 @@ font-weight: bold;
 .adding-tribe-publish-button:hover {
   opacity: 0.9;
 }
+
+
+/* Modal Overlay */
+.custom-modal .modal-dialog {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 100vh;
+}
+
+/* Modal Content */
+.custom-modal .modal-content {
+  background: #fff;
+  border-radius: 8px;
+  padding: 20px;
+  box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+  text-align: center;
+  width: 400px;
+}
+
+/* Modal Header */
+.custom-modal .modal-header {
+  border-bottom: none;
+  font-size: 18px;
+  font-weight: bold;
+}
+
+/* Modal Body */
+.custom-modal .modal-body {
+  font-size: 16px;
+  color: #004d6b;
+  font-family: sans-serif;
+  font-weight: 700;
+  
+
+}
+
+/* Modal Footer */
+.custom-modal .modal-footer {
+  border-top: none;
+  display: flex;
+  justify-content: center;
+}
+
+/* Close Button */
+.custom-modal .btn-secondary {
+  background-color: #7b6d96;
+  border: none;
+  padding: 10px 20px;
+  border-radius: 5px;
+  font-size: 16px;
+  margin-top: 10px
+}
+
+.custom-modal .btn-secondary:hover {
+  opacity: 0.9;
+}
+
+/* Back Button */
+.adding-tribe-back-button {
+  background-color: #9d499a;
+  color: white;
+  border: none;
+  padding: 12px 24px;
+  border-radius: 5px;
+  cursor: pointer;
+  font-size: 16px;
+  font-weight: bold;
+}
+
+/* Hover Effect */
+.adding-tribe-back-button:hover {
+  background-color: #b0b0b0;
+}
+
+
+
