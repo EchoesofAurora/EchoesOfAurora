@@ -4,7 +4,7 @@ import "../styles/AdminStyle.css"
 import envelope from '../images/envelope.png';
 import lock from '../images/Component 1.png';
 import Header from '../components/AHeader.js';
-import Footer from '../components/AFooter.js';
+import Footer from '../components/Footer.js';
 import HeroContainer from '../components/HeroContainer.js';
 
 const HeroSection = () => {

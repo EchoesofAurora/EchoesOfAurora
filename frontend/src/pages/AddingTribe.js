@@ -5,7 +5,6 @@ import "../styles/AddingTribe.css";
 import "../styles/ManageTribes.css";
 import Sidebar from "../components/Sidebar";
 import Header from "../components/AdminHeader";
-import Footer from "../components/AdminFooter";
 import { MapContainer, TileLayer, Polygon, Polyline, Circle, useMapEvents } from "react-leaflet";
 import "leaflet/dist/leaflet.css";
 
@@ -201,7 +200,6 @@ const AddingTribe = () => {
         <Header />
         <HeroAddingTribe />
       </div>
-      <Footer />
     </div>
   );
 };
