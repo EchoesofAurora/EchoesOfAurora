@@ -2,7 +2,6 @@ import React from 'react';
 // import '../styles/passwordChanged.css';
 import "../styles/AdminStyle.css"
 import Header from '../components/AHeader.js';
-import Footer from '../components/AFooter.js';
 import lock from '../images/Component 1.png';
 import { Link } from 'react-router-dom';
 import HeroContainer from '../components/HeroContainer.js';
@@ -71,7 +70,6 @@ const SetNewPassword = () => {
     <div>
       <Header />
       <HeroSection />
-      <Footer />
     </div>
   );
 };

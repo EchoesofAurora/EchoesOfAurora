@@ -5,8 +5,6 @@ import TribeBackground2 from "../images/stories/story-background2.png";
 import TribeBackground3 from "../images/stories/story-background3.png";
 import Sidebar from "../components/Sidebar";
 import Header from "../components/AdminHeader";
-import Footer from "../components/AdminFooter";
-
 
 const HeroManageTribes = () => {
   const [showDeletePopup, setShowDeletePopup] = useState(false);
@@ -177,7 +175,6 @@ const ManageTribes = () => {
       <div className="div">
         <Header />
         <HeroManageTribes />
-        <Footer />
       </div>
     </div>
   );

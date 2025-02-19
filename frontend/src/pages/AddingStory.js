@@ -5,7 +5,6 @@ import "../styles/AddingStory.css";
 import "../styles/ManageStories.css";
 import Sidebar from "../components/Sidebar";
 import Header from "../components/AdminHeader";
-import Footer from "../components/AdminFooter";
 
 const HeroAddingStory = () => {
   const [selectedTribe, setSelectedTribe] = useState(""); // Tribe selection
@@ -92,7 +91,6 @@ const AddingStory = () => {
         <Header />
         <HeroAddingStory />
       </div>
-      <Footer />
     </div>
   );
 };

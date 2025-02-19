@@ -5,7 +5,6 @@ import storyBackground2 from "../images/stories/story-background2.png";
 import storyBackground3 from "../images/stories/story-background3.png";
 import Sidebar from "../components/Sidebar";
 import Header from "../components/AdminHeader";
-import Footer from "../components/AdminFooter";
 
 const HeroManageStories = () => {
   const [showDeleteModal, setShowDeleteModal] = useState(false);
@@ -188,7 +187,6 @@ const ManageStories = () => {
       <div className="div">
         <Header />
         <HeroManageStories />
-        <Footer />
       </div>
     </div>
   );

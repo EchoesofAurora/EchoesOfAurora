@@ -5,7 +5,6 @@ import "../styles/EditTribe.css";
 import "../styles/ManageTribes.css";
 import Sidebar from "../components/Sidebar";
 import Header from "../components/AdminHeader";
-import Footer from "../components/AdminFooter";
 import { MapContainer, TileLayer } from "react-leaflet";
 import "leaflet/dist/leaflet.css";
 import { useParams } from "react-router-dom"; // To get tribe ID from URL
@@ -153,7 +152,6 @@ const EditTribe = () => {
         <Header />
         <HeroEditTribe />
       </div>
-      <Footer />
     </div>
   );
 };
