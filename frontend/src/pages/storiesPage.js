@@ -48,27 +48,15 @@ function StoriesPage() {
   };
 
   return (
-    <div className="user-frontend stories-page">
+    <div className="user-frontend stories-page user-section-background long-section-background">
       <Header />
-      <div className="hero hero-section stories-hero">
+      <div className="hero hero-section stories-hero smaller-hero-header">
         <h1 className="user-hero-title">
           Aurora Stories
         </h1>
-        <p className="user-hero-subtext">
-          Explore a collection of ancient stories that reveal the celestial
-          connections of indigenous cultures to the northern lights.
-        </p>
-        <button className="explore-button">Explore</button>
       </div>
-      <div className="description">
-        <h2>Timeless Tales of Sky and Spirit</h2>
-        <p>
-          Each story holds a profound connection to the celestial wonders of the
-          aurora borealis, illuminating the heritage, beliefs, and spiritual
-          insights of diverse cultures.
-        </p>
-      </div>
-      <div className="stories-list">
+      <div></div>
+      <div className="stories-list user-section-shadow">
         {loading ? (
           <p>Loading stories...</p>
         ) : error ? (
@@ -82,7 +70,7 @@ function StoriesPage() {
                 className="story-image"
               />
               <div className="story-content">
-                <h3 className="story-title">{index + 1}. {story.story_name}</h3>
+                <h3 className="story-title">{story.story_name}</h3>
                 <p className="story-description">
                   <strong>Description:</strong>{" "}
                   {story.story_text.slice(0, 150)}...

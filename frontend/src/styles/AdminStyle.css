@@ -1,4 +1,4 @@
-.hero-container {
+.admin-hero-container {
   position: relative; /* Set up a containing block for positioning */
   display: flex;
   flex-direction: column;
@@ -11,7 +11,7 @@
   overflow: hidden; /* Ensure no content spills out */
 }
 
-.hero-container::before {
+.admin-hero-container::before {
   content: '';
   position: absolute;
   top: 0;
@@ -24,7 +24,7 @@
   z-index: -2; /* Place it at the bottom layer */
 }
 
-.hero-container::after {
+.admin-hero-container::after {
   content: '';
   position: absolute;
   top: 0;
@@ -37,12 +37,12 @@
 
 
 
-.hero-logo {
+.admin-hero-logo {
   width: 60%;
   height: auto;
 }
 
-.hero-title {
+.admin-hero-title {
   font-family: 'Texturina, serif';
   font-size: 46px;
   color: #FFFFFF;
@@ -52,7 +52,7 @@
   text-align: center; /* Center align text */
 }
 
-.hero-description {
+.admin-hero-description {
   font-family: 'Texturina, serif';
   font-size: 18px;
   font-weight: 400;

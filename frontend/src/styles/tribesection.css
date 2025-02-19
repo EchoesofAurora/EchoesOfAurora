@@ -23,6 +23,7 @@
     flex-direction: column;
     gap: 20px;
     align-items: center;
+    padding: 50px 0px;
 }
 
 .tribe-card {
@@ -34,8 +35,7 @@
     border-radius: 15px;
     overflow: hidden;
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-    width: 100%;
-    max-width: 800px;
+    width: 80%;
     margin: 0 auto;
     padding: 20px;
 }

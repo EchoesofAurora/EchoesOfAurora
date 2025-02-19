@@ -4,14 +4,14 @@ import "../styles/AdminStyle.css"; // Ensure the correct CSS file is imported
 
 const HeroContainer = ({ title, description }) => {
   return (
-    <div className="hero-container">
+    <div className="admin-hero-container">
       <img 
         src={logo}
         alt="Aurora Stories Logo"
-        className="hero-logo"
+        className="admin-hero-logo"
       />
-      <h1 className="hero-title">{title}</h1>
-      <p className="hero-description">{description}</p>
+      <h1 className="admin-hero-title">{title}</h1>
+      <p className="admin-hero-description">{description}</p>
     </div>
   );
 };
