@@ -183,7 +183,6 @@
     border-bottom-right-radius: 100px;
   }
   
-  .story-content,
   .features-content,
   .commitment-content {
     display: flex;
@@ -195,7 +194,6 @@
     padding: 20px;
   }
   
-  .story-title,
   .features-title,
   .commitment-title {
     font-size: 2rem; /* Larger title */
@@ -222,7 +220,6 @@
     margin: 10 auto; /* Center the text horizontally */
   }
   
-  .story-description,
   .features-description,
   .commitment-description {
     font-size: 1.5rem; /* Adjust size to match */
@@ -235,23 +232,5 @@
     line-height: 1.5; /* Adjust line height for better readability */
     letter-spacing: 1px; /* Slightly increase spacing for impact */
     text-align: center;
-
-  }
-  
-  
-  
-  .learn-more-button {
-    background-color: #7b61ff;
-    color: white;
-    padding: 12px 20px;
-    border: none;
-    border-radius: 10px;
-    font-size: 1rem;
-    cursor: pointer;
-    transition: background-color 0.3s ease;
-  }
-  
-  .learn-more-button:hover {
-    background-color: #6448e8; /* Darker hover effect */
   }
   

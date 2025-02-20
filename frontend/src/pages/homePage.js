@@ -29,12 +29,12 @@ const HeroSection = () => {
 
   return (
 
-    <section className="hero hero-section"
+    <section className="user-hero user-hero-section user-section-background"
              style={{
                background: `url(${images[currentImageIndex]}) no-repeat center center/cover`,
              }}>
-      <h1 className="hero-title">Explore the Mystical World of Aurora Borealis</h1>
-      <p className="hero-text">
+      <h1 className="user-hero-title">Explore the Mystical World of Aurora Borealis</h1>
+      <p className="user-hero-subtext">
         Welcome to the Indigenous Stories and Space Weather Platform, where we merge North American indigenous storytelling about the aurora borealis with historical space weather data.
       </p>
     </section>
@@ -51,7 +51,7 @@ const AboutSection = () => {
   };
 
   return (
-    <section className="section about">
+    <section className="user-section about user-section-background user-section-shadow">
       <div className="about-content">
         <div className="about-text">
           <h2>About This Project</h2>
@@ -121,21 +121,40 @@ const StoriesSection = () => {
     navigate("/stories");
   };
 
+  const handleLearnMore = (story) => {
+    navigate(`/story/${story.story_id}`, { state: { story } });
+  };
+
   return (
-    <section className="section stories">
+    <section className="user-section stories user-section-background long-section-background user-section-shadow">
       <h2>Stories</h2>
-      <div className="story-card-container">
+      <div className="stories-list">
         {loading ? (
           <p>Loading stories...</p>
         ) : error ? (
           <p>Error: {error}</p>
         ) : stories.length > 0 ? (
-          stories.slice(0, 4).map((story, index) => (
-            <StoryCard
-              image={getImageUrl(story.story_id)}
-              title={story.story_name}
-              description={story.story_text.slice(0, 150)}
-            />
+          stories.map((story, index) => (
+            <div className="story-card" key={index}>
+              <img
+                src={getImageUrl(story.story_id)}
+                alt={story.story_name}
+                className="story-image"
+              />
+              <div className="story-content">
+                <h3 className="story-title">{story.story_name}</h3>
+                <p className="story-description">
+                  <strong>Description:</strong>{" "}
+                  {story.story_text.slice(0, 150)}...
+                </p>
+                <button
+                  className="learn-more-button"
+                  onClick={() => handleLearnMore(story)}
+                >
+                  Learn more
+                </button>
+              </div>
+            </div>
           ))
         ) : (
           <p>No stories found.</p>
@@ -148,11 +167,11 @@ const StoriesSection = () => {
 
 // Map Section Component
 const MapSection = () => (
-  <section className="section map-section">
+  <section className="user-section map-section">
     <h2>Interactive Map</h2>
     <Link to="/map">
       <img
-        className="map map-image"
+        className="user-map-image"
         src={require("../images/Map.png")}
         alt="Interactive Map of the United States"
       />

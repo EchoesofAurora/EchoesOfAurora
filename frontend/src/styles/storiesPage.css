@@ -2,6 +2,14 @@
   .stories-hero {
     background: url('../images/stories/hero.png') no-repeat center/cover;
   }
+
+  .stories-list {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    align-items: center;
+    padding: 50px 0px;
+  }
   
   .stories-container {
     display: flex;
@@ -14,17 +22,16 @@
   
   .story-card {
     display: flex;
+    flex-direction: row;
     align-items: center;
-    gap: 20px; /* Space between image and text */
-    border-radius: 15px; /* Rounded corners */
-    background-color: rgba(255,255,255,0.6);
-    box-shadow: 0px 8px 20px rgba(0, 0, 0, 0.1); /* Subtle shadow */
+    background-color: white;
+    color: black;
+    border-radius: 15px;
     overflow: hidden;
-    transition: transform 0.3s ease;
-    padding: 20px; /* Internal padding */
-    width: 80%; /* Percentage width of the container */
-    max-width: 800px;
-    margin: 30px auto; /* Center-align the card horizontally */
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    width: 80%;
+    margin: 0 auto;
+    padding: 20px;
   }
   
   
@@ -36,52 +43,47 @@
     flex-direction: row-reverse; /* Reverse: image on the right */
   }
   
-  .story-card:hover {
-    transform: translateY(-5px); /* Lift effect on hover */
-  }
-  
   .story-image {
-    width: 400px !important; /* Fixed width for images */
-    /*height: 100px; /* Fixed height */
-    object-fit: cover; /* Ensure the image is properly cropped */
-    border-radius: 20px; /* Rounded corners for images */
-    margin-right: 50px;
+    width: 300px;
+    height: 200px;
+    object-fit: cover;
+    border-radius: 10px;
+    margin-right: 20px;
   }
   
   .story-content {
     display: flex;
     flex-direction: column;
-    justify-content: flex-start; /* Align content to the top */
-    max-width: 500px; /* Limit text width */
-    gap: 10px; /* Optional: Add spacing between child elements */
+    justify-content: center;
+    flex: 1 1;
+    text-align: left;
   }
   
   .story-title {
-    font-size: 2rem; /* Larger title */
-    color: #000; 
+    font-size: 1.5rem;
+    margin: 0 0 10px;
     font-weight: bold;
-    margin-bottom: 10px;
+    color: #120048;
   }
   
   .story-description {
     font-size: 1rem;
-    color: #000 !important; /* Ensure black color */
-    line-height: 1.5; /* Add line height for better readability */
+    margin: 5px 0;
+    color: #333
   }
 
   .learn-more-button {
-    background-color: #A285FF; /* Updated lighter purple */
-    color: white; /* White text */
-    padding: 8px 16px; 
+    align-self: flex-start;
+    margin-top: 15px;
+    padding: 10px 20px;
+    background-color: #9e00b5;
+    color: white;
     border: none;
-    border-radius: 8px; /* Slightly rounded corners */
-    font-size: 0.9rem; /* Smaller font size */
+    border-radius: 5px;
     cursor: pointer;
-    font-weight: bold; /* Bold text for visibility */
-    width: 150px; /* Ensure the width is not fixed */
-    min-width: unset; /* Remove any default minimum width */
-    transition: background-color 0.3s ease;
-    align-items: center;
+    text-transform: uppercase;
+    font-weight: bold;
+    font-size: 0.9rem;
   }
 
   /* Responsive Design */

@@ -39,27 +39,13 @@ function TribesSection() {
   };
  
   return (
-    <div className="user-frontend tribes-section">
+    <div className="user-frontend tribes-section user-section-background user-section-shadow">
       <Header />
-      <div className="hero hero-section tribe-hero">
+      <div className="hero hero-section tribe-hero smaller-hero-header">
         <h1 className='user-hero-title'>Indigenous Tribes</h1>
-        <p className="user-hero-subtext">
-          “Discover the stories and heritage of indigenous tribes connected to
-          the aurora borealis.”
-        </p>
-        <button className="explore-button">Explore</button>
       </div>
-      <div className="description">
-        <h2>Honoring Indigenous Heritage and Celestial Wisdom</h2>
-        <p>
-        "Each of these indigenous tribes holds unique stories that connect the natural wonders of the 
-        aurora borealis with cultural beliefs, spiritual insights, and ancient knowledge. 
-        Explore the rich traditions and perspectives of these communities, where the lights of the northern 
-        skies are woven into the fabric of their heritage. Dive into the stories, histories,
-         and contributions of each tribe as they illuminate the night and pass down their legacy."
-        </p>
-      </div>
-      <div className="tribes-list">
+      <div></div>
+      <div className="tribes-list user-section-shadow">
         {loading ? (
           <p>Loading tribes...</p>
         ) : error ? (
@@ -73,7 +59,7 @@ function TribesSection() {
                 className="tribe-image"
               />
               <div className="tribe-info">
-                <h3>{index + 1}. {tribe.tribe_name}</h3>
+                <h3>{tribe.tribe_name}</h3>
                 <p>
                   <strong>Location:</strong> {tribe.tribe_text.slice(0, 150)}...
                 </p>

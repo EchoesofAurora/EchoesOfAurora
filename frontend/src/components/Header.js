@@ -11,17 +11,17 @@ const Header = () => {
   };
 
   return (
-    <header className="header">
-      <div className="container">
-        <div className="logo">
-          <img src={logo} alt="Aurora Logo" className="logo-img" />
+    <header className="user-header">
+      <div className="user-header-container">
+        <div className="user-header-logo">
+          <img src={logo} alt="Aurora Logo" className="user-header-logo-img" />
         </div>
-        <div className="hamburger" onClick={toggleMenu}>
+        <div className="user-header-hamburger" onClick={toggleMenu}>
           <div></div>
           <div></div>
           <div></div>
         </div>
-        <nav className={`nav-bar ${isMenuOpen ? 'active' : ''}`}>
+        <nav className={`user-header-nav-bar ${isMenuOpen ? 'active' : ''}`}>
           <Link to="/">Home</Link>
           <Link to="/map">Interactive Map</Link>
           <Link to="/stories">Stories</Link>
@@ -30,7 +30,7 @@ const Header = () => {
           <Link to="/contactus">Contact Us</Link>
         </nav>
         <Link to="/Admin/SignIn" className="sign-in-button-link">
-          <button className="sign-in-button">Sign In</button>
+          <button className="user-header-sign-in-button">Sign In</button>
         </Link>
       </div>
     </header>
