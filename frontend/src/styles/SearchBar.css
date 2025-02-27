@@ -10,7 +10,7 @@
   .filter-sort-bar {
     display: flex;
     justify-content: space-between;
-    padding: 10px 20px;
+    padding: 8px 20px;
     background: #764182;
     border-radius: 5px;
     flex-wrap: wrap;
@@ -19,7 +19,7 @@
   
   .filter-sort-bar select,
   .filter-sort-bar input:not(.search-bar) {
-    padding: 8px;
+    padding: 4px 8px;
     border: 1px solid #ccc;
     border-radius: 5px;
     background-color: #DDD5F3;
@@ -37,7 +37,7 @@
   }
   
   .search-bar {
-    padding: 10px;
+    padding: 4px 10px;
     font-size: 16px;
     border: 1px solid #DDD5F3;
     border-radius: 5px 0px 0px 5px;

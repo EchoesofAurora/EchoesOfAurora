@@ -44,7 +44,7 @@
   }
 
 .user-hero-title {
-    font-size: 3.5rem; /* Adjust size to match */
+    font-size: 6.5rem; /* Adjust size to match */
     font-weight: 1000; /* Extra bold text */
     font-style: italic; /* Adds italic style */
     color: white; /* Ensure text is white */
@@ -52,7 +52,6 @@
     text-align: center; /* Ensure text is centered */
     line-height: 1.5; /* Adjust line height for better readability */
     letter-spacing: 1px; /* Slightly increase spacing for impact */
-    max-width: 800px; /* Limit the width to enforce line wrapping */
     word-wrap: break-word; /* Allow breaking if necessary */
     margin: 0 auto; /* Center the text horizontally */
     margin-bottom: 20px;
@@ -281,7 +280,7 @@
     display: flex;
     justify-content: center;
     align-items: center;
-    height: 170px;
+    height: 50vh;
 }
 
 
