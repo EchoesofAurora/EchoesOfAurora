@@ -1,0 +1,62 @@
+/* Example custom styles */
+.user-searchbar-container {
+    width: 82.5%;
+    margin: 0 auto;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  .filter-sort-bar {
+    display: flex;
+    justify-content: space-between;
+    padding: 8px 20px;
+    background: #764182;
+    border-radius: 5px;
+    flex-wrap: wrap;
+    box-shadow: 2px 2px 2px 2px gray;
+  }
+  
+  .filter-sort-bar select,
+  .filter-sort-bar input:not(.search-bar) {
+    padding: 4px 8px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    background-color: #DDD5F3;
+  }
+
+  .filter-sort-bar input {
+    height: 50%;
+  }
+
+  .search-container {
+    width: 100%;
+    margin: 0 auto;
+    display: flex;
+    flex-direction: column;
+  }
+  
+  .search-bar {
+    padding: 4px 10px;
+    font-size: 16px;
+    border: 1px solid #DDD5F3;
+    border-radius: 5px 0px 0px 5px;
+    background-color: #DDD5F3;
+  }
+  
+.year-range-label {
+    color: rgb(254, 239, 255);
+    padding: 0px 10px;
+}
+
+.search-and-sort-container {
+    display: flex;
+    gap: 10px;
+}
+
+.search-button {
+    background-color: #764182;
+    color: rgb(254, 239, 255);
+    height: 100%;
+    border-radius: 0px 5px 5px 0px;
+}

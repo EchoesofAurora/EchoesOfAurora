@@ -4,6 +4,7 @@ import "../styles/tribesection.css";
 import "../styles/styles.css";
 import Header from '../components/Header';
 import Footer from '../components/Footer';
+import SearchBar from "./SearchBar";
  
 function TribesSection() {
   const [tribes, setTribes] = useState([]);
@@ -37,6 +38,24 @@ function TribesSection() {
   const handleLearnMore = (tribe) => {
     navigate(`/tribe/${tribe.tribe_id}`, { state: { tribe } });
   };
+
+  /* Dummy data for tribes */
+  const dummyTribes = ["Apache", "Navajo", "Cherokee", "Sioux"];
+
+  const handleSearch = (searchTerm) => {
+    console.log("Search:", searchTerm);
+    // Implement search functionality here
+  };
+
+  const handleSort = (sortOption) => {
+    console.log("Sort By:", sortOption);
+    // Implement sorting functionality here
+  };
+
+  const handleFilter = (timeRange, tribe) => {
+    console.log("Filter Time Range:", timeRange, "Tribe:", tribe);
+    // Implement filtering functionality here
+  };
  
   return (
     <div className="user-frontend tribes-section user-section-background user-section-shadow">
@@ -46,6 +65,9 @@ function TribesSection() {
       </div>
       <div></div>
       <div className="tribes-list user-section-shadow">
+        <div className="user-searchbar-container">
+          <SearchBar tribes={dummyTribes} onSearch={handleSearch} onSort={handleSort} onFilter={handleFilter} />
+        </div>
         {loading ? (
           <p>Loading tribes...</p>
         ) : error ? (
