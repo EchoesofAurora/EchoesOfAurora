@@ -51,6 +51,8 @@ router.delete('/images/:mediaId', async (req, res) => {
   const { mediaId } = req.params;
   const tribeId = req.query.tribe_id; // Expect tribe_id as a query parameter
 
+  console.log("DELETE request received for media_id:", mediaId, "with tribe_id:", tribeId, "from IP:", req.ip, "Headers:", req.headers);
+
   if (!tribeId) {
     return res.status(400).json({ message: 'tribe_id is required for deletion' });
   }
@@ -61,6 +63,7 @@ router.delete('/images/:mediaId', async (req, res) => {
       return res.status(400).json({ message: `Tribe with ID ${tribeId} does not exist` });
     }
 
+    console.log("Checking image_store for media_id:", mediaId, "and tribe_id:", tribeId);
     const result = await client.query(
       'DELETE FROM image_store WHERE media_id = $1 AND tribe_id = $2 RETURNING *',
       [mediaId, tribeId]

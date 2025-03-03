@@ -5,11 +5,11 @@ import "../styles/AddingTribe.css";
 import "../styles/ManageTribes.css";
 import Sidebar from "../components/Sidebar";
 import Header from "../components/AdminHeader";
+import Footer from "../components/AdminFooter";
 import { MapContainer, TileLayer, Polygon, Polyline, Circle, useMapEvents } from "react-leaflet";
 import "leaflet/dist/leaflet.css";
 import { Modal, Button } from "react-bootstrap";
 import { useNavigate } from "react-router-dom"; // Import useNavigate
-
 
 const MapWithDrawing = ({ isDrawingEnabled, onShapeUpdate, drawnShape, tempMarkers, setTempMarkers }) => {
   useMapEvents({
@@ -59,18 +59,13 @@ const HeroAddingTribe = () => {
     },
   });
 
+  const [selectedImages, setSelectedImages] = useState([]); // State for selected images
+  const [showModal, setShowModal] = useState(false);
+  const [modalMessage, setModalMessage] = useState("");
 
-const [selectedImages, setSelectedImages] = useState([]); // State for selected images
+  const handleClose = () => setShowModal(false); // Function to close modal
 
-// State for modal
-const [showModal, setShowModal] = useState(false);
-const [modalMessage, setModalMessage] = useState("");
-  
-const handleClose = () => setShowModal(false); // Function to close modal
-
-
-
-// Handle GeoJSON input changes
+  // Handle GeoJSON input changes
   const handleGeojsonChange = (e, field) => {
     setGeojson({
       ...geojson,
@@ -86,16 +81,16 @@ const handleClose = () => setShowModal(false); // Function to close modal
   // Form submission handler using fetch
   const handleFormSubmit = async (e, publishStatus) => {
     e.preventDefault();
-
+  
     // Basic validation
     if (!tribeName) {
       alert("Please enter a tribe name.");
       return;
     }
-
+  
     // Prepare GeoJSON data
     const geoJsonCoordinates = [drawnShape.map(([lat, lng]) => [lng, lat])];
-
+  
     const requestData = {
       tribe_name: tribeName,
       tribe_text: description,
@@ -107,9 +102,9 @@ const handleClose = () => setShowModal(false); // Function to close modal
         type: "Polygon",
         coordinates: geoJsonCoordinates,
       },
-      published: publishStatus, // ✅ Key Fix: Determines if tribe is saved or published
+      published: publishStatus,
     };
-
+  
     try {
       // Send tribe data
       const response = await fetch("/api/admin/tribes", {
@@ -119,51 +114,49 @@ const handleClose = () => setShowModal(false); // Function to close modal
         },
         body: JSON.stringify(requestData),
       });
-
-      if (response.ok) {
-        const data = await response.json();
-        setModalMessage(
-          publishStatus
-            ? ` "${data.tribe_name}" has been successfully Published.`
-            : ` "${data.tribe_name}" has been added in Editing mode.`
-        );
-        setShowModal(true); // ✅ Show modal after saving
-      } else {
+  
+      if (!response.ok) {
         const errorData = await response.json();
         alert(`Error: ${errorData.error}`);
         return;
       }
-
-      const tribeData = await response.json();
-      alert(`Tribe "${tribeData.tribe_name}" added successfully!`);
-
+  
+      const tribeData = await response.json(); // Parse response once
+      setModalMessage(
+        publishStatus
+          ? `"${tribeData.tribe_name}" has been successfully Published.`
+          : `"${tribeData.tribe_name}" has been added in Editing mode.`
+      );
+      setShowModal(true);
+  
       // Upload images after tribe is successfully added
       if (selectedImages.length > 0) {
         const formData = new FormData();
         for (let i = 0; i < selectedImages.length; i++) {
-          formData.append('images', selectedImages[i]);
+          formData.append("images", selectedImages[i]);
         }
-        formData.append('tribe_id', tribeData.tribe_id);  // Send the tribe_id to associate the images
-      
+        formData.append("tribe_id", tribeData.tribe_id); // Append tribe_id
+  
         try {
           const imageResponse = await fetch("http://localhost:5001/api/images/upload", {
             method: "POST",
             body: formData,
           });
-      
+  
           if (imageResponse.ok) {
+            const imageData = await imageResponse.json();
+            console.log("Image upload success:", imageData);
             alert("Images uploaded successfully!");
           } else {
             const errorData = await imageResponse.json();
             console.error("Upload error:", errorData);
-            alert("Failed to upload images.");
+            alert(`Failed to upload images: ${errorData.message}`);
           }
         } catch (error) {
-          console.error("Network error:", error);
+          console.error("Network error during image upload:", error);
           alert("Network error during image upload.");
         }
       }
-      
     } catch (error) {
       console.error("Error adding tribe:", error);
       alert("Failed to add tribe. Please try again.");
@@ -187,7 +180,7 @@ const handleClose = () => setShowModal(false); // Function to close modal
         <div className="adding-tribe-frame">
           <h1 className="adding-tribe-title">Add Tribe</h1>
           <p className="adding-tribe-subtitle">You are adding a new tribe.</p>
-          <form className="adding-tribe-form" onSubmit={handleFormSubmit}>
+          <form className="adding-tribe-form" onSubmit={(e) => handleFormSubmit(e, false)}>
             <div className="adding-tribe-form-group">
               <label htmlFor="tribeName" className="adding-tribe-label">Tribe Name</label>
               <input
@@ -283,21 +276,17 @@ const handleClose = () => setShowModal(false); // Function to close modal
               />
             </div>
 
-
             {/* Save and Save & Publish Buttons */}
             <div className="adding-tribe-button-group">
-            <button type="button" className="adding-tribe-back-button" onClick={() => {
-              window.scrollTo(0, 0); // Scroll to top before navigating
-              navigate("/Admin/ManageTribes");
-              }}>
-              Back
-            </button>
-            <button type="button" className="adding-tribe-save-button" onClick={(e) => handleFormSubmit(e, false)}>
-              Save
-            </button>
-            <button type="button" className="adding-tribe-publish-button" onClick={(e) => handleFormSubmit(e, true)}>
-              Save & Publish
-            </button>
+              <button type="button" className="adding-tribe-back-button" onClick={() => navigate("/Admin/ManageTribes")}>
+                Back
+              </button>
+              <button type="submit" className="adding-tribe-save-button">
+                Save
+              </button>
+              <button type="button" className="adding-tribe-publish-button" onClick={(e) => handleFormSubmit(e, true)}>
+                Save & Publish
+              </button>
             </div>
           </form>
         </div>
@@ -314,7 +303,6 @@ const handleClose = () => setShowModal(false); // Function to close modal
         </Modal>
       </main>
     </div>
-      
   );
 };
 
@@ -325,20 +313,9 @@ const AddingTribe = () => {
         <Header />
         <HeroAddingTribe />
       </div>
+      <Footer />
     </div>
   );
-};  
+};
 
 export default AddingTribe;
-
-
-
-
-
-
-
-
-
-
-
-

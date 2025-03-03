@@ -264,20 +264,48 @@ const HeroEditTribe = () => {
       const imageToRemove = tribeData.uploadedImages[index];
       if (imageToRemove && imageToRemove.media_id) {
         try {
-          const response = await fetch(`http://localhost:5001/api/images/${imageToRemove.media_id}`, {
+          console.log("Attempting to delete image with media_id:", imageToRemove.media_id, "for tribe_id:", id, "URL:", `http://localhost:5001/api/images/${imageToRemove.media_id}?tribe_id=${parseInt(id, 10)}`);
+          const response = await fetch(`http://localhost:5001/api/images/${imageToRemove.media_id}?tribe_id=${parseInt(id, 10)}`, {
             method: "DELETE",
             headers: {
               "Content-Type": "application/json",
             },
           });
           if (!response.ok) {
-            throw new Error(`Failed to delete image with media_id ${imageToRemove.media_id}: ${response.statusText}`);
+            let errorText = response.statusText;
+            let responseText = '';
+  
+            // Read the response body only once
+            const reader = response.body.getReader();
+            const decoder = new TextDecoder();
+            let result = '';
+            while (true) {
+              const { done, value } = await reader.read();
+              if (done) break;
+              result += decoder.decode(value);
+            }
+            responseText = result;
+  
+            try {
+              // Try to parse as JSON if it looks like JSON
+              if (responseText.trim().startsWith('{') || responseText.trim().startsWith('[')) {
+                const errorData = JSON.parse(responseText);
+                errorText = errorData.message || errorText;
+              } else {
+                // If not JSON, use the raw text as the error message
+                errorText = `Server error (status ${response.status}): ${responseText || 'No response body'}`;
+              }
+            } catch (jsonError) {
+              errorText = `Server error (status ${response.status}): ${responseText || 'Invalid JSON response'}`;
+            }
+  
+            throw new Error(`Failed to delete image with media_id ${imageToRemove.media_id}: ${errorText}`);
           }
           setTribeData((prev) => ({
             ...prev,
             uploadedImages: prev.uploadedImages.filter((_, i) => i !== index),
           }));
-
+  
           const refreshedData = await (await fetch(`/api/admin/tribes/${id}`)).json();
           let refreshedImagePreviews = [];
           if (refreshedData.images && refreshedData.images.length > 0) {
@@ -521,6 +549,7 @@ const EditTribe = () => {
         <Header />
         <HeroEditTribe />
       </div>
+      <Footer />
     </div>
   );
 };
