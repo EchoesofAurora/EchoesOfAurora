@@ -1,11 +1,9 @@
-// MapComponent.jsx
-import React, { useState, useCallback,useEffect } from "react";
+import React, { useState, useCallback, useEffect, useRef } from "react";
 import MapGL, { Source, Layer, Popup, NavigationControl } from "react-map-gl";
-import { FlyToInterpolator } from "react-map-gl"; // Correct import for smooth zooming
+import { FlyToInterpolator } from "react-map-gl";
 import "mapbox-gl/dist/mapbox-gl.css";
-import geojsonData from "./final-tribes.json"; // Ensure the path is correct
+import geojsonData from "./final-tribes.json";
 import "../styles/mapBox.css";
-import { use } from "react";
 
 const MapBoxComponent = () => {
   const [viewport, setViewport] = useState({
@@ -14,43 +12,52 @@ const MapBoxComponent = () => {
     zoom: 1.5,
     width: "100%",
     height: "800px",
-    transitionDuration: 500, // Smooth transition duration (in milliseconds)
-    transitionInterpolator: new FlyToInterpolator(), // Correct usage of FlyToInterpolator
+    transitionDuration: 500,
+    transitionInterpolator: new FlyToInterpolator(),
   });
 
   const [popupInfo, setPopupInfo] = useState(null);
   const [hoveredFeatureId, setHoveredFeatureId] = useState(null);
-  const [is3dOn, setIsOn] = useState(false);
+  const [is3dOn, setIs3dOn] = useState(false);
   const [isStoriesOn, setIsStoriesOn] = useState(false);
-  const [mapStyle, setMapStyle] = useState("mapbox://styles/kodalis2/cm7kvvsfl00x601qo0597eedp");
+  const [mapStyle, setMapStyle] = useState(
+    "mapbox://styles/kodalis2/cm7kvvsfl00x601qo0597eedp"
+  );
+  const [selectedYear, setSelectedYear] = useState(null); // Timeline state, no filtering
+  const timelineRef = useRef(null); // Ref for the timeline container to manage scrolling
 
+  // Define year sequence from 1000 to 2025
+  const startYear = 1000;
+  const currentYear = new Date().getFullYear(); // 2025 as of Feb 26, 2025
+  const years = Array.from(
+    { length: currentYear - startYear + 1 },
+    (_, i) => startYear + i
+  );
+
+  // Update map style based on 3D toggle
   useEffect(() => {
-    setMapStyle(is3dOn ? "mapbox://styles/kodalis2/cm7kuhknr00wv01qo7212f42o" : "mapbox://styles/kodalis2/cm7kvvsfl00x601qo0597eedp");
+    setMapStyle(
+      is3dOn
+        ? "mapbox://styles/kodalis2/cm7kuhknr00wv01qo7212f42o"
+        : "mapbox://styles/kodalis2/cm7kvvsfl00x601qo0597eedp"
+    );
   }, [is3dOn]);
 
-  const handleToggle = () => {
-    setIsOn(!is3dOn);
-  };
-  const handleStoriesToggle = () => {
-    setIsStoriesOn(!isStoriesOn);
-  };
+  const handleToggle = () => setIs3dOn(!is3dOn);
+  const handleStoriesToggle = () => setIsStoriesOn(!isStoriesOn);
 
   const handleHover = useCallback((event) => {
     const features = event.features;
-    if (features && features.length > 0) {
-      setHoveredFeatureId(features[0].id);
-    } else {
-      setHoveredFeatureId(null);
-    }
+    setHoveredFeatureId(
+      features && features.length > 0 ? features[0].id : null
+    );
   }, []);
 
   const handleClick = (event) => {
     const features = event.features;
-
     if (features && features.length > 0) {
       const feature = features[0];
       const [lng, lat] = event.lngLat;
-
       if (feature.properties && lng !== undefined && lat !== undefined) {
         setPopupInfo({
           properties: feature.properties,
@@ -65,7 +72,7 @@ const MapBoxComponent = () => {
     type: "fill",
     source: "tribes",
     paint: {
-      "fill-color": ["get", "color"], // Gets color from GeoJSON properties
+      "fill-color": ["get", "color"],
       "fill-opacity": 0.5,
     },
   };
@@ -78,7 +85,7 @@ const MapBoxComponent = () => {
       "fill-color": ["get", "color"],
       "fill-opacity": 0.6,
     },
-    filter: ["==", "id", hoveredFeatureId],
+    filter: ["==", "id", hoveredFeatureId || ""],
   };
 
   const hoverBorderLayer = {
@@ -89,7 +96,7 @@ const MapBoxComponent = () => {
       "line-color": "#000",
       "line-width": 1,
     },
-    filter: ["==", "id", hoveredFeatureId],
+    filter: ["==", "id", hoveredFeatureId || ""],
   };
 
   const labelLayer = {
@@ -111,12 +118,23 @@ const MapBoxComponent = () => {
     },
   };
 
+  // Handle scrolling left/right without triggering map interactions
+  const scrollTimeline = (direction, event) => {
+    if (timelineRef.current) {
+      event.preventDefault(); // Prevent default browser behavior
+      event.stopPropagation(); // Prevent map click events
+      const scrollAmount = timelineRef.current.offsetWidth / 2; // Scroll half the container width
+      timelineRef.current.scrollLeft += direction * scrollAmount;
+    }
+  };
+
   return (
-    <div style={{ width: "100%", height: "100vh" }}>
+    <div style={{ width: "100%", height: "100vh", position: "relative" }}>
       <MapGL
         {...viewport}
-        mapboxApiAccessToken="pk.eyJ1Ijoia29kYWxpczIiLCJhIjoiY203ZHhtbGwwMDd2bDJrb2R2emNiaGgwMiJ9.4QoqSStqAAGvBCVkU48v7w" // Replace with your actual token
+        mapboxApiAccessToken="pk.eyJ1Ijoia29kYWxpczIiLCJhIjoiY203ZHhtbGwwMDd2bDJrb2R2emNiaGgwMiJ9.4QoqSStqAAGvBCVkU48v7w"
         mapStyle={mapStyle}
+        doubleClickZoom={true}
         onViewportChange={(newViewport) =>
           setViewport({
             ...newViewport,
@@ -139,7 +157,6 @@ const MapBoxComponent = () => {
           <Layer key="tribe-label" {...labelLayer} />
         </Source>
 
-        {/* Navigation controls for zoom and rotation */}
         <div style={{ position: "absolute", top: 10, left: 10 }}>
           <NavigationControl showZoom showCompass />
         </div>
@@ -153,11 +170,67 @@ const MapBoxComponent = () => {
             </label>
             <span className="status-text">{"Stories"}</span>
             <label className="switch">
-              <input type="checkbox" checked={isStoriesOn} onChange={handleStoriesToggle} />
+              <input
+                type="checkbox"
+                checked={isStoriesOn}
+                onChange={handleStoriesToggle}
+              />
               <span className="slider"></span>
             </label>
           </div>
         </div>
+
+        {/* Timeline */}
+        <div
+          className="timeline-container"
+          style={{ position: "absolute", bottom: 80 }}
+        >
+          <button
+            className="timeline-arrow left"
+            onClick={(e) => {
+              scrollTimeline(-1, e);
+              e.stopPropagation();
+            }}
+            onDoubleClick={(e) => {
+              e.preventDefault();
+              e.stopPropagation();
+            }}
+          >
+            &lt;
+          </button>
+
+          <div
+            className="timeline-years"
+            ref={timelineRef}
+          >
+            {years.map((year) => (
+              <span
+                key={year}
+                className={`timeline-year ${
+                  selectedYear === year ? "active" : ""
+                }`}
+                onClick={() => setSelectedYear(year)}
+              >
+                {year}
+              </span>
+            ))}
+          </div>
+
+          <button
+            className="timeline-arrow right"
+            onClick={(e) => {
+              scrollTimeline(1, e);
+              e.stopPropagation();
+            }}
+            onDoubleClick={(e) => {
+              e.preventDefault();
+              e.stopPropagation();
+            }}
+          >
+            &gt;
+          </button>
+        </div>
+
         {popupInfo && (
           <Popup
             longitude={popupInfo.coordinates.lng}
