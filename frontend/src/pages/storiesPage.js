@@ -4,6 +4,7 @@ import "../styles/storiesPage.css";
 import "../styles/styles.css";
 import Header from "../components/Header";
 import Footer from "../components/Footer";
+import SearchBar from "./SearchBar";
 
 
 function StoriesPage() {
@@ -47,8 +48,25 @@ function StoriesPage() {
     navigate(`/story/${story.story_id}`, { state: { story } });
   };
 
+  const tribes = ["Apache", "Navajo", "Cherokee", "Sioux"];
+
+  const handleSearch = (searchTerm) => {
+    console.log("Search:", searchTerm);
+    // Implement search functionality here
+  };
+
+  const handleSort = (sortOption) => {
+    console.log("Sort By:", sortOption);
+    // Implement sorting functionality here
+  };
+
+  const handleFilter = (timeRange, tribe) => {
+    console.log("Filter Time Range:", timeRange, "Tribe:", tribe);
+    // Implement filtering functionality here
+  };
+
   return (
-    <div className="user-frontend stories-page user-section-background long-section-background">
+    <div className="user-frontend stories-page user-section-background long-section-background user-section-shadow">
       <Header />
       <div className="hero hero-section stories-hero smaller-hero-header">
         <h1 className="user-hero-title">
@@ -57,6 +75,9 @@ function StoriesPage() {
       </div>
       <div></div>
       <div className="stories-list user-section-shadow">
+        <div className="user-searchbar-container">
+          <SearchBar tribes={tribes} onSearch={handleSearch} onSort={handleSort} onFilter={handleFilter} />
+        </div>
         {loading ? (
           <p>Loading stories...</p>
         ) : error ? (

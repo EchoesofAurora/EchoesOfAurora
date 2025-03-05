@@ -1,6 +1,5 @@
 // StoriesTable.js
 import React from "react";
-import vector155 from "../images/vector-155.svg";
 import "../styles/StoriesTable.css";
 
 const stories = [
