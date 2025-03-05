@@ -30,8 +30,8 @@ const MapBoxComponent = () => {
   const startYear = 1000;
   const currentYear = new Date().getFullYear(); // 2025 as of Feb 26, 2025
   const years = Array.from(
-    { length: currentYear - startYear + 1 },
-    (_, i) => startYear + i
+    { length: Math.ceil((currentYear - startYear) / 10) + 1 },
+    (_, i) => startYear + i * 10
   );
 
   // Update map style based on 3D toggle
@@ -132,7 +132,7 @@ const MapBoxComponent = () => {
     <div style={{ width: "100%", height: "100vh", position: "relative" }}>
       <MapGL
         {...viewport}
-        mapboxApiAccessToken="pk.eyJ1Ijoia29kYWxpczIiLCJhIjoiY203ZHhtbGwwMDd2bDJrb2R2emNiaGgwMiJ9.4QoqSStqAAGvBCVkU48v7w"
+        mapboxApiAccessToken={process.env.REACT_APP_MAPBOX_TOKEN}
         mapStyle={mapStyle}
         doubleClickZoom={true}
         onViewportChange={(newViewport) =>
@@ -199,10 +199,7 @@ const MapBoxComponent = () => {
             &lt;
           </button>
 
-          <div
-            className="timeline-years"
-            ref={timelineRef}
-          >
+          <div className="timeline-years" ref={timelineRef}>
             {years.map((year) => (
               <span
                 key={year}
