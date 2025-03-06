@@ -58,7 +58,8 @@ const HeroAddingTribe = () => {
     },
   });
 
-  const [selectedImages, setSelectedImages] = useState([]); // State for selected images
+  const [selectedImages, setSelectedImages] = useState([]); // State for selected images (File objects)
+  const [imagePreviews, setImagePreviews] = useState([]); // State for image preview URLs
 
   // State for modal
   const [showModal, setShowModal] = useState(false);
@@ -74,9 +75,19 @@ const HeroAddingTribe = () => {
     });
   };
 
-  // Handle image selection
+  // Handle image selection and generate previews
   const handleImageChange = (e) => {
-    setSelectedImages(e.target.files);
+    const files = Array.from(e.target.files);
+    const newPreviews = files.map((file) => URL.createObjectURL(file));
+    
+    setSelectedImages((prev) => [...prev, ...files]); // Add new files to the list
+    setImagePreviews((prev) => [...prev, ...newPreviews]); // Add new preview URLs
+  };
+
+  // Handle removing an image from the preview
+  const handleRemoveImage = (index) => {
+    setSelectedImages((prev) => prev.filter((_, i) => i !== index));
+    setImagePreviews((prev) => prev.filter((_, i) => i !== index));
   };
 
   // Form submission handler using fetch
@@ -85,7 +96,8 @@ const HeroAddingTribe = () => {
 
     // Basic validation
     if (!tribeName) {
-      alert("Please enter a tribe name.");
+      setModalMessage("Please enter a tribe name.");
+      setShowModal(true);
       return;
     }
 
@@ -103,7 +115,7 @@ const HeroAddingTribe = () => {
         type: "Polygon",
         coordinates: geoJsonCoordinates,
       },
-      published: publishStatus, // ✅ Key Fix: Determines if tribe is saved or published
+      published: publishStatus,
     };
 
     try {
@@ -116,22 +128,18 @@ const HeroAddingTribe = () => {
         body: JSON.stringify(requestData),
       });
 
-      if (response.ok) {
-        const data = await response.json();
-        setModalMessage(
-          publishStatus
-            ? ` "${data.tribe_name}" has been successfully Published.`
-            : ` "${data.tribe_name}" has been added in Editing mode.`
-        );
-        setShowModal(true); // ✅ Show modal after saving
-      } else {
+      if (!response.ok) {
         const errorData = await response.json();
-        alert(`Error: ${errorData.error}`);
-        return;
+        throw new Error(errorData.error || "Failed to add tribe");
       }
 
       const tribeData = await response.json();
-      alert(`Tribe "${tribeData.tribe_name}" added successfully!`);
+      setModalMessage(
+        publishStatus
+          ? ` "${tribeData.tribe_name}" has been successfully Published.`
+          : ` "${tribeData.tribe_name}" has been added in Editing mode.`
+      );
+      setShowModal(true);
 
       // Upload images after tribe is successfully added
       if (selectedImages.length > 0) {
@@ -139,30 +147,34 @@ const HeroAddingTribe = () => {
         for (let i = 0; i < selectedImages.length; i++) {
           formData.append('images', selectedImages[i]);
         }
-        formData.append('tribe_id', tribeData.tribe_id);  // Send the tribe_id to associate the images
-      
-        try {
-          const imageResponse = await fetch("http://localhost:5001/api/images/upload", {
-            method: "POST",
-            body: formData,
-          });
-      
-          if (imageResponse.ok) {
-            alert("Images uploaded successfully!");
-          } else {
-            const errorData = await imageResponse.json();
-            console.error("Upload error:", errorData);
-            alert("Failed to upload images.");
-          }
-        } catch (error) {
-          console.error("Network error:", error);
-          alert("Network error during image upload.");
+        formData.append('tribe_id', tribeData.tribe_id);
+
+        console.log("Sending image upload request with tribe_id:", tribeData.tribe_id);
+        console.log("FormData entries:", Array.from(formData.entries())); // Debug FormData contents
+        const imageResponse = await fetch("http://localhost:5001/api/images/upload", {
+          method: "POST",
+          body: formData,
+        });
+
+        if (!imageResponse.ok) {
+          const errorData = await imageResponse.json().catch(() => ({ message: "No JSON response" }));
+          console.error("Image upload error:", errorData);
+          throw new Error(`Image upload failed: ${errorData.message}`);
         }
+
+        const imageData = await imageResponse.json();
+        console.log("Image upload success:", imageData);
+        setModalMessage((prev) => `${prev} Images uploaded successfully!`);
+        
+        // Clear the previews after successful upload
+        setSelectedImages([]);
+        setImagePreviews([]);
       }
       
     } catch (error) {
-      console.error("Error adding tribe:", error);
-      alert("Failed to add tribe. Please try again.");
+      console.error("Error in handleFormSubmit:", error);
+      setModalMessage(`Failed to add tribe or upload images: ${error.message}`);
+      setShowModal(true);
     }
   };
 
@@ -281,10 +293,41 @@ const HeroAddingTribe = () => {
               />
             </div>
 
+            {/* Image Preview Section */}
+            <div className="adding-tribe-form-group">
+              <label className="adding-tribe-label">Uploaded Images</label>
+              <div className="image-preview-container">
+                {imagePreviews.length > 0 ? (
+                  imagePreviews.map((preview, index) => (
+                    <div key={index} className="tribe-image">
+                      <img
+                        src={preview}
+                        alt={`Preview ${index + 1}`}
+                        width="100"
+                        height="100"
+                        onError={(e) => {
+                          e.target.src = "/images/placeholder.png"; // Update with actual path to a placeholder image
+                        }}
+                      />
+                      <button
+                        type="button"
+                        className="remove-image-button"
+                        onClick={() => handleRemoveImage(index)}
+                      >
+                        Remove
+                      </button>
+                    </div>
+                  ))
+                ) : (
+                  <p>No images selected.</p>
+                )}
+              </div>
+            </div>
+
             {/* Image Upload Section */}
             <div className="adding-tribe-form-group">
               <label htmlFor="uploadImages" className="adding-tribe-label">Upload Images</label>
-              <input type="file" multiple onChange={handleImageChange} />
+              <input type="file" id="uploadImages" multiple onChange={handleImageChange} />
               <p className="adding-tribe-upload-instruction">Supported formats: JPG, PNG</p>
             </div>
 

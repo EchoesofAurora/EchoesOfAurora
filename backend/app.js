@@ -17,7 +17,7 @@ app.use(cors({
     origin: 'http://localhost:3000',  // Frontend address
     methods: ['GET', 'POST', 'PUT', 'DELETE'],
     allowedHeaders: ['Content-Type', 'Authorization'],
-  }));
+}));
 
 // API Routes
 app.use('/api/tribes', tribesRoutes); // Routes for tribes
@@ -28,6 +28,12 @@ app.use('/api/images', imageUploadRoutes); // Mount the image upload routes
 // Default Route
 app.get('/', (req, res) => {
     res.send('Welcome to the Aurora Project Backend!');
+});
+
+// Global error handling middleware
+app.use((err, req, res, next) => {
+    console.error('Global error handler:', err.stack);
+    res.status(500).json({ message: 'Internal server error', error: err.message });
 });
 
 module.exports = app; // Export the app instance
