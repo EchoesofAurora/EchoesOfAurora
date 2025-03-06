@@ -4,6 +4,7 @@ import { FlyToInterpolator } from "react-map-gl";
 import "mapbox-gl/dist/mapbox-gl.css";
 import geojsonData from "./final-tribes.json";
 import "../styles/mapBox.css";
+import storiesData from "./stories.json";
 
 const MapBoxComponent = () => {
   const [viewport, setViewport] = useState({
@@ -23,16 +24,23 @@ const MapBoxComponent = () => {
   const [mapStyle, setMapStyle] = useState(
     "mapbox://styles/kodalis2/cm7kvvsfl00x601qo0597eedp"
   );
-  const [selectedYear, setSelectedYear] = useState(null); // Timeline state, no filtering
+  const [selectedYear, setSelectedYear] = useState(1900); // Timeline state, no filtering
   const timelineRef = useRef(null); // Ref for the timeline container to manage scrolling
+  const [filteredStories, setFilteredStories] = useState(storiesData);
 
   // Define year sequence from 1000 to 2025
   const startYear = 1000;
   const currentYear = new Date().getFullYear(); // 2025 as of Feb 26, 2025
-  const years = Array.from(
-    { length: Math.ceil((currentYear - startYear) / 10) + 1 },
-    (_, i) => startYear + i * 10
-  );
+  const years = [];
+
+  for (let year = startYear; year <= currentYear; year += 100) {
+    years.push(year);
+  }
+
+  // Ensure currentYear is included if not already
+  if (years[years.length - 1] !== currentYear) {
+    years.push(currentYear);
+  }
 
   // Update map style based on 3D toggle
   useEffect(() => {
@@ -128,6 +136,35 @@ const MapBoxComponent = () => {
     }
   };
 
+  // Define Layer for Stories (will only be shown when isStoriesOn is true)
+  const storiesLayer = {
+    id: "stories-layer",
+    type: "circle",
+    paint: {
+      "circle-radius": 6,
+      "circle-color": "#1E90FF", // Blue color for stories
+      "circle-stroke-width": 2,
+      "circle-stroke-color": "#ffffff",
+    },
+  };
+
+  useEffect(() => {
+    if (selectedYear !== null) {
+      const nextInterval = years.find((year) => year > selectedYear);
+      const filtered = {
+        ...storiesData,
+        features: storiesData.features.filter((story) => {
+          const storyYear = story.properties.year; // Assuming 'year' is in properties
+          return (
+            storyYear >= selectedYear &&
+            (nextInterval ? storyYear < nextInterval : true)
+          );
+        }),
+      };
+      setFilteredStories(filtered);
+    }
+  }, [selectedYear]);
+
   return (
     <div style={{ width: "100%", height: "100vh", position: "relative" }}>
       <MapGL
@@ -156,6 +193,12 @@ const MapBoxComponent = () => {
           )}
           <Layer key="tribe-label" {...labelLayer} />
         </Source>
+        {/* Stories Source and Layer - Only shown if isStoriesOn is true */}
+        {isStoriesOn && (
+          <Source id="stories" type="geojson" data={filteredStories}>
+            <Layer {...storiesLayer} />
+          </Source>
+        )}
 
         <div style={{ position: "absolute", top: 10, left: 10 }}>
           <NavigationControl showZoom showCompass />
