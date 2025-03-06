@@ -1,11 +1,9 @@
 const express = require('express');
 const multer = require('multer');
 const client = require('../config/db');
-
 const router = express.Router();
 const upload = multer({ storage: multer.memoryStorage() });
 
-// Route to upload images for tribes or stories
 router.post('/upload', upload.array('images', 10), async (req, res) => {
   const { tribe_id, story_id } = req.body;
 
@@ -13,66 +11,48 @@ router.post('/upload', upload.array('images', 10), async (req, res) => {
     return res.status(400).json({ message: 'Either tribe_id or story_id must be provided' });
   }
 
+  if (!req.files || req.files.length === 0) {
+    return res.status(400).json({ message: 'No images provided for upload' });
+  }
+
   try {
-    if (tribe_id) {
-      const tribeCheck = await client.query('SELECT tribe_id FROM tribes WHERE tribe_id = $1', [tribe_id]);
-      if (tribeCheck.rows.length === 0) {
-        return res.status(400).json({ message: `Tribe with ID ${tribe_id} does not exist` });
-      }
-    }
-    if (story_id) {
-      const storyCheck = await client.query('SELECT story_id FROM stories WHERE story_id = $1', [story_id]);
-      if (storyCheck.rows.length === 0) {
-        return res.status(400).json({ message: `Story with ID ${story_id} does not exist` });
-      }
-    }
+    await client.query('BEGIN');
 
     const uploadedMediaIds = [];
-    const queries = req.files.map((file) => {
+    for (const file of req.files) {
       const query = `
         INSERT INTO image_store (media_name, media_type, image_data, tribe_id, story_id)
         VALUES ($1, $2, $3, $4, $5)
         RETURNING media_id;
       `;
       const values = [file.originalname, file.mimetype, file.buffer, tribe_id || null, story_id || null];
-      return client.query(query, values).then(result => uploadedMediaIds.push(result.rows[0].media_id));
-    });
+      const result = await client.query(query, values);
+      uploadedMediaIds.push(result.rows[0].media_id);
+    }
 
-    await Promise.all(queries);
+    await client.query('COMMIT');
     res.status(200).json({ message: 'Images uploaded successfully', media_ids: uploadedMediaIds });
+
   } catch (error) {
+    await client.query('ROLLBACK');
     console.error('Error uploading images:', error);
     res.status(500).json({ message: 'Image upload failed', error: error.message });
   }
 });
 
-// Route to delete an image by media_id with tribe_id validation
-router.delete('/images/:mediaId', async (req, res) => {
+router.delete('/:mediaId', async (req, res) => {  
   const { mediaId } = req.params;
-  const tribeId = req.query.tribe_id; // Expect tribe_id as a query parameter
-
-  console.log("DELETE request received for media_id:", mediaId, "with tribe_id:", tribeId, "from IP:", req.ip, "Headers:", req.headers);
-
-  if (!tribeId) {
-    return res.status(400).json({ message: 'tribe_id is required for deletion' });
-  }
 
   try {
-    const tribeCheck = await client.query('SELECT tribe_id FROM tribes WHERE tribe_id = $1', [tribeId]);
-    if (tribeCheck.rows.length === 0) {
-      return res.status(400).json({ message: `Tribe with ID ${tribeId} does not exist` });
+    const imageCheck = await client.query('SELECT * FROM image_store WHERE media_id = $1', [mediaId]);
+    if (imageCheck.rows.length === 0) {
+      return res.status(404).json({ message: `Image with media_id ${mediaId} not found.` });
     }
 
-    console.log("Checking image_store for media_id:", mediaId, "and tribe_id:", tribeId);
-    const result = await client.query(
-      'DELETE FROM image_store WHERE media_id = $1 AND tribe_id = $2 RETURNING *',
-      [mediaId, tribeId]
-    );
-    if (result.rows.length === 0) {
-      return res.status(404).json({ message: `Image with media_id ${mediaId} not found for tribe_id ${tribeId}` });
-    }
-    console.log(`Deleted image with media_id ${mediaId} for tribe_id ${tribeId}`);
-    res.status(200).json({ message: 'Image deleted successfully' });
+    const result = await client.query('DELETE FROM image_store WHERE media_id = $1 RETURNING *', [mediaId]);
+
+    res.status(200).json({ message: `Image ${mediaId} deleted successfully`, deletedImage: result.rows[0] });
+
   } catch (error) {
     console.error('Error deleting image:', error);
     res.status(500).json({ message: 'Failed to delete image', error: error.message });

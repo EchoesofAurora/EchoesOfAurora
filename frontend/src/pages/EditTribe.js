@@ -60,6 +60,7 @@ const HeroEditTribe = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [imagesUploaded, setImagesUploaded] = useState(false); // Track if new images were uploaded
+  const [imagesToRemove, setImagesToRemove] = useState([]); // Track images marked for removal
 
   const navigate = useNavigate();
 
@@ -92,6 +93,23 @@ const HeroEditTribe = () => {
         if (!data || Object.keys(data).length === 0) {
           throw new Error("Received empty tribe data!");
         }
+
+        // Safely handle geojson_data.coordinates
+        let processedCoordinates = [];
+        if (data.geojson_data?.coordinates) {
+          try {
+            let coordinates = typeof data.geojson_data.coordinates === 'string' 
+              ? JSON.parse(data.geojson_data.coordinates) 
+              : data.geojson_data.coordinates;
+            if (Array.isArray(coordinates) && coordinates.length > 0 && Array.isArray(coordinates[0])) {
+              processedCoordinates = coordinates[0].map(([lng, lat]) => [lat, lng]);
+            }
+          } catch {
+            processedCoordinates = [];
+          }
+        }
+        setDrawnShape(processedCoordinates);
+
         setTribeData({
           tribe_name: data.tribe_name || "",
           tribe_text: data.tribe_text || "",
@@ -103,9 +121,7 @@ const HeroEditTribe = () => {
           uploadedImages: imagePreviews, // All persisted images with media_id
           newImages: [], // Reset new image previews
         });
-        if (data.geojson_data && data.geojson_data.coordinates && data.geojson_data.coordinates.length) {
-          setDrawnShape(data.geojson_data.coordinates[0].map(([lng, lat]) => [lat, lng]));
-        }
+        setDrawnShape(processedCoordinates); // Use the processed coordinates
       } catch (err) {
         console.error("Error loading tribe data for tribe_id", id, ":", err);
         setError(`Failed to load tribe data: ${err.message}`);
@@ -210,7 +226,62 @@ const HeroEditTribe = () => {
     e.preventDefault();
 
     try {
-      const response = await fetch(`/api/admin/tribes/${id}`, {
+      // Validate tribe_id
+      const tribeId = parseInt(id, 10);
+      if (isNaN(tribeId)) {
+        throw new Error("Invalid tribe ID format");
+      }
+
+      // Handle deletion of marked images first
+      let deletionErrors = [];
+      for (const mediaId of imagesToRemove) {
+        console.log(`Attempting to delete image with media_id: ${mediaId} for tribe_id: ${tribeId} at URL: /api/images/${mediaId}?tribe_id=${tribeId}`);
+        const response = await fetch(`/api/images/${mediaId}?tribe_id=${tribeId}`, {
+          method: "DELETE",
+          headers: {
+            "Content-Type": "application/json",
+          },
+        });
+
+        if (!response.ok) {
+          let errorText = response.statusText;
+          let responseText = '';
+
+          // Read the response body
+          const reader = response.body?.getReader();
+          if (reader) {
+            const decoder = new TextDecoder();
+            let result = '';
+            while (true) {
+              const { done, value } = await reader.read();
+              if (done) break;
+              result += decoder.decode(value);
+            }
+            responseText = result;
+          }
+
+          try {
+            if (responseText.trim().startsWith('{') || responseText.trim().startsWith('[')) {
+              const errorData = JSON.parse(responseText);
+              errorText = errorData.message || errorText;
+            } else {
+              errorText = `Server error (status ${response.status}): ${responseText || 'No response body'}`;
+            }
+          } catch (jsonError) {
+            errorText = `Server error (status ${response.status}): ${responseText || 'Invalid JSON response'}`;
+          }
+
+          console.error(`Failed to delete image with media_id ${mediaId}: ${errorText} (Status: ${response.status})`);
+          deletionErrors.push(`Image ${mediaId}: ${errorText}`);
+          continue; // Continue with other deletions even if this one fails
+        }
+      }
+      setImagesToRemove([]);
+
+      if (deletionErrors.length > 0) {
+        throw new Error(`Some images could not be deleted: ${deletionErrors.join('; ')}`);
+      }
+      const response = await fetch(`/api/admin/tribes/${tribeId}`, {
         method: "PUT",
         headers: {
           "Content-Type": "application/json",
@@ -237,8 +308,24 @@ const HeroEditTribe = () => {
           setImagesUploaded(false);
         }
 
+        // Refresh tribe data to ensure uploadedImages reflects the latest state
+        const refreshedData = await (await fetch(`/api/admin/tribes/${tribeId}`)).json();
+        let refreshedImagePreviews = [];
+        if (refreshedData.images && refreshedData.images.length > 0) {
+          refreshedImagePreviews = refreshedData.images.map((image) => {
+            if (image.image_data && image.media_type && image.media_id) {
+              return {
+                src: `data:${image.media_type};base64,${image.image_data}`,
+                media_id: image.media_id,
+              };
+            }
+            return null;
+          }).filter(preview => preview !== null);
+        }
+
         setTribeData((prev) => ({
           ...prev,
+          uploadedImages: refreshedImagePreviews,
           newImages: [],
         }));
 
@@ -248,84 +335,28 @@ const HeroEditTribe = () => {
         throw new Error("Failed to save tribe data.");
       }
     } catch (err) {
-      alert("An error occurred while saving. Please try again.");
+      alert(`An error occurred while saving or deleting images. Please try again. Error: ${err.message}`);
     }
   };
 
-  const handleRemoveImage = async (index) => {
+  const handleRemoveImage = (index) => {
     const allImages = [...tribeData.uploadedImages, ...tribeData.newImages];
     if (index >= tribeData.uploadedImages.length) {
+      // Handle removal of new (unuploaded) images
       const newIndex = index - tribeData.uploadedImages.length;
       setTribeData((prev) => ({
         ...prev,
         newImages: prev.newImages.filter((_, i) => i !== newIndex),
       }));
     } else {
+      // Mark persisted (uploaded) images for removal
       const imageToRemove = tribeData.uploadedImages[index];
       if (imageToRemove && imageToRemove.media_id) {
-        try {
-          console.log("Attempting to delete image with media_id:", imageToRemove.media_id, "for tribe_id:", id, "URL:", `http://localhost:5001/api/images/${imageToRemove.media_id}?tribe_id=${parseInt(id, 10)}`);
-          const response = await fetch(`http://localhost:5001/api/images/${imageToRemove.media_id}?tribe_id=${parseInt(id, 10)}`, {
-            method: "DELETE",
-            headers: {
-              "Content-Type": "application/json",
-            },
-          });
-          if (!response.ok) {
-            let errorText = response.statusText;
-            let responseText = '';
-  
-            // Read the response body only once
-            const reader = response.body.getReader();
-            const decoder = new TextDecoder();
-            let result = '';
-            while (true) {
-              const { done, value } = await reader.read();
-              if (done) break;
-              result += decoder.decode(value);
-            }
-            responseText = result;
-  
-            try {
-              // Try to parse as JSON if it looks like JSON
-              if (responseText.trim().startsWith('{') || responseText.trim().startsWith('[')) {
-                const errorData = JSON.parse(responseText);
-                errorText = errorData.message || errorText;
-              } else {
-                // If not JSON, use the raw text as the error message
-                errorText = `Server error (status ${response.status}): ${responseText || 'No response body'}`;
-              }
-            } catch (jsonError) {
-              errorText = `Server error (status ${response.status}): ${responseText || 'Invalid JSON response'}`;
-            }
-  
-            throw new Error(`Failed to delete image with media_id ${imageToRemove.media_id}: ${errorText}`);
-          }
-          setTribeData((prev) => ({
-            ...prev,
-            uploadedImages: prev.uploadedImages.filter((_, i) => i !== index),
-          }));
-  
-          const refreshedData = await (await fetch(`/api/admin/tribes/${id}`)).json();
-          let refreshedImagePreviews = [];
-          if (refreshedData.images && refreshedData.images.length > 0) {
-            refreshedImagePreviews = refreshedData.images.map((image) => {
-              if (image.image_data && image.media_type && image.media_id) {
-                return {
-                  src: `data:${image.media_type};base64,${image.image_data}`,
-                  media_id: image.media_id,
-                };
-              }
-              return null;
-            }).filter(preview => preview !== null);
-          }
-          setTribeData((prev) => ({
-            ...prev,
-            uploadedImages: refreshedImagePreviews,
-          }));
-        } catch (err) {
-          alert(`Failed to delete image: ${err.message}`);
-        }
+        setImagesToRemove((prev) => [...prev, imageToRemove.media_id]);
+        setTribeData((prev) => ({
+          ...prev,
+          uploadedImages: prev.uploadedImages.filter((_, i) => i !== index),
+        }));
       }
     }
   };

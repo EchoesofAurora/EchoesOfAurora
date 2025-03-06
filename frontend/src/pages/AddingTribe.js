@@ -5,7 +5,6 @@ import "../styles/AddingTribe.css";
 import "../styles/ManageTribes.css";
 import Sidebar from "../components/Sidebar";
 import Header from "../components/AdminHeader";
-import Footer from "../components/AdminFooter";
 import { MapContainer, TileLayer, Polygon, Polyline, Circle, useMapEvents } from "react-leaflet";
 import "leaflet/dist/leaflet.css";
 import { Modal, Button } from "react-bootstrap";
@@ -60,9 +59,11 @@ const HeroAddingTribe = () => {
   });
 
   const [selectedImages, setSelectedImages] = useState([]); // State for selected images
+
+  // State for modal
   const [showModal, setShowModal] = useState(false);
   const [modalMessage, setModalMessage] = useState("");
-
+  
   const handleClose = () => setShowModal(false); // Function to close modal
 
   // Handle GeoJSON input changes
@@ -81,16 +82,16 @@ const HeroAddingTribe = () => {
   // Form submission handler using fetch
   const handleFormSubmit = async (e, publishStatus) => {
     e.preventDefault();
-  
+
     // Basic validation
     if (!tribeName) {
       alert("Please enter a tribe name.");
       return;
     }
-  
+
     // Prepare GeoJSON data
     const geoJsonCoordinates = [drawnShape.map(([lat, lng]) => [lng, lat])];
-  
+
     const requestData = {
       tribe_name: tribeName,
       tribe_text: description,
@@ -102,9 +103,9 @@ const HeroAddingTribe = () => {
         type: "Polygon",
         coordinates: geoJsonCoordinates,
       },
-      published: publishStatus,
+      published: publishStatus, // ✅ Key Fix: Determines if tribe is saved or published
     };
-  
+
     try {
       // Send tribe data
       const response = await fetch("/api/admin/tribes", {
@@ -114,49 +115,51 @@ const HeroAddingTribe = () => {
         },
         body: JSON.stringify(requestData),
       });
-  
-      if (!response.ok) {
+
+      if (response.ok) {
+        const data = await response.json();
+        setModalMessage(
+          publishStatus
+            ? ` "${data.tribe_name}" has been successfully Published.`
+            : ` "${data.tribe_name}" has been added in Editing mode.`
+        );
+        setShowModal(true); // ✅ Show modal after saving
+      } else {
         const errorData = await response.json();
         alert(`Error: ${errorData.error}`);
         return;
       }
-  
-      const tribeData = await response.json(); // Parse response once
-      setModalMessage(
-        publishStatus
-          ? `"${tribeData.tribe_name}" has been successfully Published.`
-          : `"${tribeData.tribe_name}" has been added in Editing mode.`
-      );
-      setShowModal(true);
-  
+
+      const tribeData = await response.json();
+      alert(`Tribe "${tribeData.tribe_name}" added successfully!`);
+
       // Upload images after tribe is successfully added
       if (selectedImages.length > 0) {
         const formData = new FormData();
         for (let i = 0; i < selectedImages.length; i++) {
-          formData.append("images", selectedImages[i]);
+          formData.append('images', selectedImages[i]);
         }
-        formData.append("tribe_id", tribeData.tribe_id); // Append tribe_id
-  
+        formData.append('tribe_id', tribeData.tribe_id);  // Send the tribe_id to associate the images
+      
         try {
           const imageResponse = await fetch("http://localhost:5001/api/images/upload", {
             method: "POST",
             body: formData,
           });
-  
+      
           if (imageResponse.ok) {
-            const imageData = await imageResponse.json();
-            console.log("Image upload success:", imageData);
             alert("Images uploaded successfully!");
           } else {
             const errorData = await imageResponse.json();
             console.error("Upload error:", errorData);
-            alert(`Failed to upload images: ${errorData.message}`);
+            alert("Failed to upload images.");
           }
         } catch (error) {
-          console.error("Network error during image upload:", error);
+          console.error("Network error:", error);
           alert("Network error during image upload.");
         }
       }
+      
     } catch (error) {
       console.error("Error adding tribe:", error);
       alert("Failed to add tribe. Please try again.");
@@ -168,9 +171,21 @@ const HeroAddingTribe = () => {
       setDrawnShape([]);
       setTempMarkers([]);
     } else {
+      // Close the shape if there are at least 3 points
       setDrawnShape((prevShape) => (prevShape.length > 2 ? [...prevShape, prevShape[0]] : prevShape));
     }
     setIsDrawingEnabled(!isDrawingEnabled);
+  };
+
+  // Synchronize drawnShape with geojson.geometry.coordinates
+  const updateGeojsonCoordinates = (coordinates) => {
+    setGeojson((prev) => ({
+      ...prev,
+      geometry: {
+        ...prev.geometry,
+        coordinates: JSON.stringify([coordinates.map(([lat, lng]) => [lng, lat])]),
+      },
+    }));
   };
 
   return (
@@ -180,7 +195,7 @@ const HeroAddingTribe = () => {
         <div className="adding-tribe-frame">
           <h1 className="adding-tribe-title">Add Tribe</h1>
           <p className="adding-tribe-subtitle">You are adding a new tribe.</p>
-          <form className="adding-tribe-form" onSubmit={(e) => handleFormSubmit(e, false)}>
+          <form className="adding-tribe-form" onSubmit={handleFormSubmit}>
             <div className="adding-tribe-form-group">
               <label htmlFor="tribeName" className="adding-tribe-label">Tribe Name</label>
               <input
@@ -230,7 +245,17 @@ const HeroAddingTribe = () => {
               </button>
               <MapContainer center={[40.736, -74.172]} zoom={5} scrollWheelZoom={true} className="adding-tribe-map">
                 <TileLayer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" />
-                <MapWithDrawing isDrawingEnabled={isDrawingEnabled} onShapeUpdate={setDrawnShape} drawnShape={drawnShape} tempMarkers={tempMarkers} setTempMarkers={setTempMarkers} />
+                <MapWithDrawing
+                  key={JSON.stringify(drawnShape)} // Use JSON.stringify for reliable key updates
+                  isDrawingEnabled={isDrawingEnabled}
+                  onShapeUpdate={(newShape) => {
+                    setDrawnShape(newShape);
+                    updateGeojsonCoordinates(newShape); // Sync with geojson.geometry.coordinates
+                  }}
+                  drawnShape={drawnShape}
+                  tempMarkers={tempMarkers}
+                  setTempMarkers={setTempMarkers}
+                />
               </MapContainer>
               <p>Drawn Shape Coordinates: {JSON.stringify(drawnShape)}</p>
             </div>
@@ -278,10 +303,13 @@ const HeroAddingTribe = () => {
 
             {/* Save and Save & Publish Buttons */}
             <div className="adding-tribe-button-group">
-              <button type="button" className="adding-tribe-back-button" onClick={() => navigate("/Admin/ManageTribes")}>
+              <button type="button" className="adding-tribe-back-button" onClick={() => {
+                window.scrollTo(0, 0); // Scroll to top before navigating
+                navigate("/Admin/ManageTribes");
+              }}>
                 Back
               </button>
-              <button type="submit" className="adding-tribe-save-button">
+              <button type="button" className="adding-tribe-save-button" onClick={(e) => handleFormSubmit(e, false)}>
                 Save
               </button>
               <button type="button" className="adding-tribe-publish-button" onClick={(e) => handleFormSubmit(e, true)}>
@@ -313,7 +341,6 @@ const AddingTribe = () => {
         <Header />
         <HeroAddingTribe />
       </div>
-      <Footer />
     </div>
   );
 };
