@@ -5,6 +5,7 @@ import storyBackground2 from "../images/stories/story-background2.png";
 import storyBackground3 from "../images/stories/story-background3.png";
 import Sidebar from "../components/Sidebar";
 import Header from "../components/AdminHeader";
+import AdminSearchBar from "../components/AdminSearchBar"
 
 const HeroManageStories = () => {
   const [showDeleteModal, setShowDeleteModal] = useState(false);
@@ -127,6 +128,8 @@ const HeroManageStories = () => {
           <button className="back-btn" onClick={() => window.location.href = "/Admin/Dashboard"}>Back</button>
           <button className="new-story-btn" onClick={() => window.location.href = "/ManageStories/AddingStory"}>+ New Story</button>
         </div>
+
+        {/* <AdminSearchBar /> */}
 
         <div className="stories-table">
           <div className="table-header">

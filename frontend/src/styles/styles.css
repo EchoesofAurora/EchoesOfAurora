@@ -44,7 +44,7 @@
   }
 
 .user-hero-title {
-    font-size: 6.5rem; /* Adjust size to match */
+    font-size: 5.5rem; /* Adjust size to match */
     font-weight: 1000; /* Extra bold text */
     font-style: italic; /* Adds italic style */
     color: white; /* Ensure text is white */
@@ -58,7 +58,7 @@
   }
 
 .user-hero-subtext {
-    font-size: 1rem;
+    font-size: 1.5rem;
     margin-bottom: 30px;
     padding: 0 20%;
     color: #cecece;
@@ -280,7 +280,7 @@
     display: flex;
     justify-content: center;
     align-items: center;
-    height: 50vh;
+    height: 20vh;
 }
 
 

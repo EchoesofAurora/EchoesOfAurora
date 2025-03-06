@@ -4,7 +4,7 @@ import "../styles/tribesection.css";
 import "../styles/styles.css";
 import Header from '../components/Header';
 import Footer from '../components/Footer';
-import SearchBar from "./SearchBar";
+import SearchBar from "../components/SearchBar";
  
 function TribesSection() {
   const [tribes, setTribes] = useState([]);

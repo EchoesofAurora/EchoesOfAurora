@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { FaSearch } from "react-icons/fa"; // ✅ Correct import
 import "../styles/SearchBar.css"; // Import the custom CSS file
 
-const SearchBar = ({ onSearch, onSort, onFilter }) => {
+const AdminSearchBar = ({ onSearch, onSort, onFilter }) => {
   const [searchQuery, setSearchQuery] = useState("");
   const [sortOption, setSortOption] = useState("");
   const [filterTribe, setFilterTribe] = useState("");
@@ -89,4 +89,4 @@ const SearchBar = ({ onSearch, onSort, onFilter }) => {
   );
 };
 
-export default SearchBar;
+export default AdminSearchBar;
