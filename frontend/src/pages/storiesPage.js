@@ -23,7 +23,7 @@ function StoriesPage() {
         }
         const data = await response.json();
         setStories(data);
-        setSearchResults(data); // Initialize search results with all stories
+        setSearchResults(data.sort((a, b) => a.story_name.localeCompare(b.story_name))); // Initialize search results with all stories
       } catch (error) {
         setError(error.message);
       } finally {
@@ -55,6 +55,10 @@ function StoriesPage() {
     acc[tribe.tribe_name] = tribe.tribe_id;  // Use tribe_name as the key and tribe_id as the value
     return acc;
   }, {});
+
+  const reverseTribeDictionary = Object.fromEntries(
+    Object.entries(tribeDictionary).map(([name, id]) => [id, name])
+  );
 
   const imagesContext = require.context("../images/stories", false, /\.png$/);
 
@@ -149,16 +153,22 @@ function StoriesPage() {
                 className="story-image"
               />
               <div className="story-content">
-                <h3 className="story-title">{story.story_name}</h3>
+                <div className="story-card-top-bar">
+                  <h3 className="story-title">{story.story_name}</h3>
+                  <h2 className="story-tribe">{reverseTribeDictionary[story.tribe_id]}</h2>
+                </div>
                 <p className="story-description">
                   <strong>Description:</strong> {story.story_text.slice(0, 150)}...
                 </p>
-                <button
-                  className="learn-more-button"
-                  onClick={() => handleLearnMore(story)}
-                >
-                  Learn more
-                </button>
+                <div className="story-card-bottom-bar">
+                  <button
+                    className="learn-more-button"
+                    onClick={() => handleLearnMore(story)}
+                  >
+                    Learn more
+                  </button>
+                  <h2 className="story-year">Year: {story.story_year}</h2>
+                </div>
               </div>
             </div>
           ))

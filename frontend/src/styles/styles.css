@@ -176,7 +176,7 @@
     text-align: center;
 }
 
-.user-section h2 {
+.user-section-title {
     font-size: 3.8rem;
     color: rgb(91, 52, 10);
     margin: 0px 0px 20px 0px;
@@ -281,5 +281,3 @@
     align-items: center;
     height: 45vh;
 }
-
-

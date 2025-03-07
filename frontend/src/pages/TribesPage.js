@@ -113,12 +113,15 @@ function TribesSection() {
                 <p>
                   <strong>Location:</strong> {tribe.tribe_text.slice(0, 150)}...
                 </p>
-                <button
-                  className="learn-more"
-                  onClick={() => handleLearnMore(tribe)}
-                >
-                  Learn more
-                </button>
+                <div className="tribe-card-bottom-bar">
+                  <button
+                    className="learn-more"
+                    onClick={() => handleLearnMore(tribe)}
+                  >
+                    Learn more
+                  </button>
+                  <h2 className="tribe-year">Year: {tribe.start_year}</h2>
+                </div>
               </div>
             </div>
           ))

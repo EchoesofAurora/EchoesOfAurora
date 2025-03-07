@@ -54,7 +54,7 @@ const AboutSection = () => {
     <section className="user-section about user-section-background user-section-shadow">
       <div className="about-content">
         <div className="about-text">
-          <h2>About This Project</h2>
+          <h2 className="user-section-title">About This Project</h2>
           <p className='user-section-intro-description block-align'>
             Welcome to a unique fusion of science, culture, and storytelling. This platform brings together indigenous knowledge and modern space weather research to explore the fascinating phenomena of the aurora borealis. Through interactive tools and real-life stories, we aim to educate, inspire, and celebrate the rich cultural heritage connected to the northern lights.
             <br></br>
@@ -70,20 +70,10 @@ const AboutSection = () => {
   );
 };
 
-// Story Card Component
-const StoryCard = ({ image, title, description }) => (
-  <div className="story-card">
-    <img src={image} alt={title} />
-    <div className="story-content">
-      <h3>{title}</h3>
-      <p>{description}</p>
-    </div>
-  </div>
-);
-
 // Stories Section Component
 const StoriesSection = () => {
   const [stories, setStories] = useState([]);
+  const [tribes, setTribes] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const navigate = useNavigate();
@@ -104,7 +94,29 @@ const StoriesSection = () => {
       }
     };
     fetchStories();
+
+    const fetchTribes = async () => {
+      try {
+        const response = await fetch("/api/tribes"); // Fetch stories from backend
+        if (!response.ok) {
+          throw new Error(`HTTP error! Status: ${response.status}`);
+        }
+        const data = await response.json();
+        setTribes(data);
+      } catch (error) {
+        setError(error.message);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchTribes();
   }, []);
+
+  const tribeDictionary = tribes.reduce((acc, tribe) => {
+    acc[tribe.tribe_id] = tribe.tribe_name;  // Use tribe_name as the key and tribe_id as the value
+    return acc;
+  }, {});
 
   const imagesContext = require.context("../images/stories", false, /\.png$/);
   const getImageUrl = (storyId) => {
@@ -127,7 +139,7 @@ const StoriesSection = () => {
 
   return (
     <section className="user-section stories user-section-background long-section-background user-section-shadow">
-      <h2>Stories</h2>
+      <h2 className="user-section-title">Stories</h2>
       <div className="stories-list">
         {loading ? (
           <p>Loading stories...</p>
@@ -142,17 +154,22 @@ const StoriesSection = () => {
                 className="story-image"
               />
               <div className="story-content">
-                <h3 className="story-title">{story.story_name}</h3>
+                <div className="story-card-top-bar">
+                  <h3 className="story-title">{story.story_name}</h3>
+                  <h2 className="story-tribe">{tribeDictionary[story.tribe_id]}</h2>
+                </div>
                 <p className="story-description">
-                  <strong>Description:</strong>{" "}
-                  {story.story_text.slice(0, 150)}...
+                  <strong>Description:</strong> {story.story_text.slice(0, 150)}...
                 </p>
-                <button
-                  className="learn-more-button"
-                  onClick={() => handleLearnMore(story)}
-                >
-                  Learn more
-                </button>
+                <div className="story-card-bottom-bar">
+                  <button
+                    className="learn-more-button"
+                    onClick={() => handleLearnMore(story)}
+                  >
+                    Learn more
+                  </button>
+                  <h2 className="story-year">Year: {story.story_year}</h2>
+                </div>
               </div>
             </div>
           ))
@@ -168,7 +185,7 @@ const StoriesSection = () => {
 // Map Section Component
 const MapSection = () => (
   <section className="user-section map-section">
-    <h2>Interactive Map</h2>
+    <h2 className="user-section-title">Interactive Map</h2>
     <Link to="/map">
       <img
         className="user-map-image"
