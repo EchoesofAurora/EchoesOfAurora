@@ -55,7 +55,7 @@ const AboutSection = () => {
       <div className="about-content">
         <div className="about-text">
           <h2>About This Project</h2>
-          <p class='block-align'>
+          <p className='user-section-intro-description block-align'>
             Welcome to a unique fusion of science, culture, and storytelling. This platform brings together indigenous knowledge and modern space weather research to explore the fascinating phenomena of the aurora borealis. Through interactive tools and real-life stories, we aim to educate, inspire, and celebrate the rich cultural heritage connected to the northern lights.
             <br></br>
             Discover more about auroras and the legends that surround them, as we bridge the gap between ancient traditions and cutting-edge science.

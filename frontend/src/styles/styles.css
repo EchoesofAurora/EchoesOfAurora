@@ -182,8 +182,7 @@
     margin: 0px 0px 20px 0px;
 }
 
-.user-section p {
-    max-width: 800px;
+.user-section-intro-description {
     margin: 0 auto 40px auto;
     font-size: 1.3rem;
     color: rgb(91, 52, 10);
@@ -280,7 +279,7 @@
     display: flex;
     justify-content: center;
     align-items: center;
-    height: 20vh;
+    height: 45vh;
 }
 
 

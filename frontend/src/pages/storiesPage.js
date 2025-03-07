@@ -4,10 +4,11 @@ import "../styles/storiesPage.css";
 import "../styles/styles.css";
 import Header from "../components/Header";
 import Footer from "../components/Footer";
-import SearchBar from "../components/SearchBar";
+import SearchBar from "../components/StorySearchBar";
 
 function StoriesPage() {
   const [stories, setStories] = useState([]);
+  const [tribes, setTribes] = useState([]);
   const [searchResults, setSearchResults] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -22,7 +23,6 @@ function StoriesPage() {
         }
         const data = await response.json();
         setStories(data);
-        console.log(data);
         setSearchResults(data); // Initialize search results with all stories
       } catch (error) {
         setError(error.message);
@@ -32,7 +32,29 @@ function StoriesPage() {
     };
 
     fetchStories();
+
+    const fetchTribes = async () => {
+      try {
+        const response = await fetch("/api/tribes"); // Fetch stories from backend
+        if (!response.ok) {
+          throw new Error(`HTTP error! Status: ${response.status}`);
+        }
+        const data = await response.json();
+        setTribes(data);
+      } catch (error) {
+        setError(error.message);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchTribes();
   }, []);
+
+  const tribeDictionary = tribes.reduce((acc, tribe) => {
+    acc[tribe.tribe_name] = tribe.tribe_id;  // Use tribe_name as the key and tribe_id as the value
+    return acc;
+  }, {});
 
   const imagesContext = require.context("../images/stories", false, /\.png$/);
 
@@ -48,9 +70,7 @@ function StoriesPage() {
   const handleLearnMore = (story) => {
     navigate(`/story/${story.story_id}`, { state: { story } });
   };
-
-  const tribes = ["Apache", "Navajo", "Cherokee", "Sioux"];
-
+  
   const handleSearch = (searchTerm) => {
     if (!searchTerm) {
       setSearchResults(stories);
@@ -89,15 +109,14 @@ function StoriesPage() {
     setSearchResults(sortedStories);
   };
 
-  const handleFilter = (timeRange, tribeName) => {
+  const handleFilter = (tribeName, timeRange) => {
     let filteredStories = stories;
 
-    if (tribeName && tribes[tribeName] !== undefined) {
-      const tribeId = tribes[tribeName];
+    if (tribeName && tribeDictionary[tribeName] !== undefined) {
+      const tribeId = tribeDictionary[tribeName];
       filteredStories = filteredStories.filter(story => story.tribe_id === tribeId);
     }
 
-    console.log(timeRange);
     if (timeRange && timeRange.length === 2) {
       filteredStories = filteredStories.filter(story => 
         story.story_year >= timeRange[0] && story.story_year <= timeRange[1]
@@ -115,7 +134,7 @@ function StoriesPage() {
       </div>
       <div className="stories-list user-section-shadow">
         <div className="user-searchbar-container">
-          <SearchBar tribes={Object.keys(tribes)} onSearch={handleSearch} onSort={handleSort} onFilter={handleFilter} />
+          <SearchBar tribes={tribes} onSearch={handleSearch} onSort={handleSort} onFilter={handleFilter} />
         </div>
         {loading ? (
           <p>Loading stories...</p>

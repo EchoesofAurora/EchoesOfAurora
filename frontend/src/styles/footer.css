@@ -11,10 +11,14 @@
     display: flex;
     flex-wrap: wrap; /* Ensure responsiveness */
     justify-content: space-around; /* Space out the sections */
-    align-items: center; /* Align items vertically */
     margin-bottom: 30px; /* Space below the content */
   }
-  
+
+  .footer-logo {
+    align-content: center;
+  }
+
+
   /* Footer Logo */
   .footer-logo img {
     border-radius: 50%; /* Circular logo */
@@ -55,8 +59,9 @@
   
   /* Useful Links Section */
   .footer-links {
-    text-align: left; /* Align links to the left */
-    padding: 0px 20px;
+    text-align: left;
+    white-space: nowrap;
+    padding: 0px 20px 0px 20px;
   }
   
   .footer-links h3 {
@@ -92,10 +97,11 @@
   .footer-contacts h3 {
     font-size: 1.2rem;
     color: white;
+    margin-bottom: 5px;
   }
   
   .footer-contacts p {
-    margin: 5px 0; /* Space between lines */
+    margin: 0px 0px 5px 0px; /* Space between lines */
     font-size: 0.9rem;
     color: #d3d3d3; /* Light grey for text */
   }
