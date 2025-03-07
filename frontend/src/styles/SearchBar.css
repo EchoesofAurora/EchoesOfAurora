@@ -58,11 +58,31 @@
 }
 
 @media (max-width: 768px) {
-  .user-searchbar-container {
-    flex-direction: row;
+  .search-bar-container {
+    width: 70%;
   }
 
   .search-and-sort-container {
-    flex-wrap: wrap;
+    padding: 5px 0 5px 0px;
+  }
+
+  .search-bar {
+    width: 90%;
+  }
+
+  .sort-dropdown {
+    width: 30%;
+  }
+
+  .tribe-dropdown {
+    width: 30%;
+  }
+
+  .year-input-field {
+    width: 15%;
+  }
+
+  .time-range {
+    align-content: end;
   }
 }
