@@ -19,14 +19,10 @@
   
   .filter-sort-bar select,
   .filter-sort-bar input:not(.search-bar) {
-    padding: 4px 8px;
+    padding: 5px 8px;
     border: 1px solid #ccc;
     border-radius: 5px;
     background-color: #DDD5F3;
-  }
-
-  .filter-sort-bar input {
-    height: 50%;
   }
 
   .search-container {
@@ -40,7 +36,7 @@
     padding: 4px 10px;
     font-size: 16px;
     border: 1px solid #DDD5F3;
-    border-radius: 5px 0px 0px 5px;
+    border-radius: 5px 5px 5px 5px;
     background-color: #DDD5F3;
   }
   

@@ -44,7 +44,7 @@
   }
 
 .user-hero-title {
-    font-size: 6.5rem; /* Adjust size to match */
+    font-size: 5.5rem; /* Adjust size to match */
     font-weight: 1000; /* Extra bold text */
     font-style: italic; /* Adds italic style */
     color: white; /* Ensure text is white */
@@ -58,7 +58,7 @@
   }
 
 .user-hero-subtext {
-    font-size: 1rem;
+    font-size: 1.5rem;
     margin-bottom: 30px;
     padding: 0 20%;
     color: #cecece;
@@ -176,14 +176,13 @@
     text-align: center;
 }
 
-.user-section h2 {
+.user-section-title {
     font-size: 3.8rem;
     color: rgb(91, 52, 10);
     margin: 0px 0px 20px 0px;
 }
 
-.user-section p {
-    max-width: 800px;
+.user-section-intro-description {
     margin: 0 auto 40px auto;
     font-size: 1.3rem;
     color: rgb(91, 52, 10);
@@ -280,7 +279,5 @@
     display: flex;
     justify-content: center;
     align-items: center;
-    height: 50vh;
+    height: 45vh;
 }
-
-
