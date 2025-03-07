@@ -56,3 +56,13 @@
     height: 100%;
     border-radius: 0px 5px 5px 0px;
 }
+
+@media (max-width: 768px) {
+  .user-searchbar-container {
+    flex-direction: row;
+  }
+
+  .search-and-sort-container {
+    flex-wrap: wrap;
+  }
+}
