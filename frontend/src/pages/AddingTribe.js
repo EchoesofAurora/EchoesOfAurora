@@ -386,4 +386,6 @@ const AddingTribe = () => {
       </div>
     </div>
   );
-export default AddingTribe;
+};
+
+export default AddingTribe; // Moved to top level
