@@ -29,8 +29,7 @@ router.get('/:tribeId', async (req, res) => {
       'SELECT media_id, media_name, media_type, image_data FROM image_store WHERE tribe_id = $1',
       [tribeId]
     );
-    console.log(`Found ${imagesResult.rows.length} images for tribe_id ${tribeId}:`, imagesResult.rows.map(row => row.media_id));
-
+    
     // Convert image_data (Buffer) to base64 string for frontend compatibility
     tribe.images = imagesResult.rows.map(row => ({
       media_id: row.media_id,

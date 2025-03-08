@@ -5,7 +5,6 @@ import "../styles/styles.css";
 import Header from "../components/Header";
 import Footer from "../components/Footer";
 
-
 function StoriesPage() {
   const [stories, setStories] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -15,13 +14,15 @@ function StoriesPage() {
   useEffect(() => {
     const fetchStories = async () => {
       try {
-        const response = await fetch("/api/stories"); // Fetch stories from backend
+        const response = await fetch("/api/stories");
         if (!response.ok) {
           throw new Error(`HTTP error! Status: ${response.status}`);
         }
         const data = await response.json();
+        console.log("Fetched stories:", data); // Debug log
         setStories(data);
       } catch (error) {
+        console.error("Error fetching stories:", error);
         setError(error.message);
       } finally {
         setLoading(false);
@@ -41,7 +42,6 @@ function StoriesPage() {
       return null;
     }
   };
-  
 
   const handleLearnMore = (story) => {
     navigate(`/story/${story.story_id}`, { state: { story } });
@@ -51,21 +51,16 @@ function StoriesPage() {
     <div className="user-frontend stories-page">
       <Header />
       <div className="hero hero-section stories-hero">
-        <h1 className="user-hero-title">
-          Aurora Stories
-        </h1>
+        <h1 className="user-hero-title">Aurora Stories</h1>
         <p className="user-hero-subtext">
-          Explore a collection of ancient stories that reveal the celestial
-          connections of indigenous cultures to the northern lights.
+          Explore a collection of ancient stories that reveal the celestial connections of indigenous cultures to the northern lights.
         </p>
         <button className="explore-button">Explore</button>
       </div>
       <div className="description">
         <h2>Timeless Tales of Sky and Spirit</h2>
         <p>
-          Each story holds a profound connection to the celestial wonders of the
-          aurora borealis, illuminating the heritage, beliefs, and spiritual
-          insights of diverse cultures.
+          Each story holds a profound connection to the celestial wonders of the aurora borealis, illuminating the heritage, beliefs, and spiritual insights of diverse cultures.
         </p>
       </div>
       <div className="stories-list">
@@ -75,17 +70,16 @@ function StoriesPage() {
           <p>Error: {error}</p>
         ) : stories.length > 0 ? (
           stories.map((story, index) => (
-            <div className="story-card" key={index}>
+            <div className="story-card" key={story.story_id}>
               <img
-                src={getImageUrl(story.story_id)}
+                src={getImageUrl(story.story_id) || "/default-story-image.png"}
                 alt={story.story_name}
                 className="story-image"
               />
               <div className="story-content">
                 <h3 className="story-title">{index + 1}. {story.story_name}</h3>
                 <p className="story-description">
-                  <strong>Description:</strong>{" "}
-                  {story.story_text.slice(0, 150)}...
+                  <strong>Description:</strong> {story.story_text.slice(0, 150)}...
                 </p>
                 <button
                   className="learn-more-button"
@@ -97,7 +91,7 @@ function StoriesPage() {
             </div>
           ))
         ) : (
-          <p>No stories found.</p>
+          <p>No published stories available.</p>
         )}
       </div>
       <Footer />
