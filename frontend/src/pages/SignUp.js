@@ -1,112 +1,121 @@
-import React from 'react';
-import "../styles/AdminStyle.css"
-import envelope from '../images/envelope.png';
-import personFrame from '../images/personFrame.png';
+import React, { useState } from "react";
+import "../styles/AdminStyle.css";
+import Sidebar from "../components/Sidebar";
+import Header from "../components/AdminHeader";
+import envelope from "../images/envelope.png";
+import personFrame from "../images/personFrame.png";
 import lock from '../images/Component 1.png';
-import Header from '../components/AHeader.js';
-import Footer from '../components/AFooter.js';
-import HeroContainer from '../components/HeroContainer.js';
 
+const HeroAdminAddUser = () => {
+  const [user, setUser] = useState({
+    fullName: "",
+    email: "",
+    password: "",
+    confirmPassword: "",
+  });
 
+  const handleChange = (e) => {
+    setUser({ ...user, [e.target.name]: e.target.value });
+  };
 
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    if (user.password !== user.confirmPassword) {
+      alert("Passwords do not match!");
+      return;
+    }
+    console.log("New User Added:", user);
+    alert("User added successfully!");
+  };
 
-const HeroSection = ()=>{
   return (
-    <div className="sign-in-wrapper">
-      <HeroContainer 
-      title="Welcome to Echoes of Aurora" 
-      description="Discover our collection of stories and resources to immerse yourself in the wonders of Indigenous culture and the aurora borealis" 
-      /> 
-      <div className="login-container">
-        <div className='login-container-text'>
-          <h1 className="Login-title">Sign Up</h1>
-          <p className="Login-description">Welcome! Please enter your details</p>
-        </div>
- 
-        <div className="input-container">
-          <label className="label">Full Name</label>
-          <div className="input-wrapper">
-            <img 
-              src= {personFrame}
-              alt="person"
-              className="envelope"
-            />
-            <input
-              type="Name"
-              placeholder="Enter your Full Name"
-              className="input"
-            />
-          </div>
-        </div>
-        <div className="input-container">
-          <label className="label">Email</label>
-          <div className="input-wrapper">
-            <img 
-              src= {envelope}
-              alt="mail"
-              className="envelope"
-            />
-            <input
-              type="email"
-              placeholder="Enter your email"
-              className="input"
-            />
-          </div>
-        </div>
+    <div className="overlap">
+      <Sidebar />
+      <main className="rightFrame-5">
+        <div className="content-container">
+          <h1 className="page-title">Add New User</h1>
+          <form className="profile-container" onSubmit={handleSubmit}>
+            <div className="input-container">
+              <label className="label">Full Name</label>
+              <div className="input-wrapper">
+                <img src={personFrame} alt="person" className="newUserFormIcon" />
+                <input
+                  type="text"
+                  name="fullName"
+                  placeholder="Enter full name"
+                  className="input"
+                  value={user.fullName}
+                  onChange={handleChange}
+                  required
+                />
+              </div>
+            </div>
 
-        <div className="input-container">
-          <label className="password-label">Password</label>
-          <div className="password-wrapper">
-            <img 
-              src= {lock}
-              alt="lock"
-              className="lock"
-            />
-            <input
-              type="password"
-              placeholder="********"
-              className="password-input"
-            />
-          </div>
-        </div>
-        <div className="input-container">
-          <label className="password-label">Confirm Password</label>
-          <div className="password-wrapper">
-            <img 
-              src= {lock}
-              alt="lock"
-              className="lock"
-            />
-            <input
-              type="Password"
-              placeholder="********"
-              className="password-input"
-            />
-          </div>
-        </div>
+            <div className="input-container">
+              <label className="label">Email</label>
+              <div className="input-wrapper">
+                <img src={envelope} alt="mail" className="newUserFormIcon" />
+                <input
+                  type="email"
+                  name="email"
+                  placeholder="Enter email"
+                  className="input"
+                  value={user.email}
+                  onChange={handleChange}
+                  required
+                />
+              </div>
+            </div>
 
-        <a href='../'><button className="signIn-button">
-          <span className="button-text">Sign Up</span>
-        </button></a>
+            <div className="input-container">
+              <label className="label">Password</label>
+              <div className="input-wrapper">
+                <img src={lock} alt="lock" className="newUserFormIcon" />
+                <input
+                  type="password"
+                  name="password"
+                  placeholder="Enter password"
+                  className="input"
+                  value={user.password}
+                  onChange={handleChange}
+                  required
+                />
+              </div>
+            </div>
 
-        <p className="sign-up-text">
-          I already have an account? <a href="../" className="sign-up-link">Sign In</a>
-        </p>
+            <div className="input-container">
+              <label className="label">Confirm Password</label>
+              <div className="input-wrapper">
+                <img src={lock} alt="lock" className="newUserFormIcon" />
+                <input
+                  type="password"
+                  name="confirmPassword"
+                  placeholder="Confirm password"
+                  className="input"
+                  value={user.confirmPassword}
+                  onChange={handleChange}
+                  required
+                />
+              </div>
+            </div>
+
+            <button type="submit" className="submit-button">Add User</button>
+          </form>
+        </div>
+      </main>
+    </div>
+  );
+};
+
+const AdminAddUser = () => {
+  return (
+    <div className="ManageStories">
+      <div className="div">
+        <Header />
+        <HeroAdminAddUser />
       </div>
     </div>
   );
 };
 
-
-
-const SignUp = () => {
-  return (
-    <div>
-      <Header />
-      <HeroSection />
-      <Footer />
-    </div>
-  );
-};
-
-export default SignUp;
+export default AdminAddUser;

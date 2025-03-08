@@ -7,6 +7,7 @@ import Sidebar from "../components/Sidebar";
 import Header from "../components/AdminHeader";
 import { Modal, Button } from "react-bootstrap";
 import { useNavigate } from "react-router-dom";
+import AdminSearchBar from "../components/AdminSearchBar"
 
 const HeroManageStories = () => {
   const [stories, setStories] = useState([]);
@@ -106,6 +107,7 @@ const HeroManageStories = () => {
             </Modal.Footer>
           </Modal>
         )}
+        {/* <AdminSearchBar /> */}
 
         <div className="stories-table">
           <div className="table-header">
