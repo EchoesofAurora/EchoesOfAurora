@@ -17,14 +17,16 @@ function StoriesPage() {
   useEffect(() => {
     const fetchStories = async () => {
       try {
-        const response = await fetch("/api/stories"); // Fetch stories from backend
+        const response = await fetch("/api/stories");
         if (!response.ok) {
           throw new Error(`HTTP error! Status: ${response.status}`);
         }
         const data = await response.json();
+        console.log("Fetched stories:", data); // Debug log
         setStories(data);
         setSearchResults(data.sort((a, b) => a.story_name.localeCompare(b.story_name))); // Initialize search results with all stories
       } catch (error) {
+        console.error("Error fetching stories:", error);
         setError(error.message);
       } finally {
         setLoading(false);
@@ -148,7 +150,7 @@ function StoriesPage() {
           searchResults.map((story, index) => (
             <div className="story-card" key={index}>
               <img
-                src={getImageUrl(story.story_id)}
+                src={getImageUrl(story.story_id) || "/default-story-image.png"}
                 alt={story.story_name}
                 className="story-image"
               />
@@ -173,7 +175,7 @@ function StoriesPage() {
             </div>
           ))
         ) : (
-          <p>No stories found.</p>
+          <p>No published stories available.</p>
         )}
       </div>
       <Footer />

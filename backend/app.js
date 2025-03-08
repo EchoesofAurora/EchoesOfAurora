@@ -6,7 +6,8 @@ const cors = require('cors');
 const tribesRoutes = require('./routes/tribes');
 const storiesRoutes = require('./routes/stories');
 const adminTribeRoutes = require('./routes/adminTribes');
-const imageUploadRoutes = require('./routes/imageUploadRoutes'); // Import image upload routes
+const adminStoriesRoutes = require('./routes/adminStories');
+const imageUploadRoutes = require('./routes/imageUploadRoutes');
 
 // Initialize the Express App
 const app = express();
@@ -17,17 +18,24 @@ app.use(cors({
     origin: 'http://localhost:3000',  // Frontend address
     methods: ['GET', 'POST', 'PUT', 'DELETE'],
     allowedHeaders: ['Content-Type', 'Authorization'],
-  }));
+}));
 
 // API Routes
-app.use('/api/tribes', tribesRoutes); // Routes for tribes
-app.use('/api/stories', storiesRoutes); // Routes for stories
-app.use('/api/admin/tribes', adminTribeRoutes); // Admin-specific routes
-app.use('/api/images', imageUploadRoutes); // Mount the image upload routes
+app.use('/api/tribes', tribesRoutes);
+app.use('/api/stories', storiesRoutes);
+app.use('/api/admin/tribes', adminTribeRoutes);
+app.use('/api/admin/stories', adminStoriesRoutes);
+app.use('/api/images', imageUploadRoutes);
 
 // Default Route
 app.get('/', (req, res) => {
     res.send('Welcome to the Aurora Project Backend!');
 });
 
-module.exports = app; // Export the app instance
+// Global error handling middleware
+app.use((err, req, res, next) => {
+    console.error('Global error handler:', err.stack);
+    res.status(500).json({ message: 'Internal server error', error: err.message });
+});
+
+module.exports = app;

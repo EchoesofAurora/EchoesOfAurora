@@ -43,10 +43,14 @@ const ProfileUpdatedPopUp = ({ field, newValue, onClose }) => {
         </p>
 
         {!pinSent ? (
-          <button className="popup-send-pin-button" onClick={handleSendPin}>
-            Send PIN
-          </button>
-          
+          <div className="popup-buttons">
+            <button className="popup-send-pin-button" onClick={handleSendPin}>
+              Send PIN
+            </button>
+            <button className="popup-close-button" onClick={onClose}>
+              Cancel
+            </button>
+          </div>
         ) : (
           <>
             <input
@@ -64,11 +68,11 @@ const ProfileUpdatedPopUp = ({ field, newValue, onClose }) => {
                 Cancel
               </button>
             </div>
-            <p className="popup-timer">Time left: {Math.floor(timeLeft / 60)}:{(timeLeft % 60).toString().padStart(2, "0")}</p>
+            <p className="popup-timer">
+              Time left: {Math.floor(timeLeft / 60)}:{(timeLeft % 60).toString().padStart(2, "0")}
+            </p>
           </>
         )}
-
-        
       </div>
     </section>
   );
