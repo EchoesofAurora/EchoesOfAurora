@@ -5,6 +5,7 @@ import "../styles/AddingStory.css";
 import "../styles/ManageStories.css";
 import Sidebar from "../components/Sidebar";
 import Header from "../components/AdminHeader";
+import Footer from "../components/AdminFooter";
 import { Modal, Button } from "react-bootstrap";
 import { useNavigate } from "react-router-dom";
 
@@ -339,6 +340,7 @@ const AddingStory = () => {
         <Header />
         <HeroAddingStory />
       </div>
+      <Footer />
     </div>
   );
 };
