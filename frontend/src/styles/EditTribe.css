@@ -107,6 +107,7 @@
 .edit-tribe-publish-button:hover {
   opacity: 0.9;
 }
+
 .edit-tribe-upload-button {
   background-color: #a49cbe;
   color: #fff;
@@ -122,97 +123,104 @@
   color: #313638;
   margin-top: 5px;
 }
-/* Back Button */
-.editt-tribe-back-button {
-background-color: #9d499a;
-color: white;
-border: none;
-padding: 12px 24px;
-border-radius: 5px;
-cursor: pointer;
-font-size: 16px;
-font-weight: bold;
+
+/* Back Button (Fixed typo: editt-tribe-back-button to edit-tribe-back-button) */
+.edit-tribe-back-button {
+  background-color: #9d499a;
+  color: white;
+  border: none;
+  padding: 12px 24px;
+  border-radius: 5px;
+  cursor: pointer;
+  font-size: 16px;
+  font-weight: bold;
 }
 
 /* Hover Effect */
 .edit-tribe-back-button:hover {
-background-color: #b0b0b0;
+  background-color: #b0b0b0;
 }
 
 .edit-tribe-map-section {
-margin-top: 20px;
+  margin-top: 20px;
 }
+
 .edit-tribe-map-instruction {
-font-size: 16px;
-color: #b2b2b2;
-margin-bottom: 10px;
+  font-size: 16px;
+  color: #b2b2b2;
+  margin-bottom: 10px;
 }
 
 .edit-tribe-map-button {
-background-color: #a49cbe;
-color: #fff;
-border: none;
-border-radius: 4px;
-padding: 10px 20px;
-margin-bottom: 15px;
-cursor: pointer;
+  background-color: #a49cbe;
+  color: #fff;
+  border: none;
+  border-radius: 4px;
+  padding: 10px 20px;
+  margin-bottom: 15px;
+  cursor: pointer;
 }
 
 .edit-tribe-map-button:hover {
-background-color: #7b6d96;
+  background-color: #7b6d96;
 }
 
 /* Modal Overlay */
 .custom-modal .modal-dialog {
-display: flex;
-align-items: center;
-justify-content: center;
-min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 100vh;
 }
 
 /* Modal Content */
 .custom-modal .modal-content {
-background: #fff;
-border-radius: 8px;
-padding: 20px;
-box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
-text-align: center;
-width: 400px;
+  background: #fff;
+  border-radius: 8px;
+  padding: 20px;
+  box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+  text-align: center;
+  width: 400px;
 }
 
 /* Modal Header */
 .custom-modal .modal-header {
-border-bottom: none;
-font-size: 18px;
-font-weight: bold;
+  border-bottom: none;
+  font-size: 18px;
+  font-weight: bold;
 }
 
 /* Modal Body */
 .custom-modal .modal-body {
-font-size: 16px;
-color: #004d6b;
-font-family: sans-serif;
-font-weight: 700;
+  font-size: 16px;
+  color: #004d6b;
+  font-family: sans-serif;
+  font-weight: 700;
 }
 
 /* Modal Footer */
 .custom-modal .modal-footer {
-border-top: none;
-display: flex;
-justify-content: center;
+  border-top: none;
+  display: flex;
+  justify-content: center;
 }
 
 /* Close Button */
 .custom-modal .btn-secondary {
-background-color: #7b6d96;
-border: none;
-padding: 10px 20px;
-border-radius: 5px;
-font-size: 16px;
+  background-color: #7b6d96;
+  border: none;
+  padding: 10px 20px;
+  border-radius: 5px;
+  font-size: 16px;
 }
 
 .custom-modal .btn-secondary:hover {
-opacity: 0.9;
+  opacity: 0.9;
+}
+
+.tribe-image {
+  position: relative;
+  display: inline-block;
 }
 
 .tribe-image img {
@@ -220,8 +228,107 @@ opacity: 0.9;
   max-width: 100%;
   height: auto;
 }
+
 .image-preview-container {
   display: flex;
   gap: 10px;
   flex-wrap: wrap;
+}
+
+.remove-image-button {
+  position: absolute;
+    top: -5px;
+    right: -5px;
+    background: red;
+    color: white;
+    border: none;
+    padding: 3px 6px;
+    font-size: 12px;
+    border-radius: 50%;
+    cursor: pointer;
+    opacity: 0.8;
+    transition: opacity 0.2s;
+}
+
+.remove-image-button:hover {
+  background-color: rgba(255, 0, 0, 1);
+}
+
+/* Styles for ImageUpload Component */
+.image-uploader-container {
+  margin: 20px 0;
+}
+
+.custom-file-upload {
+  display: inline-block;
+  padding: 10px 20px;
+  background-color: #a49cbe;
+  color: white;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.custom-file-upload input {
+  display: none;
+}
+
+.image-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-top: 10px;
+}
+
+.image-wrapper {
+  position: relative;
+  display: inline-block;
+}
+
+.image-preview {
+  width: 100px;
+  height: 100px;
+  object-fit: cover;
+  cursor: pointer;
+}
+
+.remove-btn {
+  position: absolute;
+  top: 5px;
+  right: 5px;
+  background-color: rgba(255, 0, 0, 0.7);
+  color: white;
+  border: none;
+  border-radius: 50%;
+  width: 20px;
+  height: 20px;
+  cursor: pointer;
+  font-size: 14px;
+  line-height: 20px;
+  text-align: center;
+}
+
+.remove-btn:hover {
+  background-color: rgba(255, 0, 0, 1);
+}
+
+.overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.8);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+}
+
+.expanded-image-container {
+  position: relative;
+}
+
+.expanded-image {
+  max-width: 90vw;
+  max-height: 90vh;
 }
