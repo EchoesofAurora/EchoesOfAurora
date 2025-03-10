@@ -386,4 +386,5 @@ const AddingTribe = () => {
       </div>
     </div>
   );
+}
 export default AddingTribe;
