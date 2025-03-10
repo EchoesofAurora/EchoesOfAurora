@@ -1,28 +1,29 @@
-import React from 'react';
-import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
-import HomePage from '../src/pages/homePage';
-import StoriesPage from '../src/pages/storiesPage';
-import TribesPage from './pages/TribesPage';
+import React from "react";
+import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+import HomePage from "../src/pages/homePage";
+import StoriesPage from "../src/pages/storiesPage";
+import TribesPage from "./pages/TribesPage";
 import TribeLandingPage from "./pages/tribeLandingPage";
-import StoryLandingPage from './pages/StoryLandingPage';
-import MapPage from './pages/mapPage';
-import ContactPage from './pages/contactPage';
-import About from './pages/About';
-import SignIn from './pages/LoginPage';
-import ForgotPassword from './pages/forgotPassword';
-import PasswordChanged from './pages/PasswordChanged';
-import SetNewPassword from './pages/SetNewPassword';
-import SignUp from './pages/SignUp'; 
-import Dashboard from './pages/Dashboard';
-import ManageStories from './pages/ManageStories';
-import ManageTribes from './pages/ManageTribes';
+import StoryLandingPage from "./pages/StoryLandingPage";
+import MapPage from "./pages/mapPage";
+import ContactPage from "./pages/contactPage";
+import About from "./pages/About";
+import SignIn from "./pages/LoginPage";
+import ForgotPassword from "./pages/forgotPassword";
+import PasswordChanged from "./pages/PasswordChanged";
+import SetNewPassword from "./pages/SetNewPassword";
+import SignUp from "./pages/SignUp";
+import Dashboard from "./pages/Dashboard";
+import ManageStories from "./pages/ManageStories";
+import ManageTribes from "./pages/ManageTribes";
 import EditTribe from "./pages/EditTribe";
-import UserSubmissions from './pages/UserSubmissions';
-import AddingTribe from './pages/AddingTribe';
-import EditProfile from './pages/profileEdit';
+import UserSubmissions from "./pages/UserSubmissions";
+import AddingTribe from "./pages/AddingTribe";
+import EditProfile from "./pages/profileEdit";
 import AddingStory from "./pages/AddingStory";
 import EditStory from "./pages/EditStory";
 import SubmissionDetail from './pages/SubmissionDetail'; // New component for detailed view
+
 import "bootstrap/dist/css/bootstrap.min.css";
 
 const App = () => {

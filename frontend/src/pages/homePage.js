@@ -29,13 +29,13 @@ const HeroSection = () => {
 
   return (
 
-    <section className="hero hero-section"
+    <section className="user-hero user-hero-section user-section-background"
              style={{
                background: `url(${images[currentImageIndex]}) no-repeat center center/cover`,
              }}>
-      <h1 className="hero-title">Explore the Mystical World of Aurora Borealis</h1>
-      <p className="hero-text">
-        Welcome to the Indigenous Stories and Space Weather Platform, where we merge North American indigenous storytelling about the aurora borealis with historical space weather data.
+      <h1 className="user-hero-title">Echoes of Aurora</h1>
+      <p className="user-hero-subtext">
+        Welcome to "Echoes of Aurora", where we catalog and display North American indigenous storytelling about the aurora borealis with historical space weather data.
       </p>
     </section>
   );
@@ -51,11 +51,11 @@ const AboutSection = () => {
   };
 
   return (
-    <section className="section about">
+    <section className="user-section about user-section-background user-section-shadow">
       <div className="about-content">
         <div className="about-text">
-          <h2>About This Project</h2>
-          <p class='block-align'>
+          <h2 className="user-section-title">About This Project</h2>
+          <p className='user-section-intro-description block-align'>
             Welcome to a unique fusion of science, culture, and storytelling. This platform brings together indigenous knowledge and modern space weather research to explore the fascinating phenomena of the aurora borealis. Through interactive tools and real-life stories, we aim to educate, inspire, and celebrate the rich cultural heritage connected to the northern lights.
             <br></br>
             Discover more about auroras and the legends that surround them, as we bridge the gap between ancient traditions and cutting-edge science.
@@ -70,20 +70,10 @@ const AboutSection = () => {
   );
 };
 
-// Story Card Component
-const StoryCard = ({ image, title, description }) => (
-  <div className="story-card">
-    <img src={image} alt={title} />
-    <div className="story-content">
-      <h3>{title}</h3>
-      <p>{description}</p>
-    </div>
-  </div>
-);
-
 // Stories Section Component
 const StoriesSection = () => {
   const [stories, setStories] = useState([]);
+  const [tribes, setTribes] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const navigate = useNavigate();
@@ -104,7 +94,29 @@ const StoriesSection = () => {
       }
     };
     fetchStories();
+
+    const fetchTribes = async () => {
+      try {
+        const response = await fetch("/api/tribes"); // Fetch stories from backend
+        if (!response.ok) {
+          throw new Error(`HTTP error! Status: ${response.status}`);
+        }
+        const data = await response.json();
+        setTribes(data);
+      } catch (error) {
+        setError(error.message);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchTribes();
   }, []);
+
+  const tribeDictionary = tribes.reduce((acc, tribe) => {
+    acc[tribe.tribe_id] = tribe.tribe_name;  // Use tribe_name as the key and tribe_id as the value
+    return acc;
+  }, {});
 
   const imagesContext = require.context("../images/stories", false, /\.png$/);
   const getImageUrl = (storyId) => {
@@ -121,21 +133,45 @@ const StoriesSection = () => {
     navigate("/stories");
   };
 
+  const handleLearnMore = (story) => {
+    navigate(`/story/${story.story_id}`, { state: { story } });
+  };
+
   return (
-    <section className="section stories">
-      <h2>Stories</h2>
-      <div className="story-card-container">
+    <section className="user-section stories user-section-background long-section-background user-section-shadow">
+      <h2 className="user-section-title">Stories</h2>
+      <div className="stories-list">
         {loading ? (
           <p>Loading stories...</p>
         ) : error ? (
           <p>Error: {error}</p>
         ) : stories.length > 0 ? (
-          stories.slice(0, 4).map((story, index) => (
-            <StoryCard
-              image={getImageUrl(story.story_id)}
-              title={story.story_name}
-              description={story.story_text.slice(0, 150)}
-            />
+          stories.map((story, index) => (
+            <div className="story-card" key={index}>
+              <img
+                src={getImageUrl(story.story_id)}
+                alt={story.story_name}
+                className="story-image"
+              />
+              <div className="story-content">
+                <div className="story-card-top-bar">
+                  <h3 className="story-title">{story.story_name}</h3>
+                  <h2 className="story-tribe">{tribeDictionary[story.tribe_id]}</h2>
+                </div>
+                <p className="story-description">
+                  <strong>Description:</strong> {story.story_text.slice(0, 150)}...
+                </p>
+                <div className="story-card-bottom-bar">
+                  <button
+                    className="learn-more-button"
+                    onClick={() => handleLearnMore(story)}
+                  >
+                    Learn more
+                  </button>
+                  <h2 className="story-year">Year: {story.story_year}</h2>
+                </div>
+              </div>
+            </div>
           ))
         ) : (
           <p>No stories found.</p>
@@ -148,11 +184,11 @@ const StoriesSection = () => {
 
 // Map Section Component
 const MapSection = () => (
-  <section className="section map-section">
-    <h2>Interactive Map</h2>
+  <section className="user-section map-section">
+    <h2 className="user-section-title">Interactive Map</h2>
     <Link to="/map">
       <img
-        className="map map-image"
+        className="user-map-image"
         src={require("../images/Map.png")}
         alt="Interactive Map of the United States"
       />

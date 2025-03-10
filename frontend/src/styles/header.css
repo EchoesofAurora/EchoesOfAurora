@@ -1,4 +1,4 @@
-.header {
+.user-header {
   background: linear-gradient(135deg, rgba(76, 41, 82, 0.95), rgba(34, 34, 34, 0.95));
   box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
   padding: 10px;
@@ -9,9 +9,10 @@
   top: 0;
   z-index: 1000;
   font-family: 'Poppins', sans-serif;
+  height: 10vh;
 }
 
-.container {
+.user-header-container {
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -20,25 +21,25 @@
   margin: 0 auto;
 }
 
-.logo {
+.user-header-logo {
   display: flex;
   align-items: center;
   justify-content: flex-start;
-  width: 80px;
+  width: auto;
   height: auto;
 }
 
-.logo-img {
+.user-header-logo-img {
   width: 60px !important;
   height: auto !important;
 }
 
-.nav-bar {
+.user-header-nav-bar {
   display: flex;
   gap: 35px;
 }
 
-.nav-bar a {
+.user-header-nav-bar a {
   text-decoration: none;
   color: rgb(254, 239, 255);
   font-size: 1.2rem;
@@ -46,11 +47,11 @@
   transition: color 0.3s;
 }
 
-.nav-bar a:hover {
+.user-header-nav-bar a:hover {
   color: #9d4edd;
 }
 
-.sign-in-button {
+.user-header-sign-in-button {
   background-color: transparent;
   color: rgba(255, 255, 255, 0.7);
   border: 1px solid rgba(255, 255, 255, 0.7);
@@ -62,21 +63,21 @@
   transition: all 0.3s ease;
 }
 
-.sign-in-button:hover {
+.user-header-sign-in-button:hover {
   background-color: rgba(255, 255, 255, 0.1);
   color: rgba(255, 255, 255, 1);
   border-color: rgba(255, 255, 255, 1);
 }
 
 /* Hamburger Menu Styles */
-.hamburger {
+.user-header-hamburger {
   display: none;
   flex-direction: column;
   gap: 5px;
   cursor: pointer;
 }
 
-.hamburger div {
+.user-header-hamburger div {
   width: 25px;
   height: 3px;
   background: rgba(255, 255, 255, 0.7);
@@ -84,10 +85,10 @@
 }
 
 @media (max-width: 768px) {
-  .nav-bar {
+  .user-header-nav-bar {
     display: none;
     flex-direction: column;
-    background: rgba(34, 34, 34, 0.90);
+    background: rgba(34, 34, 34, 0.9);
     position: absolute;
     top: 100%;
     left: 10%;
@@ -99,11 +100,11 @@
     padding: 10px 0px;
   }
 
-  .nav-bar.active {
+  .user-header-nav-bar.active {
     display: flex;
   }
 
-  .hamburger {
+  .user-header-hamburger {
     display: flex;
   }
 }
