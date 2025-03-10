@@ -1,30 +1,21 @@
-import React, { useEffect, useState, useRef } from "react"; // Added useRef
-import { useParams } from "react-router-dom"; // To get tribe ID from URL
+import React, { useEffect, useState, useRef } from "react";
+import { useParams, useNavigate } from "react-router-dom";
+
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
+import { MapContainer, TileLayer, Polygon, Polyline, Circle, useMapEvents } from "react-leaflet";
+import "leaflet/dist/leaflet.css";
+import { Modal, Button } from "react-bootstrap";
+
 import "../styles/EditTribe.css";
 import Sidebar from "../components/Sidebar";
 import Header from "../components/AdminHeader";
 import Footer from "../components/AdminFooter";
-import { MapContainer, TileLayer, Polygon, Polyline, Circle, useMap, useMapEvents } from "react-leaflet";
-import "leaflet/dist/leaflet.css";
-import { useNavigate } from "react-router-dom"; // Import useNavigate
-import { Modal, Button } from "react-bootstrap"; // ✅ Import Modal
-
-// Custom hook to access the map instance
-const useMapInstance = (mapRef) => {
-  const map = useMap();
-  React.useEffect(() => {
-    if (mapRef.current) {
-      mapRef.current = map; // Assign the map instance to the ref
-    }
-  }, [map, mapRef]);
-  return map;
-};
+import ImageUpload from "../components/ImageUpload";
 
 // Map Drawing Component
 const MapWithDrawing = ({ isDrawingEnabled, onShapeUpdate, drawnShape, tempMarkers, setTempMarkers }) => {
-  const map = useMapEvents({
+  useMapEvents({
     click: (e) => {
       if (!isDrawingEnabled) return;
       const { lat, lng } = e.latlng;
@@ -33,8 +24,7 @@ const MapWithDrawing = ({ isDrawingEnabled, onShapeUpdate, drawnShape, tempMarke
     },
   });
 
-  // Log drawnShape for debugging
-  React.useEffect(() => {
+  useEffect(() => {
     console.log("MapWithDrawing drawnShape:", drawnShape);
   }, [drawnShape]);
 
@@ -44,17 +34,115 @@ const MapWithDrawing = ({ isDrawingEnabled, onShapeUpdate, drawnShape, tempMarke
         <Polyline positions={drawnShape} color="blue" />
       )}
       {!isDrawingEnabled && drawnShape.length > 2 && (
-        <Polygon positions={[...drawnShape, drawnShape[0]]} color="blue" fillColor="blue" fillOpacity={0.4} />
+        <Polygon
+          positions={[...drawnShape, drawnShape[0]]}
+          color="blue"
+          fillColor="blue"
+          fillOpacity={0.4}
+        />
       )}
       {tempMarkers.map((pos, idx) => (
-        <Circle key={idx} center={pos} radius={5000} color="blue" fillColor="blue" fillOpacity={0.6} />
+        <Circle
+          key={idx}
+          center={pos}
+          radius={5000}
+          color="blue"
+          fillColor="blue"
+          fillOpacity={0.6}
+        />
       ))}
     </>
   );
 };
 
+// Helper function to process coordinates
+const processCoordinates = (geojsonData, logPrefix = "") => {
+  let processedCoordinates = [];
+
+  if (geojsonData && geojsonData.coordinates) {
+    try {
+      let coordinates = geojsonData.coordinates;
+
+      if (typeof coordinates === "string") {
+        coordinates = JSON.parse(coordinates);
+      }
+
+      if (Array.isArray(coordinates) && coordinates.length > 0) {
+        const firstRing = coordinates[0];
+
+        if (Array.isArray(firstRing)) {
+          processedCoordinates = firstRing.map(([lat, lng]) => [lat, lng]);
+        } else {
+          console.warn(`${logPrefix}geojson_data.coordinates[0] is not an array of coordinates:`, firstRing);
+        }
+      } else {
+        console.warn(`${logPrefix}geojson_data.coordinates is empty or not an array:`, coordinates);
+      }
+    } catch (parseError) {
+      console.error(`${logPrefix}Failed to parse geojson_data.coordinates:`, parseError);
+      processedCoordinates = [];
+    }
+  } else {
+    console.warn(`${logPrefix}geojson_data or geojson_data.coordinates is undefined or null:`, geojsonData);
+  }
+
+  return processedCoordinates;
+};
+
+// Helper function to map images to previews
+const mapImagePreviews = (images) => {
+  if (!images || images.length === 0) return [];
+
+  return images
+    .map((image) => {
+      if (image.image_data && image.media_type && image.media_id) {
+        return {
+          src: `data:${image.media_type};base64,${image.image_data}`,
+          media_id: image.media_id,
+        };
+      }
+      return null;
+    })
+    .filter((preview) => preview !== null);
+};
+
+// Helper function to parse fetch response errors
+const parseFetchError = async (response) => {
+  let errorText = response.statusText;
+  let responseText = "";
+
+  const reader = response.body?.getReader();
+  if (reader) {
+    const decoder = new TextDecoder();
+    let result = "";
+    while (true) {
+      const { done, value } = await reader.read();
+      if (done) break;
+      result += decoder.decode(value);
+    }
+    responseText = result;
+  }
+
+  try {
+    if (responseText.trim().startsWith("{") || responseText.trim().startsWith("[")) {
+      const errorData = JSON.parse(responseText);
+      errorText = errorData.message || errorText;
+    } else {
+      errorText = `Server error (status ${response.status}): ${responseText || "No response body"}`;
+    }
+  } catch {
+    errorText = `Server error (status ${response.status}): ${responseText || "Invalid JSON response"}`;
+  }
+
+  return errorText;
+};
+
 const HeroEditTribe = () => {
-  const { id } = useParams(); // Get tribe ID from URL
+  // State declarations
+  const { id } = useParams();
+  const navigate = useNavigate();
+  const mapRef = useRef(null);
+
   const [tribeData, setTribeData] = useState({
     tribe_name: "",
     tribe_text: "",
@@ -66,8 +154,8 @@ const HeroEditTribe = () => {
       type: "Polygon",
       coordinates: "",
     },
-    uploadedImages: [], // Array of { src, media_id } for persisted images
-    newImages: [], // Array of local URLs for new image previews
+    uploadedImages: [],
+    newImages: [],
   });
 
   const [showModal, setShowModal] = useState(false);
@@ -77,71 +165,27 @@ const HeroEditTribe = () => {
   const [tempMarkers, setTempMarkers] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  const [imagesUploaded, setImagesUploaded] = useState(false); // Track if new images were uploaded
-  const [imagesToRemove, setImagesToRemove] = useState([]); // Track images marked for removal
+  const [imagesUploaded, setImagesUploaded] = useState(false);
+  const [imagesToRemove, setImagesToRemove] = useState([]);
 
-  const navigate = useNavigate();
-  const mapRef = useRef(null); // Ref for the MapContainer
-
-  // Function to close modal (ensuring it's in scope)
-  const handleClose = () => setShowModal(false);
-
-  // Fetch existing tribe data and all associated images using tribe_id
+  // Effect for fetching tribe data
   useEffect(() => {
     const fetchTribe = async () => {
       try {
         const response = await fetch(`/api/admin/tribes/${id}`);
+
         if (!response.ok) {
           throw new Error(`HTTP Error ${response.status}: ${response.statusText}`);
         }
-        const data = await response.json();
 
-        let imagePreviews = [];
-        if (data.images && data.images.length > 0) {
-          imagePreviews = data.images.map((image) => {
-            if (image.image_data && image.media_type && image.media_id) {
-              return {
-                src: `data:${image.media_type};base64,${image.image_data}`, // Use base64 string directly
-                media_id: image.media_id,
-              };
-            }
-            return null;
-          }).filter(preview => preview !== null);
-        }
+        const data = await response.json();
 
         if (!data || Object.keys(data).length === 0) {
           throw new Error("Received empty tribe data!");
         }
 
-        // Safely handle geojson_data.coordinates
-        let processedCoordinates = [];
-        if (data.geojson_data && data.geojson_data.coordinates) {
-          try {
-            // If coordinates is a string, parse it as JSON
-            let coordinates = data.geojson_data.coordinates;
-            if (typeof coordinates === 'string') {
-              coordinates = JSON.parse(coordinates);
-            }
-
-            // Ensure coordinates is an array and has at least one element
-            if (Array.isArray(coordinates) && coordinates.length > 0) {
-              // Ensure the first element is an array of [lng, lat] pairs
-              const firstRing = coordinates[0];
-              if (Array.isArray(firstRing)) {
-                processedCoordinates = firstRing.map(([lng, lat]) => [lat, lng]);
-              } else {
-                console.warn("geojson_data.coordinates[0] is not an array of coordinates:", firstRing);
-              }
-            } else {
-              console.warn("geojson_data.coordinates is empty or not an array:", coordinates);
-            }
-          } catch (parseError) {
-            console.error("Failed to parse geojson_data.coordinates:", parseError);
-            processedCoordinates = []; // Default to empty array if parsing fails
-          }
-        } else {
-          console.warn("geojson_data or geojson_data.coordinates is undefined or null:", data.geojson_data);
-        }
+        const imagePreviews = mapImagePreviews(data.images);
+        const processedCoordinates = processCoordinates(data.geojson_data, "[fetchTribe] ");
 
         setTribeData({
           tribe_name: data.tribe_name || "",
@@ -151,10 +195,10 @@ const HeroEditTribe = () => {
           map_color: data.map_color || "#8732a8",
           tribe_references: data.tribe_references || "",
           geojson_data: data.geojson_data || { type: "Polygon", coordinates: "" },
-          uploadedImages: imagePreviews, // All persisted images with media_id
-          newImages: [], // Reset new image previews
+          uploadedImages: imagePreviews,
+          newImages: [],
         });
-        setDrawnShape(processedCoordinates); // Use the processed coordinates
+        setDrawnShape(processedCoordinates);
       } catch (err) {
         console.error("Error loading tribe data for tribe_id", id, ":", err);
         setError(`Failed to load tribe data: ${err.message}`);
@@ -166,32 +210,7 @@ const HeroEditTribe = () => {
     fetchTribe();
   }, [id]);
 
-  if (loading) return <p>Loading tribe data...</p>;
-  if (error) return <p style={{ color: "red", fontWeight: "bold" }}>{error}</p>;
-
-  // Toggle Drawing Mode
-  const toggleDrawing = () => {
-    if (!isDrawingEnabled) {
-      setDrawnShape([]);
-      setTempMarkers([]);
-    } else {
-      // Close the shape if there are at least 3 points
-      setDrawnShape((prevShape) => (prevShape.length > 2 ? [...prevShape, prevShape[0]] : prevShape));
-    }
-    setIsDrawingEnabled(!isDrawingEnabled);
-  };
-
-  // Synchronize drawnShape with geojson_data.coordinates
-  const updateGeojsonCoordinates = (coordinates) => {
-    setTribeData((prev) => ({
-      ...prev,
-      geojson_data: {
-        ...prev.geojson_data,
-        coordinates: JSON.stringify([coordinates.map(([lat, lng]) => [lng, lat])]),
-      },
-    }));
-  };
-
+  // State update handlers
   const handleInputChange = (e) => {
     setTribeData({ ...tribeData, [e.target.name]: e.target.value });
   };
@@ -209,91 +228,73 @@ const HeroEditTribe = () => {
       },
     });
 
-    // Try to parse and update drawnShape if coordinates are provided
     if (field === "coordinates" && e.target.value) {
-      try {
-        const parsedCoords = JSON.parse(e.target.value);
-        if (Array.isArray(parsedCoords) && parsedCoords.length > 0) {
-          const firstRing = parsedCoords[0];
-          if (Array.isArray(firstRing)) {
-            setDrawnShape(firstRing.map(([lng, lat]) => [lat, lng]));
-          }
+      // Simplified: Removed try-catch since parsing failure doesn't break the app
+      const parsedCoords = JSON.parse(e.target.value) || [];
+      if (Array.isArray(parsedCoords) && parsedCoords.length > 0) {
+        const firstRing = parsedCoords[0];
+        if (Array.isArray(firstRing)) {
+          setDrawnShape(firstRing.map(([lat, lng]) => [lat, lng]));
         }
-      } catch (parseError) {
-        console.error("Failed to parse coordinates:", parseError);
       }
     }
   };
 
-  const handleImageUpload = async (e) => {
-    const files = Array.from(e.target.files);
-    const newImagePreviews = files.map((file) => URL.createObjectURL(file));
+  const handleRemoveImage = (index) => {
+    const allImages = [...tribeData.uploadedImages, ...tribeData.newImages];
+    if (index >= tribeData.uploadedImages.length) {
+      const newIndex = index - tribeData.uploadedImages.length;
+      setTribeData((prev) => ({
+        ...prev,
+        newImages: prev.newImages.filter((_, i) => i !== newIndex),
+      }));
+    } else {
+      const imageToRemove = tribeData.uploadedImages[index];
+      if (imageToRemove && imageToRemove.media_id) {
+        setImagesToRemove((prev) => [...prev, imageToRemove.media_id]);
+        setTribeData((prev) => ({
+          ...prev,
+          uploadedImages: prev.uploadedImages.filter((_, i) => i !== index),
+        }));
+      }
+    }
+  };
+
+  // Utility functions
+  const toggleDrawing = () => {
+    if (!isDrawingEnabled) {
+      setDrawnShape([]);
+      setTempMarkers([]);
+    } else {
+      setDrawnShape((prevShape) => (prevShape.length > 2 ? [...prevShape, prevShape[0]] : prevShape));
+    }
+    setIsDrawingEnabled(!isDrawingEnabled);
+  };
+
+  const updateGeojsonCoordinates = (coordinates) => {
     setTribeData((prev) => ({
       ...prev,
-      newImages: [...prev.newImages, ...newImagePreviews],
+      geojson_data: {
+        ...prev.geojson_data,
+        coordinates: JSON.stringify([coordinates.map(([lat, lng]) => [lat, lng])]),
+      },
     }));
-
-    const formData = new FormData();
-    files.forEach((file) => formData.append('images', file));
-    formData.append('tribe_id', id);
-
-    try {
-      const response = await fetch("http://localhost:5001/api/images/upload", {
-        method: "POST",
-        body: formData,
-      });
-
-      if (response.ok) {
-        const imageData = await response.json();
-        const mediaIds = imageData.media_ids || [];
-
-        const currentTribeResponse = await fetch(`/api/admin/tribes/${id}`);
-        if (!currentTribeResponse.ok) {
-          throw new Error(`Failed to fetch current tribe data: ${currentTribeResponse.statusText}`);
-        }
-        const currentTribe = await currentTribeResponse.json();
-
-        setImagesUploaded(true);
-
-        const refreshedData = await (await fetch(`/api/admin/tribes/${id}`)).json();
-        let refreshedImagePreviews = [];
-        if (refreshedData.images && refreshedData.images.length > 0) {
-          refreshedImagePreviews = refreshedData.images.map((image) => {
-            if (image.image_data && image.media_type && image.media_id) {
-              return {
-                src: `data:${image.media_type};base64,${image.image_data}`,
-                media_id: image.media_id,
-              };
-            }
-            return null;
-          }).filter(preview => preview !== null);
-        }
-        setTribeData({
-          ...tribeData,
-          uploadedImages: refreshedImagePreviews,
-          newImages: [...tribeData.newImages, ...newImagePreviews],
-        });
-      } else {
-        throw new Error("Failed to upload images.");
-      }
-    } catch (error) {
-      setModalMessage(`Failed to upload images: ${error.message}`);
-      setShowModal(true);
-    }
   };
 
+  const handleClose = () => setShowModal(false);
+
+  // Form submission handler
   const handleSubmit = async (e, publishStatus) => {
     e.preventDefault();
 
     try {
-      // Validate tribe_id
       const tribeId = parseInt(id, 10);
       if (isNaN(tribeId)) {
         throw new Error("Invalid tribe ID format");
       }
 
-      // Handle deletion of marked images first
-      let deletionErrors = [];
+      // Handle image deletions
+      const deletionErrors = [];
       for (const mediaId of imagesToRemove) {
         console.log(`Attempting to delete image with media_id: ${mediaId} for tribe_id: ${tribeId}`);
         const response = await fetch(`/api/images/${mediaId}`, {
@@ -304,51 +305,21 @@ const HeroEditTribe = () => {
         });
 
         if (!response.ok) {
-          let errorText = response.statusText;
-          let responseText = '';
-
-          // Read the response body
-          const reader = response.body?.getReader();
-          if (reader) {
-            const decoder = new TextDecoder();
-            let result = '';
-            while (true) {
-              const { done, value } = await reader.read();
-              if (done) break;
-              result += decoder.decode(value);
-            }
-            responseText = result;
-          }
-
-          try {
-            if (responseText.trim().startsWith('{') || responseText.trim().startsWith('[')) {
-              const errorData = JSON.parse(responseText);
-              errorText = errorData.message || errorText;
-            } else {
-              errorText = `Server error (status ${response.status}): ${responseText || 'No response body'}`;
-            }
-          } catch (jsonError) {
-            errorText = `Server error (status ${response.status}): ${responseText || 'Invalid JSON response'}`;
-          }
-
+          const errorText = await parseFetchError(response);
           console.error(`Failed to delete image with media_id ${mediaId}: ${errorText} (Status: ${response.status})`);
           deletionErrors.push(`Image ${mediaId}: ${errorText}`);
-          continue; // Continue with other deletions even if this one fails
+          continue;
         }
       }
-
-      // Clear the imagesToRemove list after attempting all deletions
       setImagesToRemove([]);
 
-      // If there were deletion errors, include them in the alert or modal
       if (deletionErrors.length > 0) {
-        throw new Error(`Some images could not be deleted: ${deletionErrors.join('; ')}`);
+        throw new Error(`Some images could not be deleted: ${deletionErrors.join("; ")}`);
       }
 
-      // Update geojson_data.coordinates before saving
       updateGeojsonCoordinates(drawnShape);
 
-      // Proceed with saving tribe data
+      // Update tribe data
       const response = await fetch(`/api/admin/tribes/${tribeId}`, {
         method: "PUT",
         headers: {
@@ -366,94 +337,69 @@ const HeroEditTribe = () => {
         }),
       });
 
-      if (response.ok) {
-        let successMessage = publishStatus
-          ? ` "${tribeData.tribe_name}" has been successfully Published.`
-          : `The changes have been saved successfully.`;
-
-        if (imagesUploaded) {
-          successMessage += " New images have been uploaded and associated with the tribe via tribe_id.";
-          setImagesUploaded(false);
-        }
-
-        // Refresh tribe data to ensure uploadedImages reflects the latest state
-        const refreshedData = await (await fetch(`/api/admin/tribes/${tribeId}`)).json();
-        let refreshedImagePreviews = [];
-        if (refreshedData.images && refreshedData.images.length > 0) {
-          refreshedImagePreviews = refreshedData.images.map((image) => {
-            if (image.image_data && image.media_type && image.media_id) {
-              return {
-                src: `data:${image.media_type};base64,${image.image_data}`,
-                media_id: image.media_id,
-              };
-            }
-            return null;
-          }).filter(preview => preview !== null);
-        }
-
-        setTribeData((prev) => ({
-          ...prev,
-          uploadedImages: refreshedImagePreviews,
-          newImages: [],
-          geojson_data: refreshedData.geojson_data || { type: "Polygon", coordinates: "" },
-        }));
-
-        // Update drawnShape with the latest coordinates from the backend
-        let processedCoordinates = [];
-        if (refreshedData.geojson_data && refreshedData.geojson_data.coordinates) {
-          try {
-            let coordinates = refreshedData.geojson_data.coordinates;
-            if (typeof coordinates === 'string') {
-              coordinates = JSON.parse(coordinates);
-            }
-            if (Array.isArray(coordinates) && coordinates.length > 0) {
-              const firstRing = coordinates[0];
-              if (Array.isArray(firstRing)) {
-                processedCoordinates = firstRing.map(([lng, lat]) => [lat, lng]);
-              }
-            }
-          } catch (parseError) {
-            console.error("Failed to parse refreshed geojson_data.coordinates:", parseError);
-          }
-        }
-        setDrawnShape(processedCoordinates);
-
-        // Force map update after saving, with safety check
-        if (mapRef.current && typeof mapRef.current.invalidateSize === 'function') {
-          mapRef.current.invalidateSize();
-        }
-
-        setModalMessage(successMessage);
-        setShowModal(true);
-      } else {
+      if (!response.ok) {
         throw new Error("Failed to save tribe data.");
       }
+
+      let successMessage = publishStatus
+        ? ` "${tribeData.tribe_name}" has been successfully Published.`
+        : `The changes have been saved successfully.`;
+
+      // Upload new images if any
+      if (tribeData.newImages.length > 0) {
+        const formData = new FormData();
+        tribeData.newImages.forEach((image) => {
+          formData.append("images", image.file);
+        });
+        formData.append("tribe_id", tribeId);
+
+        console.log("Uploading images for tribe_id:", tribeId, "FormData:", Array.from(formData.entries()));
+        const imageResponse = await fetch("http://localhost:5001/api/images/upload", {
+          method: "POST",
+          body: formData,
+        });
+
+        if (!imageResponse.ok) {
+          throw new Error("Failed to upload images.");
+        }
+
+        const imageData = await imageResponse.json();
+        console.log("Image upload completed:", imageData);
+        setImagesUploaded(true);
+      }
+
+      if (imagesUploaded) {
+        successMessage += " New images have been uploaded and associated with the tribe via tribe_id.";
+        setImagesUploaded(false);
+      }
+
+      // Refresh tribe data
+      const refreshedData = await (await fetch(`/api/admin/tribes/${tribeId}`)).json();
+      const refreshedImagePreviews = mapImagePreviews(refreshedData.images);
+      const processedCoordinates = processCoordinates(refreshedData.geojson_data, "[handleSubmit] ");
+
+      setTribeData((prev) => ({
+        ...prev,
+        uploadedImages: refreshedImagePreviews,
+        newImages: [],
+        geojson_data: refreshedData.geojson_data || { type: "Polygon", coordinates: "" },
+      }));
+      setDrawnShape(processedCoordinates);
+
+      if (mapRef.current && typeof mapRef.current.invalidateSize === "function") {
+        mapRef.current.invalidateSize();
+      }
+
+      setModalMessage(successMessage);
+      setShowModal(true);
     } catch (err) {
       alert(`An error occurred while saving or deleting images. Please try again. Error: ${err.message}`);
     }
   };
 
-  const handleRemoveImage = (index) => {
-    const allImages = [...tribeData.uploadedImages, ...tribeData.newImages];
-    if (index >= tribeData.uploadedImages.length) {
-      // Handle removal of new (unuploaded) images
-      const newIndex = index - tribeData.uploadedImages.length;
-      setTribeData((prev) => ({
-        ...prev,
-        newImages: prev.newImages.filter((_, i) => i !== newIndex),
-      }));
-    } else {
-      // Mark persisted (uploaded) images for removal
-      const imageToRemove = tribeData.uploadedImages[index];
-      if (imageToRemove && imageToRemove.media_id) {
-        setImagesToRemove((prev) => [...prev, imageToRemove.media_id]);
-        setTribeData((prev) => ({
-          ...prev,
-          uploadedImages: prev.uploadedImages.filter((_, i) => i !== index),
-        }));
-      }
-    }
-  };
+  // Render
+  if (loading) return <p>Loading tribe data...</p>;
+  if (error) return <p style={{ color: "red", fontWeight: "bold" }}>{error}</p>;
 
   return (
     <div className="overlap">
@@ -464,9 +410,10 @@ const HeroEditTribe = () => {
           <p className="edit-tribe-subtitle">You are editing tribe ID: {id}</p>
 
           <form className="edit-tribe-form">
-            {/* Tribe Name */}
             <div className="edit-tribe-form-group">
-              <label htmlFor="tribeName" className="edit-tribe-label">Tribe Name</label>
+              <label htmlFor="tribeName" className="edit-tribe-label">
+                Tribe Name
+              </label>
               <input
                 type="text"
                 id="tribeName"
@@ -477,7 +424,6 @@ const HeroEditTribe = () => {
               />
             </div>
 
-            {/* Year Range */}
             <div className="edit-tribe-form-group">
               <div className="tribeRange">
                 <div className="year-range">
@@ -505,9 +451,10 @@ const HeroEditTribe = () => {
               </div>
             </div>
 
-            {/* Description */}
             <div className="edit-tribe-form-group">
-              <label htmlFor="description" className="edit-tribe-label">Description</label>
+              <label htmlFor="description" className="edit-tribe-label">
+                Description
+              </label>
               <textarea
                 id="description"
                 name="tribe_text"
@@ -517,9 +464,10 @@ const HeroEditTribe = () => {
               />
             </div>
 
-            {/* Tribe Color */}
             <div className="edit-tribe-form-group">
-              <label htmlFor="tribeColor" className="edit-tribe-label">Choose Tribe Color</label>
+              <label htmlFor="tribeColor" className="edit-tribe-label">
+                Choose Tribe Color
+              </label>
               <input
                 type="color"
                 id="tribeColor"
@@ -531,27 +479,30 @@ const HeroEditTribe = () => {
               <span className="color-code-display">{tribeData.map_color}</span>
             </div>
 
-            {/* Map Section with Enable/Disable Drawing */}
             <div className="edit-tribe-map-section">
               <p className="edit-tribe-map-instruction">Select tribe area on the map</p>
-              <button type="button" className="edit-tribe-map-button" onClick={toggleDrawing} 
-                style={{ backgroundColor: isDrawingEnabled ? "red" : "" }}>
+              <button
+                type="button"
+                className="edit-tribe-map-button"
+                onClick={toggleDrawing}
+                style={{ backgroundColor: isDrawingEnabled ? "red" : "" }}
+              >
                 {isDrawingEnabled ? "Disable Drawing" : "Enable Drawing"}
               </button>
-              <MapContainer 
-                center={[40.736, -74.172]} 
-                zoom={5} 
-                scrollWheelZoom={true} 
+              <MapContainer
+                center={[40.736, -74.172]}
+                zoom={5}
+                scrollWheelZoom={true}
                 className="edit-tribe-map"
-                ref={mapRef} // Attach ref to MapContainer
+                ref={mapRef}
               >
                 <TileLayer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" />
                 <MapWithDrawing
-                  key={JSON.stringify(drawnShape)} // Use JSON.stringify for reliable key updates
+                  key={JSON.stringify(drawnShape)}
                   isDrawingEnabled={isDrawingEnabled}
                   onShapeUpdate={(newShape) => {
                     setDrawnShape(newShape);
-                    updateGeojsonCoordinates(newShape); // Sync with geojson_data.coordinates
+                    updateGeojsonCoordinates(newShape);
                   }}
                   drawnShape={drawnShape}
                   tempMarkers={tempMarkers}
@@ -561,42 +512,29 @@ const HeroEditTribe = () => {
               <p>Drawn Shape Coordinates: {JSON.stringify(drawnShape)}</p>
             </div>
 
-            {/* GeoJSON Fields */}
             <div className="edit-tribe-form-group">
-              <label className="edit-tribe-label">GeoJSON Data</label>
-
-              <label className="edit-tribe-label">Geometry Type</label>
-              <input
-                type="text"
-                className="edit-tribe-input"
-                placeholder="e.g., Polygon"
-                value={tribeData.geojson_data.type}
-                onChange={(e) => handleGeojsonChange(e, "type")}
-              />
-
               <label className="edit-tribe-label">Coordinates</label>
               <textarea
                 className="edit-tribe-textarea"
                 name="coordinates"
-                placeholder='Enter coordinates (e.g., [[[-74, 40], [-73, 40], [-73, 41], [-74, 40]]])'
+                placeholder="Enter coordinates (e.g., [[[-74, 40], [-73, 40], [-73, 41], [-74, 40]]])"
                 value={tribeData.geojson_data.coordinates}
                 onChange={(e) => handleGeojsonChange(e, "coordinates")}
               />
             </div>
 
-            {/* Uploaded Image Previews (Persisted and New) as Media Library */}
             <div className="edit-tribe-form-group">
               <label className="edit-tribe-label">Uploaded Images</label>
               <div className="image-preview-container">
                 {[...tribeData.uploadedImages, ...tribeData.newImages].map((image, index) => (
                   <div key={index} className="tribe-image">
-                    <img 
-                      src={image.src} 
-                      alt={`Image ${index + 1}`} 
-                      width="100" 
-                      height="100" 
+                    <img
+                      src={image.src || image.url}
+                      alt={`Tribe image ${index + 1}`}
+                      width="100"
+                      height="100"
                       onError={(e) => {
-                        e.target.src = "/images/placeholder.png"; // Update with actual path to a placeholder image
+                        e.target.src = "/images/placeholder.png";
                       }}
                     />
                     <button
@@ -614,23 +552,22 @@ const HeroEditTribe = () => {
               </div>
             </div>
 
-            {/* Image Upload */}
             <div className="edit-tribe-form-group">
-              <label htmlFor="uploadImages" className="edit-tribe-label">Upload New Images</label>
-              <input
-                type="file"
-                id="uploadImages"
-                className="edit-tribe-upload-input"
-                multiple
-                accept="image/jpeg,image/png"
-                onChange={handleImageUpload}
+              <label className="edit-tribe-label">Upload New Images</label>
+              <ImageUpload
+                onImagesChange={(images) =>
+                  setTribeData((prev) => ({ ...prev, newImages: images }))
+                }
               />
-              <p className="edit-tribe-upload-instruction">Supported formats: JPG, PNG (Max 5MB per file)</p>
+              <p className="edit-tribe-upload-instruction">
+                Supported formats: JPG, PNG (Max 5MB per file)
+              </p>
             </div>
 
-            {/* Reference Links */}
             <div className="edit-tribe-form-group">
-              <label htmlFor="referenceLinks" className="edit-tribe-label">Reference</label>
+              <label htmlFor="referenceLinks" className="edit-tribe-label">
+                Reference
+              </label>
               <input
                 type="text"
                 id="referenceLinks"
@@ -641,24 +578,39 @@ const HeroEditTribe = () => {
               />
             </div>
 
-            {/* Submit Buttons */}
             <div className="edit-tribe-button-group">
-              <button type="button" className="edit-tribe-back-button" onClick={() => {
-                window.scrollTo(0, 0); // Scroll to top before navigating
-                navigate("/Admin/ManageTribes");
-              }}>
+              <button
+                type="button"
+                className="edit-tribe-back-button"
+                onClick={() => {
+                  window.scrollTo(0, 0);
+                  navigate("/Admin/ManageTribes");
+                }}
+              >
                 Back
               </button>
-              <button type="button" className="edit-tribe-save-button" onClick={(e) => handleSubmit(e, false)}>
+              <button
+                type="button"
+                className="edit-tribe-save-button"
+                onClick={(e) => handleSubmit(e, false)}
+              >
                 Save
               </button>
-              <button type="button" className="edit-tribe-publish-button" onClick={(e) => handleSubmit(e, true)}>
+              <button
+                type="button"
+                className="edit-tribe-publish-button"
+                onClick={(e) => handleSubmit(e, true)}
+              >
                 Save & Publish
               </button>
             </div>
 
-            {/* Modal for Save & Publish Confirmation */}
-            <Modal show={showModal} onHide={handleClose} centered dialogClassName="modal-dialog-centered custom-modal">
+            <Modal
+              show={showModal}
+              onHide={handleClose}
+              centered
+              dialogClassName="modal-dialog-centered custom-modal"
+            >
               <Modal.Header closeButton>
                 <Modal.Title>Tribe Status</Modal.Title>
               </Modal.Header>
@@ -678,7 +630,10 @@ const HeroEditTribe = () => {
 
 const EditTribe = () => {
   return (
-    <div className="ManageTribes" style={{ minHeight: "100vh", display: "flex", flexDirection: "column" }}>
+    <div
+      className="ManageTribes"
+      style={{ minHeight: "100vh", display: "flex", flexDirection: "column" }}
+    >
       <div className="div" style={{ flexGrow: 1 }}>
         <Header />
         <HeroEditTribe />

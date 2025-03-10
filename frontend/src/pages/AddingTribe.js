@@ -8,8 +8,8 @@ import Header from "../components/AdminHeader";
 import { MapContainer, TileLayer, Polygon, Polyline, Circle, useMapEvents } from "react-leaflet";
 import "leaflet/dist/leaflet.css";
 import { Modal, Button } from "react-bootstrap";
-import { useNavigate } from "react-router-dom"; // Import useNavigate
-
+import { useNavigate } from "react-router-dom"; 
+import ImageUpload from "../components/ImageUpload"; 
 const MapWithDrawing = ({ isDrawingEnabled, onShapeUpdate, drawnShape, tempMarkers, setTempMarkers }) => {
   useMapEvents({
     click: (e) => {
@@ -49,7 +49,7 @@ const HeroAddingTribe = () => {
   const [geojson, setGeojson] = useState({
     type: "Feature",
     geometry: {
-      type: "Polygon",
+      type: "MultiPolygon",
       coordinates: "",
     },
     properties: {
@@ -59,7 +59,7 @@ const HeroAddingTribe = () => {
   });
 
   const [selectedImages, setSelectedImages] = useState([]); // State for selected images (File objects)
-  const [imagePreviews, setImagePreviews] = useState([]); // State for image preview URLs
+  const [imagePreviews, setImagePreviews] = useState([]); // State for image preview URLs (will be managed by ImageUpload)
 
   // State for modal
   const [showModal, setShowModal] = useState(false);
@@ -75,21 +75,6 @@ const HeroAddingTribe = () => {
     });
   };
 
-  // Handle image selection and generate previews
-  const handleImageChange = (e) => {
-    const files = Array.from(e.target.files);
-    const newPreviews = files.map((file) => URL.createObjectURL(file));
-    
-    setSelectedImages((prev) => [...prev, ...files]); // Add new files to the list
-    setImagePreviews((prev) => [...prev, ...newPreviews]); // Add new preview URLs
-  };
-
-  // Handle removing an image from the preview
-  const handleRemoveImage = (index) => {
-    setSelectedImages((prev) => prev.filter((_, i) => i !== index));
-    setImagePreviews((prev) => prev.filter((_, i) => i !== index));
-  };
-
   // Form submission handler using fetch
   const handleFormSubmit = async (e, publishStatus) => {
     e.preventDefault();
@@ -102,7 +87,7 @@ const HeroAddingTribe = () => {
     }
 
     // Prepare GeoJSON data
-    const geoJsonCoordinates = [drawnShape.map(([lat, lng]) => [lng, lat])];
+    const geoJsonCoordinates = [drawnShape.map(([lat, lng]) => [lat, lng])];
 
     const requestData = {
       tribe_name: tribeName,
@@ -145,7 +130,7 @@ const HeroAddingTribe = () => {
       if (selectedImages.length > 0) {
         const formData = new FormData();
         for (let i = 0; i < selectedImages.length; i++) {
-          formData.append('images', selectedImages[i]);
+          formData.append('images', selectedImages[i].file); // Adjusted for ImageUpload's structure
         }
         formData.append('tribe_id', tribeData.tribe_id);
 
@@ -166,9 +151,8 @@ const HeroAddingTribe = () => {
         console.log("Image upload success:", imageData);
         setModalMessage((prev) => `${prev} Images uploaded successfully!`);
         
-        // Clear the previews after successful upload
+        // Clear the images after successful upload
         setSelectedImages([]);
-        setImagePreviews([]);
       }
       
     } catch (error) {
@@ -195,7 +179,7 @@ const HeroAddingTribe = () => {
       ...prev,
       geometry: {
         ...prev.geometry,
-        coordinates: JSON.stringify([coordinates.map(([lat, lng]) => [lng, lat])]),
+        coordinates: JSON.stringify([coordinates.map(([lat, lng]) => [lat, lng])]),
       },
     }));
   };
@@ -269,20 +253,20 @@ const HeroAddingTribe = () => {
                   setTempMarkers={setTempMarkers}
                 />
               </MapContainer>
-              <p>Drawn Shape Coordinates: {JSON.stringify(drawnShape)}</p>
+              {/* <p>Drawn Shape Coordinates: {JSON.stringify(drawnShape)}</p> */}
             </div>
 
             {/* GeoJSON Fields */}
             <div className="adding-tribe-form-group">
-              <label className="adding-tribe-label">GeoJSON Data</label>
-              <label className="adding-tribe-label">Geometry Type</label>
-              <input
+              {/* <label className="adding-tribe-label">GeoJSON Data</label> */}
+              {/* <label className="adding-tribe-label">Geometry Type</label> */}
+              {/* <input
                 type="text"
                 className="adding-tribe-input"
                 placeholder="e.g., Polygon"
                 value={geojson.geometry.type}
                 onChange={(e) => handleGeojsonChange(e, "type")}
-              />
+              /> */}
 
               <label className="adding-tribe-label">Coordinates</label>
               <textarea
@@ -293,41 +277,10 @@ const HeroAddingTribe = () => {
               />
             </div>
 
-            {/* Image Preview Section */}
+            {/* Image Upload Section - Replaced with ImageUpload component */}
             <div className="adding-tribe-form-group">
-              <label className="adding-tribe-label">Uploaded Images</label>
-              <div className="image-preview-container">
-                {imagePreviews.length > 0 ? (
-                  imagePreviews.map((preview, index) => (
-                    <div key={index} className="tribe-image">
-                      <img
-                        src={preview}
-                        alt={`Preview ${index + 1}`}
-                        width="100"
-                        height="100"
-                        onError={(e) => {
-                          e.target.src = "/images/placeholder.png"; // Update with actual path to a placeholder image
-                        }}
-                      />
-                      <button
-                        type="button"
-                        className="remove-image-button"
-                        onClick={() => handleRemoveImage(index)}
-                      >
-                        Remove
-                      </button>
-                    </div>
-                  ))
-                ) : (
-                  <p>No images selected.</p>
-                )}
-              </div>
-            </div>
-
-            {/* Image Upload Section */}
-            <div className="adding-tribe-form-group">
-              <label htmlFor="uploadImages" className="adding-tribe-label">Upload Images</label>
-              <input type="file" id="uploadImages" multiple onChange={handleImageChange} />
+              <label className="adding-tribe-label">Upload Images</label>
+              <ImageUpload onImagesChange={setSelectedImages} />
               <p className="adding-tribe-upload-instruction">Supported formats: JPG, PNG</p>
             </div>
 
