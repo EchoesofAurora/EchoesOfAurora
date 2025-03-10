@@ -22,9 +22,8 @@ import AddingTribe from './pages/AddingTribe';
 import EditProfile from './pages/profileEdit';
 import AddingStory from "./pages/AddingStory";
 import EditStory from "./pages/EditStory";
+import SubmissionDetail from './pages/SubmissionDetail'; // New component for detailed view
 import "bootstrap/dist/css/bootstrap.min.css";
-
-
 
 const App = () => {
     return (
@@ -47,22 +46,16 @@ const App = () => {
                 <Route path="/Admin/ManageStories" element={<ManageStories />} />
                 <Route path="/Admin/ManageTribes" element={<ManageTribes />} />
                 <Route path="/Admin/UserSubmissions" element={<UserSubmissions />} />
+                <Route path="/Admin/UserSubmissions/:id" element={<SubmissionDetail />} /> {/* New route for detailed view */}
                 <Route path='/ManageTribe/AddingTribe' element={<AddingTribe/>}/> 
                 <Route path="/ManageStories/AddingStory" element={<AddingStory />} />
                 <Route path="/EditTribe/:id" element={<EditTribe />} />
                 <Route path="/EditStory/:id" element={<EditStory />} />
                 <Route path="/ManageTribes" element={<ManageTribes />} />
                 <Route path="/Admin/EditProfile" element={<EditProfile />} />
-                
             </Routes>
         </Router>
     );
 };
- 
+
 export default App;
-
-
-
-
-
-

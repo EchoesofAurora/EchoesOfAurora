@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import { useNavigate } from "react-router-dom"; // Import useNavigate
 import "../styles/UserSubmissions.css";
 import Sidebar from "../components/Sidebar";
 import Header from "../components/AdminHeader";
@@ -10,17 +11,12 @@ const dummySubmissions = [
   { id: 2, sender: "Alice Smith", subject: "My Grandfather's Tale", starred: false, date: "Feb 18, 2025", status: "Read" },
   { id: 3, sender: "Liam Brown", subject: "Dene Legends Compilation", starred: false, date: "Feb 17, 2025", status: "Unread" },
   { id: 4, sender: "Emily White", subject: "Traditional Chipewyan Myth", starred: true, date: "Feb 16, 2025", status: "Read" },
-  { id: 5, sender: "Alice Smith", subject: "My Grandfather's Tale", starred: false, date: "Feb 18, 2025", status: "Read" },
-  { id: 6, sender: "Liam Brown", subject: "Dene Legends Compilation", starred: false, date: "Feb 17, 2025", status: "Unread" },
-  { id: 7, sender: "Emily White", subject: "Traditional Chipewyan Myth", starred: true, date: "Feb 16, 2025", status: "Read" },
-  { id: 8, sender: "Alice Smith", subject: "My Grandfather's Tale", starred: false, date: "Feb 18, 2025", status: "Read" },
-  { id: 9, sender: "Liam Brown", subject: "Dene Legends Compilation", starred: false, date: "Feb 17, 2025", status: "Unread" },
-  { id: 10, sender: "Emily White", subject: "Traditional Chipewyan Myth", starred: true, date: "Feb 16, 2025", status: "Read" },
 ];
 
 const HeroUserSubmissions = () => {
   const [submissions, setSubmissions] = useState(dummySubmissions);
   const [selectedFilter, setSelectedFilter] = useState("Inbox");
+  const navigate = useNavigate(); // Initialize useNavigate
 
   // Function to Toggle Star
   const toggleStar = (id) => {
@@ -43,14 +39,19 @@ const HeroUserSubmissions = () => {
     return submissions;
   };
 
+  // Function to Handle Submission Click
+  const handleSubmissionClick = (id) => {
+    navigate(`/Admin/UserSubmissions/${id}`); // Navigate to detailed view
+  };
+
   return (
     <div className="overlap">
       <Sidebar />
       <main className="rightFrame-5">
         <div className="user-submissions-main">
-          <button className="back-btn" onClick={() => window.location.href = "/Admin/Dashboard"}>Back</button>
+          <button className="us-back-btn" onClick={() => navigate("/Admin/Dashboard")}>Back</button>
           
-          <h2>User Submissions</h2>
+          <h3>User Submissions</h3>
 
           {/* Horizontal Filter Bar */}
           <div className="horizontal-filters">
@@ -74,14 +75,15 @@ const HeroUserSubmissions = () => {
               <div
                 key={submission.id}
                 className={`submission-item ${submission.status === "Unread" ? "unread" : ""}`}
+                onClick={() => handleSubmissionClick(submission.id)} // Handle click
               >
-                <div className="submission-star" onClick={() => toggleStar(submission.id)}>
+                <div className="submission-star" onClick={(e) => { e.stopPropagation(); toggleStar(submission.id); }}>
                   {submission.starred ? <FaStar className="starred" /> : <FaRegStar className="unstarred" />}
                 </div>
                 <div className="submission-sender">{submission.sender}</div>
                 <div className="submission-subject">{submission.subject}</div>
                 <div className="submission-date">{submission.date}</div>
-                <div className="submission-trash" onClick={() => deleteSubmission(submission.id)}>
+                <div className="submission-trash" onClick={(e) => { e.stopPropagation(); deleteSubmission(submission.id); }}>
                   <FaTrash />
                 </div>
               </div>
