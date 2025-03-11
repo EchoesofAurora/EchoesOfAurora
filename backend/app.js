@@ -8,14 +8,15 @@ const storiesRoutes = require('./routes/stories');
 const adminTribeRoutes = require('./routes/adminTribes');
 const adminStoriesRoutes = require('./routes/adminStories');
 const imageUploadRoutes = require('./routes/imageUploadRoutes');
+const submissionsRoutes = require('./routes/submissions'); // Add this
 
 // Initialize the Express App
 const app = express();
 
 // Middleware
-app.use(express.json()); // For parsing JSON
+app.use(express.json());
 app.use(cors({
-    origin: 'http://localhost:3000',  // Frontend address
+    origin: 'http://localhost:3000',
     methods: ['GET', 'POST', 'PUT', 'DELETE'],
     allowedHeaders: ['Content-Type', 'Authorization'],
 }));
@@ -26,6 +27,7 @@ app.use('/api/stories', storiesRoutes);
 app.use('/api/admin/tribes', adminTribeRoutes);
 app.use('/api/admin/stories', adminStoriesRoutes);
 app.use('/api/images', imageUploadRoutes);
+app.use('/api/submissions', submissionsRoutes); // Add this
 
 // Default Route
 app.get('/', (req, res) => {
