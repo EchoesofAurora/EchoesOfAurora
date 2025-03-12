@@ -1,11 +1,11 @@
 import React, { useState } from "react";
-import { useNavigate } from "react-router-dom"; // Import useNavigate
+import { useNavigate } from "react-router-dom";
 import "../styles/UserSubmissions.css";
 import Sidebar from "../components/Sidebar";
 import Header from "../components/AdminHeader";
 import { FaStar, FaRegStar, FaTrash, FaEnvelopeOpenText, FaInbox } from "react-icons/fa";
+import { Modal, Button } from "react-bootstrap"; // Import Bootstrap modal
 
-// Dummy Data for Static Submissions
 const dummySubmissions = [
   { id: 1, sender: "John Doe", subject: "Story Submission: The Northern Lights", starred: true, date: "Feb 19, 2025", status: "Unread" },
   { id: 2, sender: "Alice Smith", subject: "My Grandfather's Tale", starred: false, date: "Feb 18, 2025", status: "Read" },
@@ -16,7 +16,10 @@ const dummySubmissions = [
 const HeroUserSubmissions = () => {
   const [submissions, setSubmissions] = useState(dummySubmissions);
   const [selectedFilter, setSelectedFilter] = useState("Inbox");
-  const navigate = useNavigate(); // Initialize useNavigate
+  const navigate = useNavigate();
+  
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
+  const [submissionToDelete, setSubmissionToDelete] = useState(null);
 
   // Function to Toggle Star
   const toggleStar = (id) => {
@@ -27,9 +30,21 @@ const HeroUserSubmissions = () => {
     );
   };
 
-  // Function to Delete Submission
-  const deleteSubmission = (id) => {
-    setSubmissions((prev) => prev.filter((submission) => submission.id !== id));
+  // Function to Open Delete Confirmation Modal
+  const handleDeleteClick = (id) => {
+    setSubmissionToDelete(id);
+    setShowDeleteModal(true);
+  };
+
+  // Function to Confirm Delete
+  const confirmDelete = () => {
+    setSubmissions((prev) => prev.filter((submission) => submission.id !== submissionToDelete));
+    setShowDeleteModal(false);
+  };
+
+  // Function to Cancel Delete
+  const cancelDelete = () => {
+    setShowDeleteModal(false);
   };
 
   // Function to Filter Submissions
@@ -41,7 +56,7 @@ const HeroUserSubmissions = () => {
 
   // Function to Handle Submission Click
   const handleSubmissionClick = (id) => {
-    navigate(`/Admin/UserSubmissions/${id}`); // Navigate to detailed view
+    navigate(`/Admin/UserSubmissions/${id}`);
   };
 
   return (
@@ -75,7 +90,7 @@ const HeroUserSubmissions = () => {
               <div
                 key={submission.id}
                 className={`submission-item ${submission.status === "Unread" ? "unread" : ""}`}
-                onClick={() => handleSubmissionClick(submission.id)} // Handle click
+                onClick={() => handleSubmissionClick(submission.id)}
               >
                 <div className="submission-star" onClick={(e) => { e.stopPropagation(); toggleStar(submission.id); }}>
                   {submission.starred ? <FaStar className="starred" /> : <FaRegStar className="unstarred" />}
@@ -83,7 +98,7 @@ const HeroUserSubmissions = () => {
                 <div className="submission-sender">{submission.sender}</div>
                 <div className="submission-subject">{submission.subject}</div>
                 <div className="submission-date">{submission.date}</div>
-                <div className="submission-trash" onClick={(e) => { e.stopPropagation(); deleteSubmission(submission.id); }}>
+                <div className="submission-trash" onClick={(e) => { e.stopPropagation(); handleDeleteClick(submission.id); }}>
                   <FaTrash />
                 </div>
               </div>
@@ -91,6 +106,18 @@ const HeroUserSubmissions = () => {
           </div>
         </div>
       </main>
+
+      {/* Delete Confirmation Modal */}
+      <Modal show={showDeleteModal} onHide={cancelDelete} centered>
+        <Modal.Header closeButton>
+          <Modal.Title>Confirm Deletion</Modal.Title>
+        </Modal.Header>
+        <Modal.Body>Are you sure you want to delete this submission?</Modal.Body>
+        <Modal.Footer>
+          <Button variant="secondary" onClick={cancelDelete}>No</Button>
+          <Button variant="danger" onClick={confirmDelete}>Yes</Button>
+        </Modal.Footer>
+      </Modal>
     </div>
   );
 };

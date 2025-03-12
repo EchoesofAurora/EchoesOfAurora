@@ -332,3 +332,13 @@
   max-width: 90vw;
   max-height: 90vh;
 }
+.edit-tribe-back-button {
+  background-color: #9d499a;
+  color: white;
+  border: none;
+  padding: 12px 24px;
+  border-radius: 5px;
+  cursor: pointer;
+  font-size: 16px;
+  font-weight: bold;
+}

@@ -161,6 +161,7 @@ const HeroAddingStory = () => {
       // Redirect after a short delay to allow modal to show
       setTimeout(() => {
         navigate("/Admin/ManageStories");
+        window.scrollTo(0, 0); // Scroll to the top of the page
       }, 2000);
     } catch (error) {
       console.error("Error in handleFormSubmit:", error);
