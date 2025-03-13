@@ -4,7 +4,8 @@ import { FlyToInterpolator } from "react-map-gl";
 import "mapbox-gl/dist/mapbox-gl.css";
 import geojsonData from "./final-tribes.json";
 import "../styles/mapBox.css";
-import storiesData from "./stories.json";
+import storiesData from "./updated_stories.json";
+import SidePanel from "./SidePanel";
 
 const MapBoxComponent = () => {
   const [viewport, setViewport] = useState({
@@ -27,10 +28,12 @@ const MapBoxComponent = () => {
   const [selectedYear, setSelectedYear] = useState(1900); // Timeline state, no filtering
   const timelineRef = useRef(null); // Ref for the timeline container to manage scrolling
   const [filteredStories, setFilteredStories] = useState(storiesData);
+  const [selectedTribe, setSelectedTribe] = useState(null);
+  const [selectedStories, setSelectedStories] = useState(null);
 
   // Define year sequence from 1000 to 2025
   const startYear = 1000;
-  const currentYear = new Date().getFullYear(); // 2025 as of Feb 26, 2025
+  const currentYear = new Date().getFullYear();
   const years = [];
 
   for (let year = startYear; year <= currentYear; year += 100) {
@@ -42,6 +45,17 @@ const MapBoxComponent = () => {
     years.push(currentYear);
   }
 
+  const filterTribeStories = (tribeId) => {
+    const nextInterval = years.find((year) => year > selectedYear);
+          const tribeStories = filteredStories.features.filter(
+            (story) =>
+              story.properties.tribeid === tribeId &&
+              story.properties.year >= selectedYear &&
+              (nextInterval ? story.properties.year < nextInterval : true)
+          );
+         setSelectedStories(tribeStories);
+  };
+
   // Update map style based on 3D toggle
   useEffect(() => {
     setMapStyle(
@@ -50,6 +64,32 @@ const MapBoxComponent = () => {
         : "mapbox://styles/kodalis2/cm7kvvsfl00x601qo0597eedp"
     );
   }, [is3dOn]);
+
+  useEffect(() => {
+    if (!isStoriesOn){
+      setSelectedStories(null);
+    }
+    else if (selectedTribe){
+      filterTribeStories(selectedTribe.id);
+    }
+  }, [isStoriesOn]);
+
+  useEffect(() => {
+    if (selectedYear !== null) {
+      const nextInterval = years.find((year) => year > selectedYear);
+      const filtered = {
+        ...storiesData,
+        features: storiesData.features.filter((story) => {
+          const storyYear = story.properties.year; // Assuming 'year' is in properties
+          return (
+            storyYear >= selectedYear &&
+            (nextInterval ? storyYear < nextInterval : true)
+          );
+        }),
+      };
+      setFilteredStories(filtered);
+    }
+  }, [selectedYear]);
 
   const handleToggle = () => setIs3dOn(!is3dOn);
   const handleStoriesToggle = () => setIsStoriesOn(!isStoriesOn);
@@ -63,14 +103,27 @@ const MapBoxComponent = () => {
 
   const handleClick = (event) => {
     const features = event.features;
+    
     if (features && features.length > 0) {
       const feature = features[0];
       const [lng, lat] = event.lngLat;
-      if (feature.properties && lng !== undefined && lat !== undefined) {
-        setPopupInfo({
-          properties: feature.properties,
+      console.log("Feature....", feature);
+
+      if (feature.properties) {
+        const tribe = {
+          name: feature.properties.Name,
+          id: feature.properties.id,
+          description:
+            feature.properties.description || "No description available",
           coordinates: { lng, lat },
-        });
+        };
+
+        // Filter stories related to the selected tribe in the chosen year range
+        if (isStoriesOn) {
+          filterTribeStories(tribe.id);
+        }
+
+        setSelectedTribe({ ...tribe });
       }
     }
   };
@@ -148,23 +201,6 @@ const MapBoxComponent = () => {
     },
   };
 
-  useEffect(() => {
-    if (selectedYear !== null) {
-      const nextInterval = years.find((year) => year > selectedYear);
-      const filtered = {
-        ...storiesData,
-        features: storiesData.features.filter((story) => {
-          const storyYear = story.properties.year; // Assuming 'year' is in properties
-          return (
-            storyYear >= selectedYear &&
-            (nextInterval ? storyYear < nextInterval : true)
-          );
-        }),
-      };
-      setFilteredStories(filtered);
-    }
-  }, [selectedYear]);
-
   return (
     <div style={{ width: "100%", height: "100vh", position: "relative" }}>
       <MapGL
@@ -183,6 +219,7 @@ const MapBoxComponent = () => {
         onHover={handleHover}
         interactiveLayerIds={["tribe-fill"]}
       >
+        {/* Tribes Source and Layers */}
         <Source id="tribes" type="geojson" data={geojsonData}>
           <Layer key="tribe-fill" {...fillLayer} />
           {hoveredFeatureId && (
@@ -193,6 +230,7 @@ const MapBoxComponent = () => {
           )}
           <Layer key="tribe-label" {...labelLayer} />
         </Source>
+
         {/* Stories Source and Layer - Only shown if isStoriesOn is true */}
         {isStoriesOn && (
           <Source id="stories" type="geojson" data={filteredStories}>
@@ -200,10 +238,12 @@ const MapBoxComponent = () => {
           </Source>
         )}
 
+        {/* Navigation Control */}
         <div style={{ position: "absolute", top: 10, left: 10 }}>
           <NavigationControl showZoom showCompass />
         </div>
 
+        {/* 3D and Stories Toggle */}
         <div style={{ position: "absolute", top: 10, right: 10 }}>
           <div className="toggle-container">
             <span className="status-text">{"3d"}</span>
@@ -271,28 +311,36 @@ const MapBoxComponent = () => {
           </button>
         </div>
 
-        {popupInfo && (
-          <Popup
-            longitude={popupInfo.coordinates.lng}
-            latitude={popupInfo.coordinates.lat}
-            onClose={() => setPopupInfo(null)}
-            anchor="top"
-          >
-            <div>
-              <h4>{popupInfo.properties.Name}</h4>
-              <p>ID: {popupInfo.properties.id}</p>
-              {popupInfo.properties.description && (
-                <a
-                  href={popupInfo.properties.description}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                >
-                  More Info
-                </a>
-              )}
-            </div>
-          </Popup>
+        {/* Side Panel for tribes and stories */}
+        {selectedTribe && (
+          <SidePanel
+            tribe={selectedTribe}
+            stories={selectedStories}
+            onClose={() => setSelectedTribe(null)}
+          />
         )}
+        {/* {popupInfo && (
+          // <Popup
+          //   longitude={popupInfo.coordinates.lng}
+          //   latitude={popupInfo.coordinates.lat}
+          //   onClose={() => setPopupInfo(null)}
+          //   anchor="top"
+          // >
+          //   <div>
+          //     <h4>{popupInfo.properties.Name}</h4>
+          //     <p>ID: {popupInfo.properties.id}</p>
+          //     {popupInfo.properties.description && (
+          //       <a
+          //         href={popupInfo.properties.description}
+          //         target="_blank"
+          //         rel="noopener noreferrer"
+          //       >
+          //         More Info
+          //       </a>
+          //     )}
+          //   </div>
+          // </Popup>
+        //)} */}
       </MapGL>
     </div>
   );
