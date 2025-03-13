@@ -47,7 +47,7 @@ const MyProfile = () => {
             <div className="profile-info">
               <button
                 className="profile-edit-button"
-                onClick={() => (window.location.href = "/Admin/Settings/EditProfile")}
+                onClick={() => (window.location.href = "/Admin/changePassword")}
               >
                 <div className="profile-button-content">
                   <span className="profile-button-text">Change Password</span>

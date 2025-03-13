@@ -23,6 +23,7 @@ import AddingStory from "./pages/AddingStory";
 import EditStory from "./pages/EditStory";
 import SubmissionDetail from './pages/SubmissionDetail'; // New component for detailed view
 import AdminAddUser from "./pages/AddNewUser";
+import ChangePassword from "./pages/changePassword";
 
 import "bootstrap/dist/css/bootstrap.min.css";
 
@@ -54,6 +55,7 @@ const App = () => {
                 <Route path="/ManageTribes" element={<ManageTribes />} />
                 <Route path="/Admin/EditProfile" element={<EditProfile />} />
                 <Route path="/Admin/AddUser" element={<AdminAddUser />} />
+                <Route path="/Admin/changePassword" element={<ChangePassword />} />
             </Routes>
         </Router>
     );
