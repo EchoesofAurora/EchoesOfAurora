@@ -106,4 +106,18 @@
     text-overflow: ellipsis; /* Add ellipsis (...) for truncated text */
   }
   
-  
+  /* Responsive Design */
+@media (max-width: 768px) {
+  .tribe-card {
+      flex-direction: column;
+      align-items: center;
+      width: 80%;
+  }
+
+  .tribe-image {
+    width: 100%;
+    object-fit: cover;
+    border-radius: 10px;
+    margin: 20px;
+  }
+}

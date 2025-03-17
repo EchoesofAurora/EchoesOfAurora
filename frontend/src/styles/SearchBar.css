@@ -56,3 +56,33 @@
     height: 100%;
     border-radius: 0px 5px 5px 0px;
 }
+
+@media (max-width: 768px) {
+  .search-bar-container {
+    width: 70%;
+  }
+
+  .search-and-sort-container {
+    padding: 5px 0 5px 0px;
+  }
+
+  .search-bar {
+    width: 90%;
+  }
+
+  .sort-dropdown {
+    width: 30%;
+  }
+
+  .tribe-dropdown {
+    width: 30%;
+  }
+
+  .year-input-field {
+    width: 15%;
+  }
+
+  .time-range {
+    align-content: end;
+  }
+}
