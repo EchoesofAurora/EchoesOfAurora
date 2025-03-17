@@ -1,1 +1,2 @@
-web: concurrently "npm --prefix backend start" "npm --prefix frontend start"
+web: npm --prefix backend start
+frontend: npm --prefix frontend start
