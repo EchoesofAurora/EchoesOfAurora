@@ -1,58 +1,170 @@
-.UserSubmissions {
-    background-color:#000000 ;
-    display: flex;
-    flex-direction: row;
-    justify-content: center;
-    width: 100%;
-  } 
-  
-   .text-wrapper-5 {
-    color: #000000;
-    font-family: "Inter-SemiBold", Helvetica;
-    font-size: 16px;
-    font-weight: 600;
-    left: 27px;
-    letter-spacing: 0;
-    line-height: 20.8px;
-    position: absolute;
-    top: 23px;
-    white-space: nowrap;
-  }
-  
-   .frame-wrapper {
-    align-items: center;
-    display: inline-flex;
-    gap: 226px;
-    left: 28px;
-    position: absolute;
-    top: 70px;
-  }
-  
-   .frame-8 {
-    align-items: center;
-    display: inline-flex;
-    flex: 0 0 auto;
-    gap: 10px;
-    position: relative;
-  }
-  
-   .ellipse {
-    height: 46px;
-    object-fit: cover;
-    position: relative;
-    width: 46px;
-  }
-  
-   .text-wrapper-6 {
-    color: #000000;
-    font-family: "Inter-Regular", Helvetica;
-    font-size: 16px;
-    font-weight: 400;
-    letter-spacing: 0;
-    line-height: 20.8px;
-    position: relative;
-    white-space: nowrap;
-    width: fit-content;
-  }
-  
-  
+
+/* Main container */
+.user-submissions-page {
+  display: flex;
+  height: 100vh;
+  background: linear-gradient(135deg, #f5f7fa, #c3cfe2); /* Gradient background */
+}
+
+/* Sidebar */
+.sidebar-container {
+  width: 315px;
+  flex-shrink: 0;
+  background: rgba(255, 255, 255, 0.9); /* Glass morphism effect */
+  backdrop-filter: blur(10px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+/* Main content area */
+.user-submissions-main {
+  flex-grow: 1;
+  display: flex;
+  flex-direction: column;
+  padding: 40px;
+  overflow: auto;
+  background: rgba(255, 255, 255, 0.95); /* Glass morphism effect */
+  backdrop-filter: blur(20px);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+  border-left: 1px solid rgba(255, 255, 255, 0.3);
+}
+
+/* Back Button */
+.us-back-btn {
+  width: 140px;
+  border: 1px solid #a49cbe;
+  background-color: white;
+  color: #a49cbe;
+  padding: 10px 20px;
+  border-radius: 5px;
+  cursor: pointer;
+  box-shadow: 0px 4px 4px #00000040;
+  font-size: 16px;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+  margin-bottom: 20px;
+}
+
+.us-back-btn:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.3);
+}
+
+/* Page Title */
+.user-submissions-main h2 {
+  font-size: 32px;
+  font-weight: 800;
+  color: #333;
+  margin-bottom: 20px;
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+/* Horizontal Filter Bar */
+.horizontal-filters {
+  display: flex;
+  justify-content: start;
+  gap: 15px;
+  padding: 10px 0;
+  margin-bottom: 20px;
+  border-bottom: 2px solid rgba(0, 0, 0, 0.1);
+}
+
+.horizontal-filters button {
+  background: none;
+  border: none;
+  padding: 12px 20px;
+  font-size: 16px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: #333;
+  transition: all 0.3s ease;
+  border-radius: 8px;
+}
+
+.horizontal-filters button.active {
+  background: linear-gradient(135deg, #007bff, #0056b3);
+  color: white;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+}
+
+.horizontal-filters button:hover {
+  background: rgba(0, 123, 255, 0.1);
+  color: #007bff;
+}
+
+/* Submissions List */
+.user-submissions-content {
+  flex-grow: 1;
+  padding: 20px;
+}
+
+.submission-item {
+  display: flex;
+  align-items: center;
+  padding: 15px;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+  cursor: pointer;
+  transition: all 0.3s ease;
+  border-radius: 12px;
+}
+
+.submission-item.unread {
+  background-color: rgba(240, 248, 255, 0.9); /* Light blue background for unread messages */
+  font-weight: bold; /* Bold text for unread messages */
+}
+
+.submission-item:hover {
+  background-color: rgba(249, 249, 249, 0.9);
+  transform: translateY(-3px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.submission-star {
+  width: 40px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.submission-sender {
+  width: 200px;
+  font-weight: bold;
+  color: #333;
+}
+
+.submission-subject {
+  flex-grow: 1;
+  margin: 0 20px;
+  color: #555;
+}
+
+.submission-date {
+  width: 120px;
+  text-align: right;
+  color: #666;
+}
+
+.submission-trash {
+  width: 40px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  color: #ff4444; /* Red color for trash icon */
+  cursor: pointer;
+  transition: color 0.3s ease;
+}
+
+.submission-trash:hover {
+  color: #cc0000; /* Darker red on hover */
+}
+
+.starred {
+  color: gold;
+  cursor: pointer;
+}
+
+.unstarred {
+  color: gray;
+  cursor: pointer;
+}

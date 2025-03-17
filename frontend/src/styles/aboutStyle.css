@@ -183,6 +183,7 @@
     border-bottom-right-radius: 100px;
   }
   
+  .story-content,
   .features-content,
   .commitment-content {
     display: flex;
@@ -194,6 +195,7 @@
     padding: 20px;
   }
   
+  .story-title,
   .features-title,
   .commitment-title {
     font-size: 2rem; /* Larger title */
@@ -220,6 +222,7 @@
     margin: 10 auto; /* Center the text horizontally */
   }
   
+  .story-description,
   .features-description,
   .commitment-description {
     font-size: 1.5rem; /* Adjust size to match */

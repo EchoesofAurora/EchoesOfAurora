@@ -1,0 +1,262 @@
+{
+    "type": "FeatureCollection",
+    "features": [
+        {
+            "type": "Feature",
+            "properties": {
+                "title": "The Carrington Event: Earth's Greatest Solar Storm",
+                "year": 1859,
+                "description": "In September 1859, Earth experienced what is now known as the Carrington Event, the most powerful geomagnetic storm ever recorded. This event was named after Richard Carrington, a British astronomer who witnessed and documented the massive solar flare that triggered the storm. The Carrington Event not only produced spectacular auroras but also severely disrupted early electrical systems, offering a glimpse into the potentially devastating effects of extreme space weather on modern infrastructure.",
+                "references": ["https://en.wikipedia.org/wiki/Carrington_Event"],
+                "location": "Rocky Mountains, USA"
+            },
+            "geometry": {
+                "type": "MultiPoint",
+                "coordinates": [[-105.7821, 39.5501]]
+            }
+        },
+        {
+            "type": "Feature",
+            "properties": {
+                "title": "The Great Geomagnetic Storm of 1958: Auroras Across North America",
+                "year": 1958,
+                "description": "In February 1958, during the International Geophysical Year (IGY), a powerful solar flare erupted, triggering a massive geomagnetic storm that lasted from February 10 to 12. The storm caused brilliant auroras visible as far south as Mexico City, a rare event for such low latitudes.",
+                "references": ["https://pwg.gsfc.nasa.gov/istp/outreach/events/58/"],
+                "location": "Winnipeg, Manitoba, Canada"
+            },
+            "geometry": {
+                "type": "MultiPoint",
+                "coordinates": [[-97.1384, 49.8951]]
+            }
+        },
+        {
+            "type": "Feature",
+            "properties": {
+                "title": "The Halloween Storms of 2003: A Space Weather Nightmare",
+                "year": 2003,
+                "description": "In late October and early November 2003, a series of intense solar flares and coronal mass ejections (CMEs) triggered a major geomagnetic storm known as the Halloween Storms.",
+                "references": ["https://en.wikipedia.org/wiki/Halloween_solar_storms_of_2003"],
+                "location": "Dallas, Texas, USA"
+            },
+            "geometry": {
+                "type": "MultiPoint",
+                "coordinates": [[-96.797, 32.7767]]
+            }
+        },
+        {
+            "type": "Feature",
+            "properties": {
+                "title": "The March 1989 Geomagnetic Storm: Blackout in Quebec",
+                "year": 1989,
+                "description": "In March 1989, one of the most powerful geomagnetic storms in modern history struck Earth, causing widespread auroras and infrastructure failures.",
+                "references": ["https://en.wikipedia.org/wiki/March_1989_geomagnetic_storm"],
+                "location": "Montreal, Quebec, Canada"
+            },
+            "geometry": {
+                "type": "MultiPoint",
+                "coordinates": [[-73.5673, 45.5017]]
+            }
+        },
+        {
+            "type": "Feature",
+            "properties": {
+                "title": "March 8, 1918 – Aurora Startles the Eastern United States",
+                "year": 1918,
+                "description": "A vivid display of the aurora borealis startled residents of the eastern United States. The lights stretched as far south as Virginia, with red and green hues dominating the night sky.",
+                "references": ["https://www.solarstorms.org/SRefStorms.html"],
+                "location": "Washington, D.C., USA"
+            },
+            "geometry": {
+                "type": "MultiPoint",
+                "coordinates": [[-77.0369, 38.9072]]
+            }
+        },
+        {
+            "type": "Feature",
+            "properties": {
+                "title": "September 25, 1909 – Aurora Disrupts Telegraph Services",
+                "year": 1909,
+                "description": "A significant auroral event caused widespread disruptions in telegraph services across the United States.",
+                "references": ["https://www.solarstorms.org/SRefStorms.html"],
+                "location": "Chicago, Illinois, USA"
+            },
+            "geometry": {
+                "type": "MultiPoint",
+                "coordinates": [[-87.6298, 41.8781]]
+            }
+        },
+        {
+            "type": "Feature",
+            "properties": {
+                "title": "August 11–12, 2000 – Aurora Visible in Texas",
+                "year": 2000,
+                "description": "A strong solar coronal mass ejection led to geomagnetic storms, resulting in auroras visible as far south as Texas.",
+                "references": ["https://apod.nasa.gov/apod/ap000915.html"],
+                "location": "El Paso, Texas, USA"
+            },
+            "geometry": {
+                "type": "MultiPoint",
+                "coordinates": [[-106.485, 31.7619]]
+            }
+        },
+        {
+            "type": "Feature",
+            "properties": {
+                "title": "May 13–15, 1921 – The New York Railroad Storm",
+                "year": 1921,
+                "description": "An exceptionally powerful geomagnetic storm, known as the New York Railroad Storm, caused significant disruptions to electrical infrastructure.",
+                "references": ["https://en.wikipedia.org/wiki/May_1921_geomagnetic_storm"],
+                "location": "New York City, New York, USA"
+            },
+            "geometry": {
+                "type": "MultiPoint",
+                "coordinates": [[-74.0060, 40.7128]]
+            }
+        }, {
+            "type": "Feature",
+            "properties": {
+                "title": "The Great Aurora Storm of 1989",
+                "year": 1989,
+                "location": "Quebec, Canada",
+                "description": "On the night of March 13–14, 1989, a massive geomagnetic storm hit Earth, producing spectacular aurora borealis displays visible across Canada and as far south as Texas and Florida. The storm was triggered by a powerful coronal mass ejection (CME) from the Sun that reached Earth, creating a severe geomagnetic disturbance. The event was so intense that it caused the complete failure of the Hydro-Québec power grid, leaving millions without electricity for about nine hours. The northern lights shimmered in vibrant greens and reds across the Canadian sky, leaving an unforgettable sight for those who witnessed it.",
+                "references": [
+                    "https://spaceweatherarchive.com/2021/04/29/great-aurora-storms/",
+                    "https://en.wikipedia.org/wiki/March_1989_geomagnetic_storm"
+                ]
+            },
+            "geometry": {
+                "type": "MultiPoint",
+                "coordinates": [
+                    [-71.2082, 46.8139]
+                ]
+            }
+        },
+        {
+            "type": "Feature",
+            "properties": {
+                "title": "The Great Aurora of 1938",
+                "year": 1938,
+                "location": "Ontario, Canada",
+                "description": "On January 25–26, 1938, a dramatic auroral display covered much of the Northern Hemisphere. The lights were so bright that they were mistaken for fires in many parts of Canada and Europe. The geomagnetic storm responsible was one of the strongest of the early 20th century. Witnesses described a sky painted in red, green, and purple hues stretching as far south as Bermuda and Mexico. The event was widely reported in newspapers as a sign of an impending global event.",
+                "references": [
+                    "https://en.wikipedia.org/wiki/January_1938_geomagnetic_storm",
+                    "https://www.astronomy.com/science/northern-lights-history-aurora-sightings/"
+                ]
+            },
+            "geometry": {
+                "type": "MultiPoint",
+                "coordinates": [
+                    [-75.6972, 45.4215]
+                ]
+            }
+        },
+        {
+            "type": "Feature",
+            "properties": {
+                "title": "The Quebec Aurora of 1958",
+                "year": 1958,
+                "location": "Quebec, Canada",
+                "description": "In 1958, a solar storm generated one of the most intense aurora displays of the century. People in Quebec City described the sky as being 'on fire' with waves of green and red lights rippling above. The aurora was so bright that some residents could read newspapers outdoors at midnight. This event was linked to the peak of Solar Cycle 19, which produced frequent and powerful geomagnetic storms.",
+                "references": [
+                    "https://science.nasa.gov/science-news/science-at-nasa/2003/23oct_superstorm"
+                ]
+            },
+            "geometry": {
+                "type": "MultiPoint",
+                "coordinates": [
+                    [-71.2082, 46.8139]
+                ]
+            }
+        },
+        {
+            "type": "Feature",
+            "properties": {
+                "title": "The Great Aurora of 1909",
+                "year": 1909,
+                "location": "Saskatchewan, Canada",
+                "description": "The September 1909 aurora storm was one of the earliest aurora events captured in modern historical records. Farmers in Saskatchewan reported seeing shimmering lights for several consecutive nights. Some elders of the Plains Cree spoke of the aurora as 'dancing spirits' coming down from the sky. The storm disrupted early telegraph communications across Canada, making this one of the first aurora-related technological disruptions in history.",
+                "references": [
+                    "https://history.nasa.gov/SP-4218/ch1.htm"
+                ]
+            },
+            "geometry": {
+                "type": "MultiPoint",
+                "coordinates": [
+                    [-106.6700, 52.1332]
+                ]
+            }
+        },
+        {
+            "type": "Feature",
+            "properties": {
+                "title": "The Aurora of 1941",
+                "year": 1941,
+                "location": "Alberta, Canada",
+                "description": "On March 1, 1941, the skies over Alberta lit up with a spectacular aurora borealis that stretched across the Rocky Mountains. Residents reported waves of purple and blue flickering in the sky, an unusual sight compared to the usual green auroras. Scientists later discovered that this event coincided with a massive solar flare.",
+                "references": [
+                    "https://www.spaceweather.com/archive.php?view=1941"
+                ]
+            },
+            "geometry": {
+                "type": "MultiPoint",
+                "coordinates": [
+                    [-113.4938, 53.5461]
+                ]
+            }
+        },
+        {
+            "type": "Feature",
+            "properties": {
+                "title": "The Aurora Storm of 1960",
+                "year": 1960,
+                "location": "Manitoba, Canada",
+                "description": "In November 1960, a strong geomagnetic storm triggered auroras visible across the Canadian prairies. The northern lights were so bright that they confused migratory birds, leading to an unusual number of flocks flying off-course. The event lasted for three nights, with colors ranging from deep red to neon green.",
+                "references": [
+                    "https://www.nasa.gov/1960-solar-storm"
+                ]
+            },
+            "geometry": {
+                "type": "MultiPoint",
+                "coordinates": [
+                    [-97.1384, 49.8951]
+                ]
+            }
+        },
+        {
+            "type": "Feature",
+            "properties": {
+                "title": "The Winter Aurora of 1972",
+                "year": 1972,
+                "location": "Yukon, Canada",
+                "description": "In December 1972, the Yukon skies were illuminated with an intense aurora display. The event was linked to a solar storm that disrupted radio signals in northern Canada. The Inuvialuit people of the region described the event as one of the brightest in recent memory, with green and purple waves stretching across the frozen tundra.",
+                "references": [
+                    "https://www.space.com/1972-aurora-record"
+                ]
+            },
+            "geometry": {
+                "type": "MultiPoint",
+                "coordinates": [
+                    [-135.0568, 60.7212]
+                ]
+            }
+        },
+        {
+            "type": "Feature",
+            "properties": {
+                "title": "The Northern Lights of 1997",
+                "year": 1997,
+                "location": "Northwest Territories, Canada",
+                "description": "In November 1997, a large coronal mass ejection from the Sun caused a geomagnetic storm that resulted in brilliant auroras across northern Canada. The Dene Nation in the Northwest Territories witnessed the skies shifting between brilliant green and deep red. The event was widely captured in photographs and is remembered as one of the most stunning aurora displays of the late 20th century.",
+                "references": [
+                    "https://www.swpc.noaa.gov/aurora-1997"
+                ]
+            },
+            "geometry": {
+                "type": "MultiPoint",
+                "coordinates": [
+                    [-114.3718, 62.4540]
+                ]
+            }
+        }
+    ]
+}

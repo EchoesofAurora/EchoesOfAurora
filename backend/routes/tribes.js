@@ -5,7 +5,8 @@ const pool = require('../config/db'); // Import Database Pool
 // Get All Tribes
 router.get('/', async (req, res) => {
   try {
-    const result = await pool.query('SELECT * FROM tribes');
+    // Fetch only published tribes for user-facing views
+    const result = await pool.query('SELECT * FROM tribes WHERE published = true');
     res.json(result.rows);
   } catch (err) {
     res.status(500).json({ error: err.message });
@@ -16,29 +17,34 @@ router.get('/', async (req, res) => {
 router.get('/:tribeId', async (req, res) => {
   const { tribeId } = req.params;
   try {
-    const result = await pool.query('SELECT * FROM tribes WHERE tribe_id = $1', [tribeId]);
+    const result = await pool.query('SELECT * FROM tribes WHERE tribe_id = $1 AND published = true', [tribeId]);
     if (result.rows.length === 0) {
-      return res.status(404).json({ error: 'Tribe not found' });
+      return res.status(404).json({ error: 'Tribe not found or unpublished' });
     }
     res.json(result.rows[0]);
   } catch (err) {
     res.status(500).json({ error: err.message });
-  }
+  } 
 });
 
-// Add a Tribe
+module.exports = router;
+
 router.post('/', async (req, res) => {
-  const { tribe_name, tribe_text, start_year, end_year } = req.body;
+  const { tribe_name, tribe_text, start_year, end_year, published } = req.body;
+
   try {
     const result = await pool.query(
-      'INSERT INTO tribes (tribe_name, tribe_text, start_year, end_year) VALUES ($1, $2, $3, $4) RETURNING *',
-      [tribe_name, tribe_text, start_year, end_year]
+      `INSERT INTO tribes (tribe_name, tribe_text, start_year, end_year, published) 
+       VALUES ($1, $2, $3, $4, $5) RETURNING *`,
+      [tribe_name, tribe_text, start_year, end_year, published]
     );
+
     res.status(201).json(result.rows[0]);
   } catch (err) {
     res.status(500).json({ error: err.message });
   }
 });
+
 
 // Update a Tribe by ID
 router.put('/:tribeId', async (req, res) => {

@@ -1,131 +1,90 @@
-/* Overlay style for the popup */
 .profile-update-popup-overlay {
   position: fixed;
   top: 0;
   left: 0;
   width: 100%;
-  height: 100vh;
-  background: rgba(0, 0, 0, 0.6);
+  height: 100%;
+  background: rgba(0, 0, 0, 0.5);
   display: flex;
-  justify-content: center;
   align-items: center;
+  justify-content: center;
   z-index: 1000;
 }
 
-/* Main modal popup style */
 .profile-update-popup-modal {
   background: white;
-  padding: 40px;
+  padding: 20px;
   border-radius: 10px;
   text-align: center;
-  width: 450px;
-  max-width: 90%;
-  box-shadow: 0px 5px 15px rgba(0, 0, 0, 0.2);
-  display: flex;
-  flex-direction: column;
-  align-items: center;
+  width: 350px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
 }
 
-/* Icon styling */
 .popup-icon-wrapper {
-  margin-bottom: 20px;
+  display: flex;
+  justify-content: center;
+  margin-bottom: 15px;
 }
 
 .popup-icon {
   width: 50px;
-  height: 50px;
-  object-fit: contain;
 }
 
-/* Title styling */
 .popup-title {
-  font-size: 24px;
-  font-weight: 600;
-  color: #333;
-  margin-bottom: 15px;
+  font-size: 20px;
+  font-weight: bold;
+  margin-bottom: 10px;
 }
 
-/* Message text styling */
 .popup-message {
-  font-size: 16px;
-  color: #666;
-  margin-bottom: 25px;
+  font-size: 14px;
+  margin-bottom: 20px;
 }
 
-/* Button for sending the PIN */
+.popup-buttons,
+.buttons-in-flex {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 20px;
+}
+
+.popup-send-pin-button,
+.popup-verify-button,
+.popup-close-button {
+  padding: 10px 15px;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  font-size: 14px;
+}
+
 .popup-send-pin-button {
-  background-color: #a49cbe;
-
+  background: #007bff;
   color: white;
-  padding: 12px 25px;
-  border: none;
-  border-radius: 5px;
-  font-size: 16px;
-  cursor: pointer;
-  margin-bottom: 15px;
-  transition: background-color 0.3s;
 }
 
-.popup-send-pin-button:hover {
-  background-color: #928bb0;
-}
-
-/* Input styling for PIN entry */
-.popup-pin-input {
-  width: 100%;
-  padding: 12px;
-  margin-bottom: 15px;
-  border-radius: 5px;
-  border: 1px solid #ddd;
-  font-size: 16px;
-}
-
-/* Verify button styling */
 .popup-verify-button {
-  background-color: #28a745;
+  background: #28a745;
   color: white;
-  padding: 12px 25px;
-  border: none;
+}
+
+.popup-close-button {
+  background: #dc3545;
+  color: white;
+}
+
+.popup-pin-input {
+  width: 80%;
+  padding: 10px;
+  margin-top: 10px;
+  border: 1px solid #ccc;
   border-radius: 5px;
+  text-align: center;
   font-size: 16px;
-  cursor: pointer;
-  transition: background-color 0.3s;
-
 }
 
-.popup-verify-button:hover {
-  background-color: #218838;
-}
-
-/* Timer text styling */
 .popup-timer {
   font-size: 14px;
-  color: red;
-  font-weight: 600;
-  margin-top: 15px;
-}
-
-/* Close button styling */
-.popup-close-button {
-  background-color: #dc3545;
-  color: white;
-  padding: 12px 25px;
-  border: none;
-  border-radius: 5px;
-  font-size: 16px;
-  cursor: pointer;
-  transition: background-color 0.3s;
-  width: 161.7px;
-
-}
-
-.popup-close-button:hover {
-  background-color: #c82333;
-}
-
-.buttons-in-flex{
-  width: 470px;
-  display: flex;
-  justify-content: space-around;
-
+  color: #555;
+  margin-top: 10px;
 }
