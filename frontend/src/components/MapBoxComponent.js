@@ -21,7 +21,7 @@ const MapBoxComponent = () => {
   const [popupInfo, setPopupInfo] = useState(null);
   const [hoveredFeatureId, setHoveredFeatureId] = useState(null);
   const [is3dOn, setIs3dOn] = useState(false);
-  const [isStoriesOn, setIsStoriesOn] = useState(false);
+  const [isStoriesOn, setIsStoriesOn] = useState(true);
   const [mapStyle, setMapStyle] = useState(
     "mapbox://styles/kodalis2/cm7kvvsfl00x601qo0597eedp"
   );
