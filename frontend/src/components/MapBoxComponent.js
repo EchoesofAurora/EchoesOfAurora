@@ -319,28 +319,6 @@ const MapBoxComponent = () => {
             onClose={() => setSelectedTribe(null)}
           />
         )}
-        {/* {popupInfo && (
-          // <Popup
-          //   longitude={popupInfo.coordinates.lng}
-          //   latitude={popupInfo.coordinates.lat}
-          //   onClose={() => setPopupInfo(null)}
-          //   anchor="top"
-          // >
-          //   <div>
-          //     <h4>{popupInfo.properties.Name}</h4>
-          //     <p>ID: {popupInfo.properties.id}</p>
-          //     {popupInfo.properties.description && (
-          //       <a
-          //         href={popupInfo.properties.description}
-          //         target="_blank"
-          //         rel="noopener noreferrer"
-          //       >
-          //         More Info
-          //       </a>
-          //     )}
-          //   </div>
-          // </Popup>
-        //)} */}
       </MapGL>
     </div>
   );
