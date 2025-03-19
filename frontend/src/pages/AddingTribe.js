@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useRef } from "react";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 import "../styles/AddingTribe.css";
@@ -10,6 +10,7 @@ import "leaflet/dist/leaflet.css";
 import { Modal, Button } from "react-bootstrap";
 import { useNavigate } from "react-router-dom"; 
 import ImageUpload from "../components/ImageUpload"; 
+
 const MapWithDrawing = ({ isDrawingEnabled, onShapeUpdate, drawnShape, tempMarkers, setTempMarkers }) => {
   useMapEvents({
     click: (e) => {
@@ -36,6 +37,16 @@ const MapWithDrawing = ({ isDrawingEnabled, onShapeUpdate, drawnShape, tempMarke
 };
 
 const HeroAddingTribe = () => {
+  // Form field refs for scrolling
+  const formRef = useRef(null);
+  const tribeNameRef = useRef(null);
+  const startYearRef = useRef(null);
+  const endYearRef = useRef(null);
+  const descriptionRef = useRef(null);
+  const tribeColorRef = useRef(null);
+  const mapRef = useRef(null);
+  const referencesRef = useRef(null);
+
   const [tribeName, setTribeName] = useState("");
   const [description, setDescription] = useState("");
   const [startDate, setStartDate] = useState(null);
@@ -45,7 +56,7 @@ const HeroAddingTribe = () => {
   const [tempMarkers, setTempMarkers] = useState([]);
   const [tribeColor, setTribeColor] = useState("#8732a8");
   const [referenceLinks, setReferenceLinks] = useState("");
-  const navigate = useNavigate(); // Initialize useNavigate
+  const navigate = useNavigate();
   const [geojson, setGeojson] = useState({
     type: "Feature",
     geometry: {
@@ -58,14 +69,27 @@ const HeroAddingTribe = () => {
     },
   });
 
-  const [selectedImages, setSelectedImages] = useState([]); // State for selected images (File objects)
-  const [imagePreviews, setImagePreviews] = useState([]); // State for image preview URLs (will be managed by ImageUpload)
+  // Validation states
+  const [errors, setErrors] = useState({
+    tribeName: "",
+    startDate: "",
+    endDate: "",
+    description: "",
+    drawnShape: "",
+    referenceLinks: ""
+  });
+
+  // State to track if form validation has been attempted
+  const [formSubmitAttempted, setFormSubmitAttempted] = useState(false);
+
+  const [selectedImages, setSelectedImages] = useState([]);
+  const [imagePreviews, setImagePreviews] = useState([]);
 
   // State for modal
   const [showModal, setShowModal] = useState(false);
   const [modalMessage, setModalMessage] = useState("");
   
-  const handleClose = () => setShowModal(false); // Function to close modal
+  const handleClose = () => setShowModal(false);
 
   // Handle GeoJSON input changes
   const handleGeojsonChange = (e, field) => {
@@ -75,14 +99,78 @@ const HeroAddingTribe = () => {
     });
   };
 
+  const validateForm = () => {
+    let isValid = true;
+    const newErrors = {
+      tribeName: "",
+      startDate: "",
+      endDate: "",
+      description: "",
+      drawnShape: "",
+      referenceLinks: ""
+    };
+
+    // Validate tribe name
+    if (!tribeName.trim()) {
+      newErrors.tribeName = "Tribe name is required";
+      isValid = false;
+      if (tribeNameRef.current) tribeNameRef.current.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    }
+
+    // Validate start date
+    if (!startDate) {
+      newErrors.startDate = "Start year is required";
+      isValid = false;
+      if (!newErrors.tribeName && startYearRef.current) startYearRef.current.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    }
+
+    // Validate end date
+    if (!endDate) {
+      newErrors.endDate = "End year is required";
+      isValid = false;
+      if (!newErrors.tribeName && !newErrors.startDate && endYearRef.current) endYearRef.current.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    }
+
+    // Validate description
+    if (!description.trim()) {
+      newErrors.description = "Description is required";
+      isValid = false;
+      if (!newErrors.tribeName && !newErrors.startDate && !newErrors.endDate && descriptionRef.current) 
+        descriptionRef.current.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    }
+
+    // Validate drawn shape (map)
+    if (drawnShape.length < 3) {
+      newErrors.drawnShape = "Please draw a valid area on the map";
+      isValid = false;
+      if (!newErrors.tribeName && !newErrors.startDate && !newErrors.endDate && !newErrors.description && mapRef.current) 
+        mapRef.current.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    }
+
+    // Validate reference links
+    if (!referenceLinks.trim()) {
+      newErrors.referenceLinks = "Reference is required";
+      isValid = false;
+      if (!newErrors.tribeName && !newErrors.startDate && !newErrors.endDate && !newErrors.description && !newErrors.drawnShape && referencesRef.current)
+        referencesRef.current.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    }
+
+    setErrors(newErrors);
+    
+    if (!isValid && formRef.current) {
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+    
+    return isValid;
+  };
+
   // Form submission handler using fetch
   const handleFormSubmit = async (e, publishStatus) => {
     e.preventDefault();
+    setFormSubmitAttempted(true);
 
-    // Basic validation
-    if (!tribeName) {
-      setModalMessage("Please enter a tribe name.");
-      setShowModal(true);
+    // Validate form before submission
+    if (!validateForm()) {
       return;
     }
 
@@ -155,6 +243,16 @@ const HeroAddingTribe = () => {
         setSelectedImages([]);
       }
       
+      // Reset form after successful submission
+      setTribeName("");
+      setDescription("");
+      setStartDate(null);
+      setEndDate(null);
+      setDrawnShape([]);
+      setTempMarkers([]);
+      setReferenceLinks("");
+      setFormSubmitAttempted(false);
+      
     } catch (error) {
       console.error("Error in handleFormSubmit:", error);
       setModalMessage(`Failed to add tribe or upload images: ${error.message}`);
@@ -184,46 +282,105 @@ const HeroAddingTribe = () => {
     }));
   };
 
+  // Check if any errors exist
+  const hasErrors = Object.values(errors).some(error => error !== "");
+
   return (
     <div className="overlap">
       <Sidebar />
       <main className="rightFrame-5" style={{ minHeight: "calc(100vh - 80px)", paddingBottom: "80px" }}>
-        <div className="adding-tribe-frame">
+        <div className="adding-tribe-frame" ref={formRef}>
           <h1 className="adding-tribe-title">Add Tribe</h1>
           <p className="adding-tribe-subtitle">You are adding a new tribe.</p>
+          
+          {/* Error summary message */}
+          {formSubmitAttempted && hasErrors && (
+            <div className="form-error-message" style={{ color: 'red', marginBottom: '15px', fontWeight: 'bold'  }}>
+              Please fill in all required fields marked with an asterisk (*).
+            </div>
+          )}
+          
           <form className="adding-tribe-form" onSubmit={handleFormSubmit}>
-            <div className="adding-tribe-form-group">
-              <label htmlFor="tribeName" className="adding-tribe-label">Tribe Name</label>
+            <div className="adding-tribe-form-group" ref={tribeNameRef}>
+              <label htmlFor="tribeName" className="adding-tribe-label">Tribe Name <span style={{ color: 'red' }}>*</span></label>
               <input
                 type="text"
                 id="tribeName"
-                className="adding-tribe-input"
+                className={`adding-tribe-input ${errors.tribeName ? 'input-error' : ''}`}
                 placeholder="Tribe Name"
                 value={tribeName}
-                onChange={(e) => setTribeName(e.target.value)}
+                onChange={(e) => {
+                  setTribeName(e.target.value);
+                  if (e.target.value.trim()) {
+                    setErrors({...errors, tribeName: ""});
+                  }
+                }}
+                style={errors.tribeName ? { border: '2px solid red' } : {}}
               />
+              {errors.tribeName && <div className="error-message" style={{ color: 'red', fontSize: '0.8rem', marginTop: '5px' }}>{errors.tribeName}</div>}
             </div>
 
             <div className="adding-tribe-form-group">
               <div className="tribeRange">
-                <div className="year-range">
-                  <label className="adding-tribe-label">Start Year</label>
-                  <DatePicker selected={startDate} onChange={(date) => setStartDate(date)} showYearPicker dateFormat="yyyy" className="adding-tribe-input" placeholderText="Select start year" />
+                <div className="year-range" ref={startYearRef}>
+                  <label className="adding-tribe-label">Start Year <span style={{ color: 'red' }}>*</span></label>
+                  <DatePicker 
+                    selected={startDate} 
+                    onChange={(date) => {
+                      setStartDate(date);
+                      if (date) {
+                        setErrors({...errors, startDate: ""});
+                      }
+                    }} 
+                    showYearPicker 
+                    dateFormat="yyyy" 
+                    className={`adding-tribe-input ${errors.startDate ? 'input-error' : ''}`}
+                    placeholderText="Select start year"
+                    style={errors.startDate ? { border: '2px solid red' } : {}}
+                  />
+                  {errors.startDate && <div className="error-message" style={{ color: 'red', fontSize: '0.8rem', marginTop: '5px' }}>{errors.startDate}</div>}
                 </div>
-                <div className="year-range">
-                  <label className="adding-tribe-label">End Year</label>
-                  <DatePicker selected={endDate} onChange={(date) => setEndDate(date)} showYearPicker dateFormat="yyyy" className="adding-tribe-input" placeholderText="Select end year" />
+                <div className="year-range" ref={endYearRef}>
+                  <label className="adding-tribe-label">End Year <span style={{ color: 'red' }}>*</span></label>
+                  <DatePicker 
+                    selected={endDate} 
+                    onChange={(date) => {
+                      setEndDate(date);
+                      if (date) {
+                        setErrors({...errors, endDate: ""});
+                      }
+                    }} 
+                    showYearPicker 
+                    dateFormat="yyyy" 
+                    className={`adding-tribe-input ${errors.endDate ? 'input-error' : ''}`}
+                    placeholderText="Select end year"
+                    style={errors.endDate ? { border: '2px solid red' } : {}}
+                  />
+                  {errors.endDate && <div className="error-message" style={{ color: 'red', fontSize: '0.8rem', marginTop: '5px' }}>{errors.endDate}</div>}
                 </div>
               </div>
             </div>
 
-            <div className="adding-tribe-form-group">
-              <label htmlFor="description" className="adding-tribe-label">Description</label>
-              <textarea id="description" className="adding-tribe-textarea" placeholder="Enter description" value={description} onChange={(e) => setDescription(e.target.value)} />
+            <div className="adding-tribe-form-group" ref={descriptionRef}>
+              <label htmlFor="description" className="adding-tribe-label">Description <span style={{ color: 'red' }}>*</span></label>
+              <textarea 
+                id="description" 
+                className={`adding-tribe-textarea ${errors.description ? 'input-error' : ''}`}
+                placeholder="Enter description" 
+                value={description} 
+                onChange={(e) => {
+                  setDescription(e.target.value);
+                  if (e.target.value.trim()) {
+                    setErrors({...errors, description: ""});
+                  }
+                }}
+                style={errors.description ? { border: '2px solid red' } : {}}
+              />
+              {errors.description && <div className="error-message" style={{ color: 'red', fontSize: '0.8rem', marginTop: '5px' }}>{errors.description}</div>}
             </div>
 
-            <div className="adding-tribe-form-group">
-              <label htmlFor="tribeColor" className="adding-tribe-label">Choose Tribe Color</label>
+            <div className="adding-tribe-form-group" ref={tribeColorRef}>
+              <label htmlFor="tribeColor" className="adding-tribe-label">Choose Tribe Color <span style={{ color: 'red' }}>*</span></label>
               <input
                 type="color"
                 id="tribeColor"
@@ -234,73 +391,70 @@ const HeroAddingTribe = () => {
               <span className="color-code-display">{tribeColor}</span>
             </div>
 
-            <div className="adding-tribe-map-section">
-              <p className="adding-tribe-map-instruction">Select tribe area on the map</p>
+            <div className="adding-tribe-map-section" ref={mapRef}>
+              <p className="adding-tribe-map-instruction">Select tribe area on the map <span style={{ color: 'red' }}>*</span></p>
               <button type="button" className="adding-tribe-map-button" onClick={toggleDrawing} style={{ backgroundColor: isDrawingEnabled ? "red" : "" }}>
                 {isDrawingEnabled ? "Disable Drawing" : "Enable Drawing"}
               </button>
-              <MapContainer center={[40.736, -74.172]} zoom={5} scrollWheelZoom={true} className="adding-tribe-map">
+              <MapContainer center={[40.736, -74.172]} zoom={5} scrollWheelZoom={true} className={`adding-tribe-map ${errors.drawnShape ? 'map-error' : ''}`} style={errors.drawnShape ? { border: '2px solid red' } : {}}>
                 <TileLayer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" />
                 <MapWithDrawing
-                  key={JSON.stringify(drawnShape)} // Use JSON.stringify for reliable key updates
+                  key={JSON.stringify(drawnShape)}
                   isDrawingEnabled={isDrawingEnabled}
                   onShapeUpdate={(newShape) => {
                     setDrawnShape(newShape);
-                    updateGeojsonCoordinates(newShape); // Sync with geojson.geometry.coordinates
+                    updateGeojsonCoordinates(newShape);
+                    if (newShape.length >= 3) {
+                      setErrors({...errors, drawnShape: ""});
+                    }
                   }}
                   drawnShape={drawnShape}
                   tempMarkers={tempMarkers}
                   setTempMarkers={setTempMarkers}
                 />
               </MapContainer>
-              {/* <p>Drawn Shape Coordinates: {JSON.stringify(drawnShape)}</p> */}
+              {errors.drawnShape && <div className="error-message" style={{ color: 'red', fontSize: '0.8rem', marginTop: '5px' }}>{errors.drawnShape}</div>}
             </div>
 
-            {/* GeoJSON Fields */}
             <div className="adding-tribe-form-group">
-              {/* <label className="adding-tribe-label">GeoJSON Data</label> */}
-              {/* <label className="adding-tribe-label">Geometry Type</label> */}
-              {/* <input
-                type="text"
-                className="adding-tribe-input"
-                placeholder="e.g., Polygon"
-                value={geojson.geometry.type}
-                onChange={(e) => handleGeojsonChange(e, "type")}
-              /> */}
-
               <label className="adding-tribe-label">Coordinates</label>
               <textarea
                 className="adding-tribe-textarea"
                 placeholder='Enter coordinates (e.g., [[[-74, 40], [-73, 40], [-73, 41], [-74, 40]]])'
                 value={geojson.geometry.coordinates}
                 onChange={(e) => handleGeojsonChange(e, "coordinates")}
+                disabled
               />
             </div>
 
-            {/* Image Upload Section - Replaced with ImageUpload component */}
             <div className="adding-tribe-form-group">
               <label className="adding-tribe-label">Upload Images</label>
               <ImageUpload onImagesChange={setSelectedImages} />
               <p className="adding-tribe-upload-instruction">Supported formats: JPG, PNG</p>
             </div>
 
-            {/* Reference Field */}
-            <div className="adding-tribe-form-group">
-              <label htmlFor="referenceLinks" className="adding-tribe-label">Reference</label>
+            <div className="adding-tribe-form-group" ref={referencesRef}>
+              <label htmlFor="referenceLinks" className="adding-tribe-label">Reference <span style={{ color: 'red' }}>*</span></label>
               <input
                 type="text"
                 id="referenceLinks"
-                className="adding-tribe-input"
+                className={`adding-tribe-input ${errors.referenceLinks ? 'input-error' : ''}`}
                 placeholder="Enter reference links"
                 value={referenceLinks}
-                onChange={(e) => setReferenceLinks(e.target.value)}
+                onChange={(e) => {
+                  setReferenceLinks(e.target.value);
+                  if (e.target.value.trim()) {
+                    setErrors({...errors, referenceLinks: ""});
+                  }
+                }}
+                style={errors.referenceLinks ? { border: '2px solid red' } : {}}
               />
+              {errors.referenceLinks && <div className="error-message" style={{ color: 'red', fontSize: '0.8rem', marginTop: '5px' }}>{errors.referenceLinks}</div>}
             </div>
 
-            {/* Save and Save & Publish Buttons */}
             <div className="adding-tribe-button-group">
               <button type="button" className="adding-tribe-back-button" onClick={() => {
-                window.scrollTo(0, 0); // Scroll to top before navigating
+                window.scrollTo(0, 0);
                 navigate("/Admin/ManageTribes");
               }}>
                 Back
@@ -341,4 +495,3 @@ const AddingTribe = () => {
   );
 }
 export default AddingTribe;
-

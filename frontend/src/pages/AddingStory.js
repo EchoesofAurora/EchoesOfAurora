@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 import "../styles/AddingStory.css";
@@ -12,18 +12,30 @@ import { useNavigate } from "react-router-dom";
 const HeroAddingStory = () => {
   const [storyTitle, setStoryTitle] = useState("");
   const [selectedTribe, setSelectedTribe] = useState("");
-  const [startDate, setStartDate] = useState(null);
-  const [endDate, setEndDate] = useState(null);
+  const [storyYear, setStoryYear] = useState(null);
   const [description, setDescription] = useState("");
   const [referenceLinks, setReferenceLinks] = useState("");
   const [selectedImages, setSelectedImages] = useState([]);
   const [imagePreviews, setImagePreviews] = useState([]);
   const [tribes, setTribes] = useState([]);
-  const [tribeIds, setTribeIds] = useState({}); // Map tribe names to IDs
-  const [newStoryId, setNewStoryId] = useState(null); // Store the new story ID
-
+  const [tribeIds, setTribeIds] = useState({});
+  const [newStoryId, setNewStoryId] = useState(null);
+  
   const [showModal, setShowModal] = useState(false);
   const [modalMessage, setModalMessage] = useState("");
+  
+  // Form validation states
+  const [errors, setErrors] = useState({});
+  const [formError, setFormError] = useState("");
+  const [touched, setTouched] = useState({});
+  
+  // Refs for scrolling to error fields
+  const formRef = useRef(null);
+  const titleRef = useRef(null);
+  const tribeRef = useRef(null);
+  const yearRef = useRef(null);
+  const descriptionRef = useRef(null);
+  const referenceRef = useRef(null);
 
   const navigate = useNavigate();
 
@@ -50,6 +62,96 @@ const HeroAddingStory = () => {
     };
     fetchTribes();
   }, []);
+
+  // Handle field touch events
+  const handleBlur = (field) => {
+    setTouched((prev) => ({ ...prev, [field]: true }));
+    validateField(field);
+  };
+
+  // Validate a single field
+  const validateField = (field) => {
+    let newErrors = { ...errors };
+    
+    switch (field) {
+      case 'storyTitle':
+        if (!storyTitle.trim()) {
+          newErrors.storyTitle = "Story title is required";
+        } else {
+          delete newErrors.storyTitle;
+        }
+        break;
+      case 'selectedTribe':
+        if (!selectedTribe) {
+          newErrors.selectedTribe = "Tribe selection is required";
+        } else {
+          delete newErrors.selectedTribe;
+        }
+        break;
+      case 'storyYear':
+        if (!storyYear) {
+          newErrors.storyYear = "Story year is required";
+        } else {
+          delete newErrors.storyYear;
+        }
+        break;
+      case 'description':
+        if (!description.trim()) {
+          newErrors.description = "Description is required";
+        } else {
+          delete newErrors.description;
+        }
+        break;
+      case 'referenceLinks':
+        if (!referenceLinks.trim()) {
+          newErrors.referenceLinks = "Reference is required";
+        } else {
+          delete newErrors.referenceLinks;
+        }
+        break;
+      default:
+        break;
+    }
+    
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
+  };
+
+  // Validate all fields
+  const validateForm = () => {
+    const newErrors = {};
+    const newTouched = {};
+    
+    // Mark all fields as touched
+    ['storyTitle', 'selectedTribe', 'storyYear', 'description', 'referenceLinks'].forEach(field => {
+      newTouched[field] = true;
+    });
+    setTouched(newTouched);
+    
+    // Validate each field
+    if (!storyTitle.trim()) newErrors.storyTitle = "Story title is required";
+    if (!selectedTribe) newErrors.selectedTribe = "Tribe selection is required";
+    if (!storyYear) newErrors.storyYear = "Story year is required";
+    if (!description.trim()) newErrors.description = "Description is required";
+    if (!referenceLinks.trim()) newErrors.referenceLinks = "Reference is required";
+    
+    setErrors(newErrors);
+    
+    // Set form-wide error if any fields have errors
+    if (Object.keys(newErrors).length > 0) {
+      setFormError("Please fill in all required fields");
+      
+      // Scroll to the first field with error
+      if (formRef.current) {
+        formRef.current.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }
+      
+      return false;
+    }
+    
+    setFormError("");
+    return true;
+  };
 
   // Handle image selection and generate previews
   const handleImageChange = (e) => {
@@ -80,9 +182,8 @@ const HeroAddingStory = () => {
   const handleFormSubmit = async (e, publishStatus) => {
     e.preventDefault();
 
-    if (!storyTitle || !selectedTribe) {
-      setModalMessage("Please enter a story title and select a tribe.");
-      setShowModal(true);
+    // Validate the form
+    if (!validateForm()) {
       return;
     }
 
@@ -93,14 +194,14 @@ const HeroAddingStory = () => {
       return;
     }
 
-    const storyYear = startDate ? startDate.getFullYear().toString() : endDate ? endDate.getFullYear().toString() : null;
+    const year = storyYear ? storyYear.getFullYear().toString() : null;
 
     const requestData = {
       story_name: storyTitle,
       tribe_id: tribeId,
-      story_year: storyYear,
+      story_year: year,
       story_text: description,
-      story_references: referenceLinks || null,
+      story_references: referenceLinks,
       published: publishStatus,
     };
 
@@ -117,7 +218,7 @@ const HeroAddingStory = () => {
       }
 
       const storyData = await response.json();
-      setNewStoryId(storyData.story_id); // Set the new story ID
+      setNewStoryId(storyData.story_id);
 
       if (selectedImages.length > 0) {
         const formData = new FormData();
@@ -150,24 +251,31 @@ const HeroAddingStory = () => {
       // Clear form and previews
       setStoryTitle("");
       setSelectedTribe("");
-      setStartDate(null);
-      setEndDate(null);
+      setStoryYear(null);
       setDescription("");
       setReferenceLinks("");
       setSelectedImages([]);
       setImagePreviews([]);
+      setErrors({});
+      setFormError("");
+      setTouched({});
       imagePreviews.forEach((preview) => URL.revokeObjectURL(preview));
 
       // Redirect after a short delay to allow modal to show
       setTimeout(() => {
         navigate("/Admin/ManageStories");
-        window.scrollTo(0, 0); // Scroll to the top of the page
+        window.scrollTo(0, 0);
       }, 2000);
     } catch (error) {
       console.error("Error in handleFormSubmit:", error);
       setModalMessage(`Failed to add story or upload images: ${error.message}`);
       setShowModal(true);
     }
+  };
+
+  // Get input class based on validation state
+  const getInputClassName = (field) => {
+    return `adding-story-input ${touched[field] && errors[field] ? "input-error" : ""}`;
   };
 
   return (
@@ -177,70 +285,109 @@ const HeroAddingStory = () => {
         <div className="adding-story-frame">
           <h1 className="adding-story-title">Add Story</h1>
           <p className="adding-story-subtitle">You are adding a new story.</p>
-          <form className="adding-story-form">
+          
+          {formError && (
+            <div className="form-error-message" style={{ 
+              color: "#dc3545", 
+              padding: "10px", 
+              marginBottom: "15px", 
+              backgroundColor: "#f8d7da", 
+              borderRadius: "4px",
+              borderLeft: "4px solid #dc3545"
+            }}>
+              {formError}
+            </div>
+          )}
+          
+          <form className="adding-story-form" ref={formRef}>
             <div className="adding-story-form-group">
-              <label htmlFor="storyTitle" className="adding-story-label">Story Title</label>
+              <label htmlFor="storyTitle" className="adding-story-label">
+                Story Title <span style={{ color: "#dc3545" }}>*</span>
+              </label>
               <input
                 type="text"
                 id="storyTitle"
-                className="adding-story-input"
+                ref={titleRef}
+                className={getInputClassName('storyTitle')}
                 placeholder="Enter story title"
                 value={storyTitle}
                 onChange={(e) => setStoryTitle(e.target.value)}
+                onBlur={() => handleBlur('storyTitle')}
+                style={touched.storyTitle && errors.storyTitle ? { borderColor: "#dc3545" } : {}}
               />
+              {touched.storyTitle && errors.storyTitle && (
+                <div className="error-message" style={{ color: "#dc3545", fontSize: "0.875rem", marginTop: "5px" }}>
+                  {errors.storyTitle}
+                </div>
+              )}
             </div>
 
             <div className="adding-story-form-group">
-              <label htmlFor="tribeSelect" className="adding-story-label">Select Tribe</label>
+              <label htmlFor="tribeSelect" className="adding-story-label">
+                Select Tribe <span style={{ color: "#dc3545" }}>*</span>
+              </label>
               <select
                 id="tribeSelect"
-                className="adding-story-input"
+                ref={tribeRef}
+                className={getInputClassName('selectedTribe')}
                 value={selectedTribe}
                 onChange={(e) => setSelectedTribe(e.target.value)}
+                onBlur={() => handleBlur('selectedTribe')}
+                style={touched.selectedTribe && errors.selectedTribe ? { borderColor: "#dc3545" } : {}}
               >
                 <option value="">Select a tribe</option>
                 {tribes.map((tribe, index) => (
                   <option key={index} value={tribe}>{tribe}</option>
                 ))}
               </select>
+              {touched.selectedTribe && errors.selectedTribe && (
+                <div className="error-message" style={{ color: "#dc3545", fontSize: "0.875rem", marginTop: "5px" }}>
+                  {errors.selectedTribe}
+                </div>
+              )}
             </div>
 
             <div className="adding-story-form-group">
-              <div className="storyRange">
-                <div className="year-range">
-                  <label className="adding-story-label">Start Year</label>
-                  <DatePicker
-                    selected={startDate}
-                    onChange={(date) => setStartDate(date)}
-                    showYearPicker
-                    dateFormat="yyyy"
-                    className="adding-story-input"
-                    placeholderText="Select start year"
-                  />
+              <label className="adding-story-label">
+                Year <span style={{ color: "#dc3545" }}>*</span>
+              </label>
+              <DatePicker
+                ref={yearRef}
+                selected={storyYear}
+                onChange={(date) => setStoryYear(date)}
+                showYearPicker
+                dateFormat="yyyy"
+                className={getInputClassName('storyYear')}
+                placeholderText="Select year"
+                onBlur={() => handleBlur('storyYear')}
+                style={touched.storyYear && errors.storyYear ? { borderColor: "#dc3545" } : {}}
+              />
+              {touched.storyYear && errors.storyYear && (
+                <div className="error-message" style={{ color: "#dc3545", fontSize: "0.875rem", marginTop: "5px" }}>
+                  {errors.storyYear}
                 </div>
-                <div className="year-range">
-                  <label className="adding-story-label">End Year</label>
-                  <DatePicker
-                    selected={endDate}
-                    onChange={(date) => setEndDate(date)}
-                    showYearPicker
-                    dateFormat="yyyy"
-                    className="adding-story-input"
-                    placeholderText="Select end year"
-                  />
-                </div>
-              </div>
+              )}
             </div>
 
             <div className="adding-story-form-group">
-              <label htmlFor="description" className="adding-story-label">Description</label>
+              <label htmlFor="description" className="adding-story-label">
+                Description <span style={{ color: "#dc3545" }}>*</span>
+              </label>
               <textarea
                 id="description"
-                className="adding-story-textarea"
+                ref={descriptionRef}
+                className={`adding-story-textarea ${touched.description && errors.description ? "input-error" : ""}`}
                 placeholder="Enter description"
                 value={description}
                 onChange={(e) => setDescription(e.target.value)}
+                onBlur={() => handleBlur('description')}
+                style={touched.description && errors.description ? { borderColor: "#dc3545" } : {}}
               ></textarea>
+              {touched.description && errors.description && (
+                <div className="error-message" style={{ color: "#dc3545", fontSize: "0.875rem", marginTop: "5px" }}>
+                  {errors.description}
+                </div>
+              )}
             </div>
 
             <div className="adding-story-form-group">
@@ -279,15 +426,25 @@ const HeroAddingStory = () => {
             </div>
 
             <div className="adding-story-form-group">
-              <label htmlFor="referenceLinks" className="adding-story-label">Reference</label>
+              <label htmlFor="referenceLinks" className="adding-story-label">
+                Reference <span style={{ color: "#dc3545" }}>*</span>
+              </label>
               <input
                 type="text"
                 id="referenceLinks"
-                className="adding-story-input"
+                ref={referenceRef}
+                className={getInputClassName('referenceLinks')}
                 placeholder="Enter reference links"
                 value={referenceLinks}
                 onChange={(e) => setReferenceLinks(e.target.value)}
+                onBlur={() => handleBlur('referenceLinks')}
+                style={touched.referenceLinks && errors.referenceLinks ? { borderColor: "#dc3545" } : {}}
               />
+              {touched.referenceLinks && errors.referenceLinks && (
+                <div className="error-message" style={{ color: "#dc3545", fontSize: "0.875rem", marginTop: "5px" }}>
+                  {errors.referenceLinks}
+                </div>
+              )}
             </div>
 
             <div className="adding-story-button-group">
