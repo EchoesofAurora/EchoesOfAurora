@@ -1,9 +1,13 @@
-import React, { useState, useEffect } from "react";
+// src/pages/HomePage.js
+import React, { useState, useEffect, useRef } from "react";
 import { Link, useNavigate } from "react-router-dom";
+import { useSelector, useDispatch } from "react-redux";
 import Header from '../components/Header';
 import Footer from '../components/Footer';
 import "../styles/styles.css";
 import logo from '../images/logo.png';
+import { fetchStoriesAsync } from "../redux/slices/storySlice";
+import { fetchTribesAsync } from "../redux/slices/tribeSlice";
 
 // Importing images directly for the carousel
 import carousel2 from "../images/hero_carousel/h5.jpg";
@@ -28,7 +32,6 @@ const HeroSection = () => {
   }, [images.length]);
 
   return (
-
     <section className="user-hero user-hero-section user-section-background"
              style={{
                background: `url(${images[currentImageIndex]}) no-repeat center center/cover`,
@@ -70,51 +73,34 @@ const AboutSection = () => {
   );
 };
 
-// Stories Section Component
+// Stories Section Component with Redux
 const StoriesSection = () => {
-  const [stories, setStories] = useState([]);
-  const [tribes, setTribes] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
+  const dispatch = useDispatch();
+  const { data: stories, status: storiesStatus, error: storiesError } = useSelector(state => state.stories);
+  const { data: tribes, status: tribesStatus } = useSelector(state => state.tribes);
+  
+  const loading = storiesStatus === 'loading' || tribesStatus === 'loading';
+  const error = storiesError;
   const navigate = useNavigate();
+  const dataFetchedRef = useRef(false);
 
   useEffect(() => {
-    const fetchStories = async () => {
-      try {
-        const response = await fetch("/api/stories"); // Fetch stories from backend
-        if (!response.ok) {
-          throw new Error(`HTTP error! Status: ${response.status}`);
-        }
-        const data = await response.json();
-        setStories(data);
-      } catch (error) {
-        setError(error.message);
-      } finally {
-        setLoading(false);
-      }
-    };
-    fetchStories();
-
-    const fetchTribes = async () => {
-      try {
-        const response = await fetch("/api/tribes"); // Fetch stories from backend
-        if (!response.ok) {
-          throw new Error(`HTTP error! Status: ${response.status}`);
-        }
-        const data = await response.json();
-        setTribes(data);
-      } catch (error) {
-        setError(error.message);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchTribes();
-  }, []);
+    if (dataFetchedRef.current) return;
+    dataFetchedRef.current = true;
+    
+    // Only fetch stories if we don't already have them
+    if (stories.length === 0) {
+      dispatch(fetchStoriesAsync());
+    }
+    
+    // Only fetch tribes if we don't already have them
+    if (tribes.length === 0) {
+      dispatch(fetchTribesAsync());
+    }
+  }, [dispatch, stories.length, tribes.length]);
 
   const tribeDictionary = tribes.reduce((acc, tribe) => {
-    acc[tribe.tribe_id] = tribe.tribe_name;  // Use tribe_name as the key and tribe_id as the value
+    acc[tribe.tribe_id] = tribe.tribe_name;
     return acc;
   }, {});
 
@@ -195,7 +181,6 @@ const MapSection = () => (
     </Link>
   </section>
 );
-
 
 // Home Page Component
 const HomePage = () => {

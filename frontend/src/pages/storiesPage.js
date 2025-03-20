@@ -1,60 +1,47 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
+import { useSelector, useDispatch } from "react-redux";
 import "../styles/storiesPage.css";
 import "../styles/styles.css";
 import Header from "../components/Header";
 import Footer from "../components/Footer";
 import SearchBar from "../components/StorySearchBar";
+import { 
+  fetchStoriesAsync, 
+  searchStories, 
+  sortStories, 
+  filterStories,
+  setSelectedStory
+} from "../redux/slices/storySlice";
+import { fetchTribesAsync } from "../redux/slices/tribeSlice";
 
 function StoriesPage() {
-  const [stories, setStories] = useState([]);
-  const [tribes, setTribes] = useState([]);
-  const [searchResults, setSearchResults] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
+  const dispatch = useDispatch();
+  
+  // Get data from Redux store
+  const { data: stories, searchResults, status: storiesStatus, error: storiesError } = useSelector(state => state.stories);
+  const { data: tribes, status: tribesStatus } = useSelector(state => state.tribes);
+  
+  const loading = storiesStatus === 'loading' || tribesStatus === 'loading';
+  const error = storiesError;
+  
   const navigate = useNavigate();
 
   useEffect(() => {
-    const fetchStories = async () => {
-      try {
-        const response = await fetch("/api/stories");
-        if (!response.ok) {
-          throw new Error(`HTTP error! Status: ${response.status}`);
-        }
-        const data = await response.json();
-        console.log("Fetched stories:", data); // Debug log
-        setStories(data);
-        setSearchResults(data.sort((a, b) => a.story_name.localeCompare(b.story_name))); // Initialize search results with all stories
-      } catch (error) {
-        console.error("Error fetching stories:", error);
-        setError(error.message);
-      } finally {
-        setLoading(false);
-      }
-    };
+    // Only fetch stories if they haven't been fetched or are in error state
+  if (storiesStatus === 'idle' || storiesStatus === 'failed') {
+    dispatch(fetchStoriesAsync());
+  }
+  
+  // Only fetch tribes if they haven't been fetched or are in error state
+  if (tribesStatus === 'idle' || tribesStatus === 'failed') {
+    dispatch(fetchTribesAsync());
+  }
+  }, [dispatch, tribesStatus, storiesStatus]);
 
-    fetchStories();
-
-    const fetchTribes = async () => {
-      try {
-        const response = await fetch("/api/tribes"); // Fetch stories from backend
-        if (!response.ok) {
-          throw new Error(`HTTP error! Status: ${response.status}`);
-        }
-        const data = await response.json();
-        setTribes(data);
-      } catch (error) {
-        setError(error.message);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchTribes();
-  }, []);
-
+  // Create tribe dictionaries
   const tribeDictionary = tribes.reduce((acc, tribe) => {
-    acc[tribe.tribe_name] = tribe.tribe_id;  // Use tribe_name as the key and tribe_id as the value
+    acc[tribe.tribe_name] = tribe.tribe_id;
     return acc;
   }, {});
 
@@ -74,62 +61,20 @@ function StoriesPage() {
   };
 
   const handleLearnMore = (story) => {
+    dispatch(setSelectedStory(story));
     navigate(`/story/${story.story_id}`, { state: { story } });
   };
   
   const handleSearch = (searchTerm) => {
-    if (!searchTerm) {
-      setSearchResults(stories);
-      return;
-    }
-    const filteredStories = stories.filter((story) =>
-      story.story_name.toLowerCase().includes(searchTerm.toLowerCase())
-    );
-    setSearchResults(filteredStories);
+    dispatch(searchStories(searchTerm));
   };
 
   const handleSort = (sortOption) => {
-    let sortedStories = [...searchResults];
-    switch (sortOption) {
-      case "name-asc":
-        sortedStories.sort((a, b) => a.story_name.localeCompare(b.story_name));
-        break;
-      case "name-desc":
-        sortedStories.sort((a, b) => b.story_name.localeCompare(a.story_name));
-        break;
-      case "time-asc":
-        sortedStories.sort((a, b) => a.story_year - b.story_year);
-        break;
-      case "time-desc":
-        sortedStories.sort((a, b) => b.story_year - a.story_year);
-        break;
-      case "tribe-asc":
-        sortedStories.sort((a, b) => a.tribe_id - b.tribe_id);
-        break;
-      case "tribe-desc":
-        sortedStories.sort((a, b) => b.tribe_id - a.tribe_id);
-        break;
-      default:
-        break;
-    }
-    setSearchResults(sortedStories);
+    dispatch(sortStories(sortOption));
   };
 
   const handleFilter = (tribeName, timeRange) => {
-    let filteredStories = stories;
-
-    if (tribeName && tribeDictionary[tribeName] !== undefined) {
-      const tribeId = tribeDictionary[tribeName];
-      filteredStories = filteredStories.filter(story => story.tribe_id === tribeId);
-    }
-
-    if (timeRange && timeRange.length === 2) {
-      filteredStories = filteredStories.filter(story => 
-        story.story_year >= timeRange[0] && story.story_year <= timeRange[1]
-      );
-    }
-
-    setSearchResults(filteredStories);
+    dispatch(filterStories({ tribeName, timeRange, tribeDictionary }));
   };
 
   return (

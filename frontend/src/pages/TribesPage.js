@@ -1,88 +1,52 @@
-import React, { useEffect, useState } from "react";
+// src/components/TribesSection.js
+import React, { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
+import { useSelector, useDispatch } from "react-redux";
 import "../styles/tribesection.css";
 import "../styles/styles.css";
 import Header from '../components/Header';
 import Footer from '../components/Footer';
 import SearchBar from "../components/TribeSearchBar";
+import { 
+  fetchTribesAsync, 
+  searchTribes, 
+  sortTribes, 
+  filterTribes,
+  setSelectedTribe 
+} from "../redux/slices/tribeSlice";
  
 function TribesSection() {
-  const [tribes, setTribes] = useState([]);
-  const [searchResults, setSearchResults] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
+  const dispatch = useDispatch();
+  const { data: tribes, searchResults, status, error,status: tribesStatus } = useSelector((state) => state.tribes);
+  const loading = status === 'loading';
   const navigate = useNavigate();
  
   useEffect(() => {
-    const fetchTribes = async () => {
-      try {
-        const response = await fetch("/api/tribes");
-        if (!response.ok) {
-          throw new Error(`HTTP error! Status: ${response.status}`);
-        }
-        const data = await response.json();
-        setTribes(data);
-        setSearchResults(data); // Initialize search results with all stories
-      } catch (error) {
-        setError(error.message);
-      } finally {
-        setLoading(false);
+    // Only fetch tribes if they haven't been fetched or are in error state
+      if (tribesStatus === 'idle' || tribesStatus === 'failed') {
+        dispatch(fetchTribesAsync());
       }
-    };
- 
-    fetchTribes();
-  }, []);
+  }, [dispatch, tribesStatus]);
  
   const getImageUrl = (tribeId) => {
     return require(`../images/tribes/${tribeId}.png`);
   };
  
   const handleLearnMore = (tribe) => {
+    dispatch(setSelectedTribe(tribe));
     navigate(`/tribe/${tribe.tribe_id}`, { state: { tribe } });
   };
 
   const handleSearch = (searchTerm) => {
-    if (!searchTerm) {
-      setSearchResults(tribes);
-      return;
-    }
-    const filteredTribes = tribes.filter((tribe) =>
-      tribe.tribe_name.toLowerCase().includes(searchTerm.toLowerCase())
-    );
-    setSearchResults(filteredTribes);
+    dispatch(searchTribes(searchTerm));
   };
 
   const handleSort = (sortOption) => {
-    let sortedTribes = [...searchResults];
-    switch (sortOption) {
-      case "name-asc":
-        sortedTribes.sort((a, b) => a.tribe_name.localeCompare(b.tribe_name));
-        break;
-      case "name-desc":
-        sortedTribes.sort((a, b) => b.tribe_name.localeCompare(a.tribe_name));
-        break;
-      case "time-asc":
-        sortedTribes.sort((a, b) => a.start_year - b.start_year);
-        break;
-      case "time-desc":
-        sortedTribes.sort((a, b) => b.start_year - a.start_year);
-        break;
-      default:
-        break;
-    }
-    setSearchResults(sortedTribes);
+    dispatch(sortTribes(sortOption));
   };
 
   const handleFilter = (timeRange) => {
-    let filteredTribes = tribes;
-
-    if (timeRange && timeRange.length === 2) {
-      filteredTribes = filteredTribes.filter(tribe => 
-        tribe.start_year >= timeRange[0] && tribe.start_year <= timeRange[1]
-      );
-    }
-
-    setSearchResults(filteredTribes);
+    dispatch(filterTribes(timeRange));
   };
  
   return (
@@ -104,7 +68,7 @@ function TribesSection() {
           searchResults.map((tribe, index) => (
             <div className="tribe-card" key={index}>
               <img
-                src={getImageUrl(tribe.tribe_id)}
+                src={getImageUrl(1)}
                 alt={tribe.tribe_name}
                 className="tribe-image"
               />

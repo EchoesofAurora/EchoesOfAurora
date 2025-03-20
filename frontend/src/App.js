@@ -24,11 +24,14 @@ import EditStory from "./pages/EditStory";
 import SubmissionDetail from './pages/SubmissionDetail'; // New component for detailed view
 import AdminAddUser from "./pages/AddNewUser";
 import ChangePassword from "./pages/changePassword";
+import { Provider } from 'react-redux';
+import { store } from './redux/store';
 
 import "bootstrap/dist/css/bootstrap.min.css";
 
 const App = () => {
     return (
+        <Provider store={store}>
         <Router>
             <Routes>
                 <Route path="/" element={<HomePage />} />
@@ -58,6 +61,7 @@ const App = () => {
                 <Route path="/Admin/changePassword" element={<ChangePassword />} />
             </Routes>
         </Router>
+        </Provider>
     );
 };
 
