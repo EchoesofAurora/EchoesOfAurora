@@ -11,7 +11,7 @@
   background: url('../images/stories/hero.png') no-repeat center/cover;
   padding: 50px 20px;
   color: white;
-  height: 70vh;
+  height: 45vh;
   display: flex;
   flex-direction: column;
   justify-content: center;
@@ -38,53 +38,15 @@
   margin-bottom: 20px;
 }
 
-.About-hero-title {
-  font-size: 3rem; /* Adjust size to match */
-  margin-bottom: 20px; /* Space below the text */
-  font-weight: 1000; /* Extra bold text */
-  font-style: italic; /* Adds italic style */
-  color: white; /* Ensure text is white */
-  text-shadow: 2px 2px 0px black,  /* Black outline effect */
-               -2px -2px 0px black,
-               2px -2px 0px black,
-               -2px 2px 0px black,
-               0px 2px 0px black,
-               0px -2px 0px black,
-               2px 0px 0px black,
-               -2px 0px 0px black;
-  text-align: center; /* Ensure text is centered */
-  line-height: 1.5; /* Adjust line height for better readability */
-  letter-spacing: 1px; /* Slightly increase spacing for impact */
-  max-width: 800px; /* Limit the width to enforce line wrapping */
-  word-wrap: break-word; /* Allow breaking if necessary */
-  margin: 0 auto; /* Center the text horizontally */
-}
-
-.About-explore-button {
-  background-color: #a2ff00;
-  color: #000;
-  padding: 10px 20px;
-  border: none;
-  border-radius: 8px;
-  font-size: 1.2rem;
-  cursor: pointer;
-  margin-top: 20px;
-}
-
-.About-explore-button:hover {
-  background-color: #8bdb00;
-}
-
-
   .title-In-lines{
     display: flex;
     align-items: center;
     justify-content: center;
     color: #000;
     gap: 30px;
-    margin:150px auto;
+    margin: 50px auto;
     font-style: italic;
-    font-size:larger;
+    font-size: larger;
   }
 
 
@@ -93,7 +55,6 @@
     display: flex;
     flex-direction: column;
     align-items: center;
-    margin-top: 50px;
     padding: 0 20px;
     gap: 40px; /* Space between image and text */
     transition: transform 0.3s ease;
@@ -125,6 +86,9 @@
     border-top-right-radius: 50px;
     border-bottom-right-radius: 50px;
     margin: -20px;
+    width: 50%;
+    object-fit: cover;
+    max-height: 350px;
   }
   .features-card-func.image-left img{
     border-radius: 50%;
@@ -141,6 +105,9 @@
     border-top-left-radius: 50px;
     border-bottom-left-radius: 50px;
     margin: -20px;
+    width: 50%;
+    object-fit: cover;
+    max-height: 350px;
   }
   .features-card-func.image-right img{
     border-radius: 50%;
@@ -189,7 +156,7 @@
     display: flex;
     flex-direction: column;
     justify-content: center; /* Align content to the top */
-    max-width: 700px; /* Limit text width */
+    width: 50%;
     gap: 5px; /* Optional: Add spacing between child elements */
     text-align: center;
     padding: 20px;
@@ -227,10 +194,8 @@
   .commitment-description {
     font-size: 1.5rem; /* Adjust size to match */
     margin-bottom: 20px; /* Space below the text */
-    font-weight: 1000; /* Extra bold text */
     font-style: italic; /* Adds italic style */
     color: rgb(0, 0, 0); /* Ensure text is white */
-    text-shadow: 1px 1px 0px black;  /* Black outline effect */
     text-align: center; /* Ensure text is centered */
     line-height: 1.5; /* Adjust line height for better readability */
     letter-spacing: 1px; /* Slightly increase spacing for impact */

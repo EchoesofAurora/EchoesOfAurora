@@ -13,7 +13,7 @@ const MapBoxComponent = () => {
     longitude: -100,
     zoom: 1.5,
     width: "100%",
-    height: "800px",
+    height: "88vh",
     transitionDuration: 500,
     transitionInterpolator: new FlyToInterpolator(),
   });
@@ -202,7 +202,7 @@ const MapBoxComponent = () => {
   };
 
   return (
-    <div style={{ width: "100%", height: "100vh", position: "relative" }}>
+    <div style={{ width: "100%", height: "50vh", position: "relative" }}>
       <MapGL
         {...viewport}
         mapboxApiAccessToken={process.env.REACT_APP_MAPBOX_TOKEN}

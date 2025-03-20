@@ -98,10 +98,9 @@ const About = () => {
           <Header/>
         <div className="About-hero-section">
           <h1 className="user-hero-title">About Our Platform</h1>
-          <h1 className="user-hero-subtext">
+          <p className="user-hero-subtext">
             "Bridging Indigenous Knowledge and Scientific Exploration to Educate and Inspire."
-          </h1>
-          <button className="About-explore-button">See More</button>
+          </p>
         </div>
   
         <div className="title-In-lines">
