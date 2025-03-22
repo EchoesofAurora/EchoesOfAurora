@@ -2,9 +2,11 @@ import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import "../styles/storiesPage.css";
 import "../styles/styles.css";
+import "../styles/pagination.css"; // Import the new pagination CSS
 import Header from "../components/Header";
 import Footer from "../components/Footer";
 import SearchBar from "../components/StorySearchBar";
+import Pagination from "../components/Pagination"; // Import the new Pagination component
 
 function StoriesPage() {
   const [stories, setStories] = useState([]);
@@ -12,6 +14,8 @@ function StoriesPage() {
   const [searchResults, setSearchResults] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [storiesPerPage] = useState(6);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -86,6 +90,7 @@ function StoriesPage() {
       story.story_name.toLowerCase().includes(searchTerm.toLowerCase())
     );
     setSearchResults(filteredStories);
+    setCurrentPage(1); // Reset to first page when searching
   };
 
   const handleSort = (sortOption) => {
@@ -113,6 +118,7 @@ function StoriesPage() {
         break;
     }
     setSearchResults(sortedStories);
+    setCurrentPage(1); // Reset to first page when sorting
   };
 
   const handleFilter = (tribeName, timeRange) => {
@@ -130,7 +136,16 @@ function StoriesPage() {
     }
 
     setSearchResults(filteredStories);
+    setCurrentPage(1); // Reset to first page when filtering
   };
+
+  // Calculate the current stories to display
+  const indexOfLastStory = currentPage * storiesPerPage;
+  const indexOfFirstStory = indexOfLastStory - storiesPerPage;
+  const currentStories = searchResults.slice(indexOfFirstStory, indexOfLastStory);
+  
+  // Change page
+  const paginate = (pageNumber) => setCurrentPage(pageNumber);
 
   return (
     <div className="user-frontend stories-page user-section-background long-section-background user-section-shadow">
@@ -147,33 +162,43 @@ function StoriesPage() {
         ) : error ? (
           <p>Error: {error}</p>
         ) : searchResults.length > 0 ? (
-          searchResults.map((story, index) => (
-            <div className="story-card" key={index}>
-              <img
-                src={getImageUrl(story.story_id) || "/default-story-image.png"}
-                alt={story.story_name}
-                className="story-image"
-              />
-              <div className="story-content">
-                <div className="story-card-top-bar">
-                  <h3 className="story-title">{story.story_name}</h3>
-                  <h2 className="story-tribe">{reverseTribeDictionary[story.tribe_id]}</h2>
+          <>
+            <div className="stories-container">
+              {currentStories.map((story, index) => (
+                <div className="story-card" key={index}>
+                  <img
+                    src={getImageUrl(story.story_id) || "/default-story-image.png"}
+                    alt={story.story_name}
+                    className="story-image"
+                  />
+                  <div className="story-content">
+                    <div className="story-card-top-bar">
+                      <h3 className="story-title">{story.story_name}</h3>
+                      <h2 className="story-tribe">{reverseTribeDictionary[story.tribe_id]}</h2>
+                    </div>
+                    <p className="story-description">
+                      <strong>Description:</strong> {story.story_text.slice(0, 150)}...
+                    </p>
+                    <div className="story-card-bottom-bar">
+                      <button
+                        className="learn-more-button"
+                        onClick={() => handleLearnMore(story)}
+                      >
+                        Learn more
+                      </button>
+                      <h2 className="story-year">Year: {story.story_year}</h2>
+                    </div>
+                  </div>
                 </div>
-                <p className="story-description">
-                  <strong>Description:</strong> {story.story_text.slice(0, 150)}...
-                </p>
-                <div className="story-card-bottom-bar">
-                  <button
-                    className="learn-more-button"
-                    onClick={() => handleLearnMore(story)}
-                  >
-                    Learn more
-                  </button>
-                  <h2 className="story-year">Year: {story.story_year}</h2>
-                </div>
-              </div>
+              ))}
             </div>
-          ))
+            <Pagination
+              storiesPerPage={storiesPerPage}
+              totalStories={searchResults.length}
+              paginate={paginate}
+              currentPage={currentPage}
+            />
+          </>
         ) : (
           <p>No published stories available.</p>
         )}
