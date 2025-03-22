@@ -86,7 +86,7 @@ const StoriesSection = () => {
           throw new Error(`HTTP error! Status: ${response.status}`);
         }
         const data = await response.json();
-        setStories(data);
+        setStories(data.slice(0, 4)); // Display only the first 4 stories
       } catch (error) {
         setError(error.message);
       } finally {
@@ -189,7 +189,7 @@ const MapSection = () => (
     <Link to="/map">
       <img
         className="user-map-image"
-        src={require("../images/Map.png")}
+        src={require("../images/Map-home3.png")}
         alt="Interactive Map of the United States"
       />
     </Link>
