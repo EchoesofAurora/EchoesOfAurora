@@ -166,6 +166,7 @@ const HeroAddingTribe = () => {
     if (!isDrawingEnabled) {
       setDrawnShape([]);
       setTempMarkers([]);
+      geojson.geometry.coordinates = ""; // Clear coordinates when drawing starts
     } else {
       // Close the shape if there are at least 3 points
       setDrawnShape((prevShape) => (prevShape.length > 2 ? [...prevShape, prevShape[0]] : prevShape));
@@ -236,9 +237,25 @@ const HeroAddingTribe = () => {
 
             <div className="adding-tribe-map-section">
               <p className="adding-tribe-map-instruction">Select tribe area on the map</p>
-              <button type="button" className="adding-tribe-map-button" onClick={toggleDrawing} style={{ backgroundColor: isDrawingEnabled ? "red" : "" }}>
-                {isDrawingEnabled ? "Disable Drawing" : "Enable Drawing"}
-              </button>
+              <div className="map-controls">
+              <button
+                              type="button"
+                              className={`map-control-btn ${isDrawingEnabled ? 'active' : ''}`}
+                              onClick={toggleDrawing}
+                              aria-pressed={isDrawingEnabled}
+                            >
+                              {isDrawingEnabled ? 'Finish Drawing' : 'Start Drawing'}
+                            </button>
+                            
+                            <button
+                              type="button"
+                              className="map-control-btn"
+                              onClick={toggleDrawing}
+                              disabled={drawnShape.length === 0}
+                            >
+                              Reset Map
+                            </button>
+              </div>
               <MapContainer center={[40.736, -74.172]} zoom={5} scrollWheelZoom={true} className="adding-tribe-map">
                 <TileLayer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" />
                 <MapWithDrawing
