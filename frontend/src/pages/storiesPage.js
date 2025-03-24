@@ -2,11 +2,11 @@ import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import "../styles/storiesPage.css";
 import "../styles/styles.css";
-import "../styles/pagination.css"; 
+import "../styles/pagination.css";
 import Header from "../components/Header";
 import Footer from "../components/Footer";
 import SearchBar from "../components/StorySearchBar";
-import Pagination from "../components/Pagination"; 
+import Pagination from "../components/Pagination";
 
 // Import a default image as fallback
 import defaultStoryImage from "../images/stories/1.png";
@@ -29,29 +29,10 @@ function StoriesPage() {
           throw new Error(`HTTP error! Status: ${response.status}`);
         }
         const data = await response.json();
-        console.log("Fetched stories:", data);
-        
-        // Fetch images for all stories in one go
-        const storiesWithImages = await Promise.all(
-          data.map(async (story) => {
-            try {
-              const imageResponse = await fetch(`/api/stories/${story.story_id}/images`);
-              if (imageResponse.ok) {
-                const images = await imageResponse.json();
-                if (images && images.length > 0) {
-                  return { ...story, images };
-                }
-              }
-              return story;
-            } catch (error) {
-              console.error(`Error fetching images for story ${story.story_id}:`, error);
-              return story;
-            }
-          })
+        setStories(data);
+        setSearchResults(
+          data.sort((a, b) => a.story_name.localeCompare(b.story_name))
         );
-        
-        setStories(storiesWithImages);
-        setSearchResults(storiesWithImages.sort((a, b) => a.story_name.localeCompare(b.story_name)));
       } catch (error) {
         console.error("Error fetching stories:", error);
         setError(error.message);
@@ -88,16 +69,32 @@ function StoriesPage() {
 
   // Get the first image for a story or return a default image
   const getStoryImage = (story) => {
-    if (story.images && story.images.length > 0) {
-      return `data:${story.images[0].media_type};base64,${story.images[0].image_data}`;
+    if (story.image_data) {
+      return `data:${story.media_type};base64,${story.image_data}`;
     }
-    
-    // Fallback to static image if available
+
+    // Get a random image from the stories folder
     try {
-      const imagesContext = require.context("../images/stories", false, /\.png$/);
-      return imagesContext(`./${story.story_id}.png`);
+      const imagesContext = require.context(
+        "../images/stories",
+        false,
+        /\.png$/
+      );
+      const imageKeys = imagesContext.keys();
+
+      if (imageKeys.length > 0) {
+        // Select a random image key from available images
+        const randomIndex = Math.floor(Math.random() * imageKeys.length);
+        return imagesContext(imageKeys[randomIndex]);
+      } else {
+        // If no images available in the folder
+        return defaultStoryImage;
+      }
+
+      // const fallbackImage = require("../images/stories/fallback-story.png");
+      // return fallbackImage;
     } catch (e) {
-      console.error(`Image not found: ${story.story_id}.png`);
+      console.error("Error loading random story image:", e);
       return defaultStoryImage;
     }
   };
@@ -105,7 +102,7 @@ function StoriesPage() {
   const handleLearnMore = (story) => {
     navigate(`/story/${story.story_id}`, { state: { story } });
   };
-  
+
   const handleSearch = (searchTerm) => {
     if (!searchTerm) {
       setSearchResults(stories);
@@ -151,12 +148,15 @@ function StoriesPage() {
 
     if (tribeName && tribeDictionary[tribeName] !== undefined) {
       const tribeId = tribeDictionary[tribeName];
-      filteredStories = filteredStories.filter(story => story.tribe_id === tribeId);
+      filteredStories = filteredStories.filter(
+        (story) => story.tribe_id === tribeId
+      );
     }
 
     if (timeRange && timeRange.length === 2) {
-      filteredStories = filteredStories.filter(story => 
-        story.story_year >= timeRange[0] && story.story_year <= timeRange[1]
+      filteredStories = filteredStories.filter(
+        (story) =>
+          story.story_year >= timeRange[0] && story.story_year <= timeRange[1]
       );
     }
 
@@ -167,12 +167,15 @@ function StoriesPage() {
   // Calculate the current stories to display
   const indexOfLastStory = currentPage * storiesPerPage;
   const indexOfFirstStory = indexOfLastStory - storiesPerPage;
-  const currentStories = searchResults.slice(indexOfFirstStory, indexOfLastStory);
-  
+  const currentStories = searchResults.slice(
+    indexOfFirstStory,
+    indexOfLastStory
+  );
+
   // Change page
   const paginate = (pageNumber) => setCurrentPage(pageNumber);
 
-  return (  
+  return (
     <div className="user-frontend stories-page user-section-background long-section-background user-section-shadow">
       <Header />
       <div className="hero hero-section stories-hero smaller-hero-header">
@@ -180,7 +183,12 @@ function StoriesPage() {
       </div>
       <div className="stories-list user-section-shadow">
         <div className="user-searchbar-container">
-          <SearchBar tribes={tribes} onSearch={handleSearch} onSort={handleSort} onFilter={handleFilter} />
+          <SearchBar
+            tribes={tribes}
+            onSearch={handleSearch}
+            onSort={handleSort}
+            onFilter={handleFilter}
+          />
         </div>
         {loading ? (
           <p>Loading stories...</p>
@@ -196,18 +204,23 @@ function StoriesPage() {
                     alt={story.story_name}
                     className="story-image"
                     onError={(e) => {
-                  console.log(`Error loading image for story ${story.story_id}, using default`);
-                  e.target.onerror = null; // Prevent infinite loops
-                  e.target.src = defaultStoryImage;
-                }}
-              />
+                      console.log(
+                        `Error loading image for story ${story.story_id}, using default`
+                      );
+                      e.target.onerror = null; // Prevent infinite loops
+                      e.target.src = defaultStoryImage;
+                    }}
+                  />
                   <div className="story-content">
                     <div className="story-card-top-bar">
                       <h3 className="story-title">{story.story_name}</h3>
-                      <h2 className="story-tribe">{reverseTribeDictionary[story.tribe_id]}</h2>
+                      <h2 className="story-tribe">
+                        {reverseTribeDictionary[story.tribe_id]}
+                      </h2>
                     </div>
                     <p className="story-description">
-                      <strong>Description:</strong> {story.story_text.slice(0, 150)}...
+                      <strong>Description:</strong>{" "}
+                      {story.story_text.slice(0, 150)}...
                     </p>
                     <div className="story-card-bottom-bar">
                       <button
