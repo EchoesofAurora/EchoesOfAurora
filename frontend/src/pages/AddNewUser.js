@@ -14,6 +14,9 @@ const HeroAdminAddUser = () => {
     confirmPassword: "",
   });
 
+  const [showPopup, setShowPopup] = useState(false);
+  const [popupMessage, setPopupMessage] = useState("");
+
   const handleChange = (e) => {
     setUser({ ...user, [e.target.name]: e.target.value });
   };
@@ -21,11 +24,24 @@ const HeroAdminAddUser = () => {
   const handleSubmit = (e) => {
     e.preventDefault();
     if (user.password !== user.confirmPassword) {
-      alert("Passwords do not match!");
+      setPopupMessage("Passwords do not match!");
+      setShowPopup(true);
       return;
     }
     console.log("New User Added:", user);
-    alert("User added successfully!");
+    setPopupMessage("User added successfully!");
+    setShowPopup(true);
+    // Reset form after successful submission
+    setUser({
+      fullName: "",
+      email: "",
+      password: "",
+      confirmPassword: "",
+    });
+  };
+
+  const closePopup = () => {
+    setShowPopup(false);
   };
 
   return (
@@ -103,6 +119,18 @@ const HeroAdminAddUser = () => {
           </form>
         </div>
       </main>
+
+      {/* Custom Popup */}
+      {showPopup && (
+        <div className="delete-popup-overlay">
+          <div className="delete-popup">
+            <p>{popupMessage}</p>
+            <div className="delete-popup-buttons">
+              <button className="cancel-button" onClick={closePopup}>Close</button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };
