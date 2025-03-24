@@ -1,194 +1,194 @@
 
-  .sd-submission-detail-main {
-    padding: 40px;
-    max-width: 800px;
-    margin: 0 auto;
-    background: rgba(255, 255, 255, 0.95); /* Glass morphism effect */
-    border-radius: 24px;
-    backdrop-filter: blur(20px);
-    box-shadow: 0 12px 40px rgba(0, 0, 0, 0.2);
-    border: 1px solid rgba(255, 255, 255, 0.3);
-    transform-style: preserve-3d;
-    perspective: 1000px;
-  }
-  
-  .sd-back-btn {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    border: 1px solid #a49cbe;
-    background-color: white;
-    color: #a49cbe;
-    padding: 10px 20px;
-    border-radius: 5px;
-    cursor: pointer;
-    box-shadow: 0px 4px 4px #00000040;
-    font-size: 16px;
-    transition: transform 0.3s ease, box-shadow 0.3s ease;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-    margin-bottom: 20px;
-  }
-  
-  .sd-back-btn:hover {
-    transform: translateY(-3px) rotate(-2deg);
-    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.3);
-  }
-  
-  .sd-submission-subject {
-    font-size: 36px;
-    margin-bottom: 20px;
-    color: #333;
-    font-weight: 700;
-    text-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-    transform: translateZ(20px);
-    background: linear-gradient(135deg, #151414, #302f2f);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-  }
-  
-  .sd-submission-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 20px;
-    padding-bottom: 15px;
-    border-bottom: 1px solid rgba(0, 0, 0, 0.1);
-    transform: translateZ(10px);
-  }
-  
-  .sd-sender-info {
-    display: flex;
-    flex-direction: column;
-  }
-  
-  .sd-sender-name {
-    font-size: 20px;
-    font-weight: 700;
-    color: #333;
-  }
-  
-  .sd-sender-email {
-    font-size: 14px;
-    color: #666;
-  }
-  
-  .sd-submission-date {
-    font-size: 14px;
-    color: #666;
-  }
-  
-  .sd-submission-content {
-    margin-top: 20px;
-    padding: 20px;
-    background: rgba(249, 249, 249, 0.9);
-    border: 1px solid rgba(0, 0, 0, 0.1);
-    border-radius: 16px;
-    line-height: 1.6;
-    color: #333;
-    font-size: 16px;
-    transform: translateZ(10px);
-  }
-  
-  .sd-submission-content p {
-    margin: 0;
-  }
-  
-  .sd-attachments-section {
-    margin-top: 20px;
-    transform: translateZ(10px);
-  }
-  
-  .sd-attachments-section h3 {
-    font-size: 20px;
-    font-weight: 700;
-    color: #333;
-    margin-bottom: 10px;
-  }
-  
-  .sd-attachments-list {
-    display: flex;
-    flex-direction: column;
-    gap: 10px;
-  }
-  
-  .sd-attachment-item {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    padding: 14px;
-    background: rgba(241, 241, 241, 0.9);
-    border-radius: 12px;
-    font-size: 14px;
-    transition: transform 0.3s ease, box-shadow 0.3s ease;
-    transform-style: preserve-3d;
-  }
-  
-  .sd-attachment-item:hover {
-    transform: translateY(-3px) rotate(1deg);
-    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.2);
-  }
-  
-  .sd-attachment-icon {
-    color: #666;
-  }
-  
-  .sd-attachment-name {
-    flex-grow: 1;
-    color: #333;
-  }
-  
-  .sd-attachment-size {
-    color: #666;
-  }
-  
-  .sd-download-btn {
-    background: none;
-    border: none;
-    color: #007bff;
-    cursor: pointer;
-    transition: color 0.3s ease;
-  }
-  
-  .sd-download-btn:hover {
-    color: #0056b3;
-  }
-  
-  .sd-submission-actions {
-    margin-top: 20px;
-    display: flex;
-    gap: 10px;
-    transform: translateZ(10px);
-  }
-  
-  .sd-action-btn {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    padding: 14px 28px;
-    border: none;
-    border-radius: 12px;
-    cursor: pointer;
-    font-size: 14px;
-    transition: transform 0.3s ease, box-shadow 0.3s ease;
-    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.2);
-  }
-  
-  .sd-reply-btn {
-    background: linear-gradient(135deg, #28a745, #218838);
-    color: white;
-  }
-  
-  .sd-reply-btn:hover {
-    transform: translateY(-3px) rotate(2deg);
-    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.3);
-  }
-  
-  .sd-trash-btn {
-    background: linear-gradient(135deg, #dc3545, #c82333);
-    color: white;
-  }
-  
-  .sd-trash-btn:hover {
-    transform: translateY(-3px) rotate(-2deg);
-    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.3);
-  }
+.sd-submission-detail-main {
+  padding: 40px;
+  max-width: 800px;
+  margin: 0 auto;
+  background: rgba(255, 255, 255, 0.95); /* Glass morphism effect */
+  border-radius: 24px;
+  backdrop-filter: blur(20px);
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.2);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  transform-style: preserve-3d;
+  perspective: 1000px;
+}
+
+.sd-back-btn {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  border: 1px solid #a49cbe;
+  background-color: white;
+  color: #a49cbe;
+  padding: 10px 20px;
+  border-radius: 5px;
+  cursor: pointer;
+  box-shadow: 0px 4px 4px #00000040;
+  font-size: 16px;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+  margin-bottom: 20px;
+}
+
+.sd-back-btn:hover {
+  transform: translateY(-3px) rotate(-2deg);
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.3);
+}
+
+.sd-submission-subject {
+  font-size: 36px;
+  margin-bottom: 20px;
+  color: #333;
+  font-weight: 700;
+  text-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  transform: translateZ(20px);
+  background: linear-gradient(135deg, #151414, #302f2f);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.sd-submission-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+  padding-bottom: 15px;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+  transform: translateZ(10px);
+}
+
+.sd-sender-info {
+  display: flex;
+  flex-direction: column;
+}
+
+.sd-sender-name {
+  font-size: 20px;
+  font-weight: 700;
+  color: #333;
+}
+
+.sd-sender-email {
+  font-size: 14px;
+  color: #666;
+}
+
+.sd-submission-date {
+  font-size: 14px;
+  color: #666;
+}
+
+.sd-submission-content {
+  margin-top: 20px;
+  padding: 20px;
+  background: rgba(249, 249, 249, 0.9);
+  border: 1px solid rgba(0, 0, 0, 0.1);
+  border-radius: 16px;
+  line-height: 1.6;
+  color: #333;
+  font-size: 16px;
+  transform: translateZ(10px);
+}
+
+.sd-submission-content p {
+  margin: 0;
+}
+
+.sd-attachments-section {
+  margin-top: 20px;
+  transform: translateZ(10px);
+}
+
+.sd-attachments-section h3 {
+  font-size: 20px;
+  font-weight: 700;
+  color: #333;
+  margin-bottom: 10px;
+}
+
+.sd-attachments-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.sd-attachment-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 14px;
+  background: rgba(241, 241, 241, 0.9);
+  border-radius: 12px;
+  font-size: 14px;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  transform-style: preserve-3d;
+}
+
+.sd-attachment-item:hover {
+  transform: translateY(-3px) rotate(1deg);
+  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.2);
+}
+
+.sd-attachment-icon {
+  color: #666;
+}
+
+.sd-attachment-name {
+  flex-grow: 1;
+  color: #333;
+}
+
+.sd-attachment-size {
+  color: #666;
+}
+
+.sd-download-btn {
+  background: none;
+  border: none;
+  color: #007bff;
+  cursor: pointer;
+  transition: color 0.3s ease;
+}
+
+.sd-download-btn:hover {
+  color: #0056b3;
+}
+
+.sd-submission-actions {
+  margin-top: 20px;
+  display: flex;
+  gap: 10px;
+  transform: translateZ(10px);
+}
+
+.sd-action-btn {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 14px 28px;
+  border: none;
+  border-radius: 12px;
+  cursor: pointer;
+  font-size: 14px;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.2);
+}
+
+.sd-reply-btn {
+  background: linear-gradient(135deg, #28a745, #218838);
+  color: white;
+}
+
+.sd-reply-btn:hover {
+  transform: translateY(-3px) rotate(2deg);
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.3);
+}
+
+.sd-trash-btn {
+  background: linear-gradient(135deg, #dc3545, #c82333);
+  color: white;
+}
+
+.sd-trash-btn:hover {
+  transform: translateY(-3px) rotate(-2deg);
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.3);
+}

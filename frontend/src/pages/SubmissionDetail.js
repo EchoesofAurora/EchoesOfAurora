@@ -1,18 +1,18 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { FaTrash, FaArrowLeft } from "react-icons/fa"; // Removed unused icons
+import { FaTrash, FaArrowLeft } from "react-icons/fa";
 import Sidebar from "../components/Sidebar";
 import Header from "../components/AdminHeader";
 import { motion } from "framer-motion";
-import '../styles/SubmissionDetail.css'; // Use the correct CSS file name
+import '../styles/SubmissionDetail.css';
 
-// Rename to start with uppercase to follow React component naming convention
 const HeroSubmissionDetail = () => {
   const { id } = useParams();
   const navigate = useNavigate();
   const [submission, setSubmission] = useState(null);
   const [error, setError] = useState(null);
   const [isDeleting, setIsDeleting] = useState(false);
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
 
   useEffect(() => {
     const fetchSubmission = async () => {
@@ -32,22 +32,33 @@ const HeroSubmissionDetail = () => {
     fetchSubmission();
   }, [id, navigate]);
 
-  const handleDelete = async () => {
-    if (window.confirm('Are you sure you want to delete this submission? This action cannot be undone.')) {
-      setIsDeleting(true);
-      try {
-        const response = await fetch(`http://localhost:5001/api/submissions/${id}`, {
-          method: 'DELETE',
-        });
-        if (!response.ok) {
-          throw new Error('Failed to delete submission');
-        }
-        navigate('/Admin/UserSubmissions');
-      } catch (error) {
-        console.error('Error deleting submission:', error);
-        setError('Failed to delete submission');
-        setIsDeleting(false);
+  // Function to Open Delete Confirmation Modal
+  const handleDeleteClick = () => {
+    setShowDeleteModal(true);
+  };
+
+  // Function to Cancel Delete
+  const cancelDelete = () => {
+    setShowDeleteModal(false);
+  };
+
+  // Function to Confirm Delete
+  const confirmDelete = async () => {
+    setIsDeleting(true);
+    try {
+      const response = await fetch(`http://localhost:5001/api/submissions/${id}`, {
+        method: 'DELETE',
+      });
+      if (!response.ok) {
+        throw new Error('Failed to delete submission');
       }
+      setShowDeleteModal(false);
+      navigate('/Admin/UserSubmissions');
+    } catch (error) {
+      console.error('Error deleting submission:', error);
+      setError('Failed to delete submission');
+      setIsDeleting(false);
+      setShowDeleteModal(false);
     }
   };
 
@@ -96,7 +107,7 @@ const HeroSubmissionDetail = () => {
           <motion.div className="sd-submission-actions">
             <motion.button
               className="sd-action-btn sd-trash-btn"
-              onClick={handleDelete}
+              onClick={handleDeleteClick}
               disabled={isDeleting}
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
@@ -106,6 +117,25 @@ const HeroSubmissionDetail = () => {
           </motion.div>
         </div>
       </main>
+
+      {/* Delete Confirmation Popup */}
+      {showDeleteModal && (
+        <div className="delete-popup-overlay">
+          <div className="delete-popup">
+            <p>
+              Are you sure you want to delete this submission?
+            </p>
+            <div className="delete-popup-buttons">
+              <button className="cancel-button" onClick={cancelDelete}>
+                Cancel
+              </button>
+              <button className="confirm-button" onClick={confirmDelete}>
+                {isDeleting ? 'Deleting...' : 'Delete'}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };
@@ -115,7 +145,7 @@ const SubmissionDetail = () => {
     <div className="ManageStories">
       <div className="div">
         <Header />
-        <HeroSubmissionDetail /> {/* Use the renamed component */}
+        <HeroSubmissionDetail />
       </div>
     </div>
   );

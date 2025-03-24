@@ -9,6 +9,8 @@ const HeroUserSubmissions = () => {
   const [submissions, setSubmissions] = useState([]);
   const [selectedFilter, setSelectedFilter] = useState("Inbox");
   const navigate = useNavigate();
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
+  const [submissionToDelete, setSubmissionToDelete] = useState(null);
 
   // Fetch submissions based on the selected filter
   const fetchSubmissions = async (endpoint) => {
@@ -50,22 +52,32 @@ const HeroUserSubmissions = () => {
     }
   };
 
-  // Function to delete submission
-  const deleteSubmission = async (id) => {
-    if (window.confirm('Are you sure you want to delete this submission? This action cannot be undone.')) {
-      try {
-        const response = await fetch(`/api/submissions/${id}`, {
-          method: 'DELETE',
-        });
-        if (!response.ok) {
-          throw new Error('Failed to delete submission');
-        }
-        // Refresh the submissions list
-        fetchSubmissions(selectedFilter === "Inbox" ? '' : `/${selectedFilter.toLowerCase()}`);
-      } catch (error) {
-        console.error('Error deleting submission:', error);
+  // Function to Open Delete Confirmation Modal
+  const handleDeleteClick = (id) => {
+    setSubmissionToDelete(id);
+    setShowDeleteModal(true);
+  };
+
+  // Function to Confirm Delete
+  const confirmDelete = async () => {
+    try {
+      const response = await fetch(`/api/submissions/${submissionToDelete}`, {
+        method: 'DELETE',
+      });
+      if (!response.ok) {
+        throw new Error('Failed to delete submission');
       }
+      // Refresh the submissions list
+      fetchSubmissions(selectedFilter === "Inbox" ? '' : `/${selectedFilter.toLowerCase()}`);
+      setShowDeleteModal(false);
+    } catch (error) {
+      console.error('Error deleting submission:', error);
     }
+  };
+
+  // Function to Cancel Delete
+  const cancelDelete = () => {
+    setShowDeleteModal(false);
   };
 
   // Function to handle submission click and mark as read
@@ -127,7 +139,7 @@ const HeroUserSubmissions = () => {
                     year: 'numeric',
                   })}
                 </div>
-                <div className="submission-trash" onClick={(e) => { e.stopPropagation(); deleteSubmission(submission.id); }}>
+                <div className="submission-trash" onClick={(e) => { e.stopPropagation(); handleDeleteClick(submission.id); }}>
                   <FaTrash />
                 </div>
               </div>
@@ -135,6 +147,23 @@ const HeroUserSubmissions = () => {
           </div>
         </div>
       </main>
+
+      {/* Delete Confirmation Popup */}
+      {showDeleteModal && (
+        <div className="delete-popup-overlay">
+          <div className="delete-popup">
+            <p>
+              Are you sure you want to delete this submission?
+            </p>
+            <div className="delete-popup-buttons">
+              <button className="cancel-button" onClick={cancelDelete}>
+                Cancel
+              </button>
+              <button className="confirm-button" onClick={confirmDelete}>Delete</button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };
