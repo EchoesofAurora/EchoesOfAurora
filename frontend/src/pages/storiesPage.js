@@ -2,11 +2,14 @@ import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import "../styles/storiesPage.css";
 import "../styles/styles.css";
-import "../styles/pagination.css"; // Import the new pagination CSS
+import "../styles/pagination.css"; 
 import Header from "../components/Header";
 import Footer from "../components/Footer";
 import SearchBar from "../components/StorySearchBar";
-import Pagination from "../components/Pagination"; // Import the new Pagination component
+import Pagination from "../components/Pagination"; 
+
+// Import a default image as fallback
+import defaultStoryImage from "../images/stories/1.png";
 
 function StoriesPage() {
   const [stories, setStories] = useState([]);
@@ -19,16 +22,36 @@ function StoriesPage() {
   const navigate = useNavigate();
 
   useEffect(() => {
-    const fetchStories = async () => {
+    const fetchStoriesWithImages = async () => {
       try {
         const response = await fetch("/api/stories");
         if (!response.ok) {
           throw new Error(`HTTP error! Status: ${response.status}`);
         }
         const data = await response.json();
-        console.log("Fetched stories:", data); // Debug log
-        setStories(data);
-        setSearchResults(data.sort((a, b) => a.story_name.localeCompare(b.story_name))); // Initialize search results with all stories
+        console.log("Fetched stories:", data);
+        
+        // Fetch images for all stories in one go
+        const storiesWithImages = await Promise.all(
+          data.map(async (story) => {
+            try {
+              const imageResponse = await fetch(`/api/stories/${story.story_id}/images`);
+              if (imageResponse.ok) {
+                const images = await imageResponse.json();
+                if (images && images.length > 0) {
+                  return { ...story, images };
+                }
+              }
+              return story;
+            } catch (error) {
+              console.error(`Error fetching images for story ${story.story_id}:`, error);
+              return story;
+            }
+          })
+        );
+        
+        setStories(storiesWithImages);
+        setSearchResults(storiesWithImages.sort((a, b) => a.story_name.localeCompare(b.story_name)));
       } catch (error) {
         console.error("Error fetching stories:", error);
         setError(error.message);
@@ -37,11 +60,9 @@ function StoriesPage() {
       }
     };
 
-    fetchStories();
-
     const fetchTribes = async () => {
       try {
-        const response = await fetch("/api/tribes"); // Fetch stories from backend
+        const response = await fetch("/api/tribes");
         if (!response.ok) {
           throw new Error(`HTTP error! Status: ${response.status}`);
         }
@@ -49,16 +70,15 @@ function StoriesPage() {
         setTribes(data);
       } catch (error) {
         setError(error.message);
-      } finally {
-        setLoading(false);
       }
     };
 
+    fetchStoriesWithImages();
     fetchTribes();
   }, []);
 
   const tribeDictionary = tribes.reduce((acc, tribe) => {
-    acc[tribe.tribe_name] = tribe.tribe_id;  // Use tribe_name as the key and tribe_id as the value
+    acc[tribe.tribe_name] = tribe.tribe_id;
     return acc;
   }, {});
 
@@ -66,14 +86,19 @@ function StoriesPage() {
     Object.entries(tribeDictionary).map(([name, id]) => [id, name])
   );
 
-  const imagesContext = require.context("../images/stories", false, /\.png$/);
-
-  const getImageUrl = (storyId) => {
+  // Get the first image for a story or return a default image
+  const getStoryImage = (story) => {
+    if (story.images && story.images.length > 0) {
+      return `data:${story.images[0].media_type};base64,${story.images[0].image_data}`;
+    }
+    
+    // Fallback to static image if available
     try {
-      return imagesContext(`./${storyId}.png`);
+      const imagesContext = require.context("../images/stories", false, /\.png$/);
+      return imagesContext(`./${story.story_id}.png`);
     } catch (e) {
-      console.error(`Image not found: ${storyId}.png`);
-      return null;
+      console.error(`Image not found: ${story.story_id}.png`);
+      return defaultStoryImage;
     }
   };
 
@@ -147,7 +172,7 @@ function StoriesPage() {
   // Change page
   const paginate = (pageNumber) => setCurrentPage(pageNumber);
 
-  return (
+  return (  
     <div className="user-frontend stories-page user-section-background long-section-background user-section-shadow">
       <Header />
       <div className="hero hero-section stories-hero smaller-hero-header">
@@ -167,10 +192,15 @@ function StoriesPage() {
               {currentStories.map((story, index) => (
                 <div className="story-card" key={index}>
                   <img
-                    src={getImageUrl(story.story_id) || "/default-story-image.png"}
+                    src={getStoryImage(story)}
                     alt={story.story_name}
                     className="story-image"
-                  />
+                    onError={(e) => {
+                  console.log(`Error loading image for story ${story.story_id}, using default`);
+                  e.target.onerror = null; // Prevent infinite loops
+                  e.target.src = defaultStoryImage;
+                }}
+              />
                   <div className="story-content">
                     <div className="story-card-top-bar">
                       <h3 className="story-title">{story.story_name}</h3>
