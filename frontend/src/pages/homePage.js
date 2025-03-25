@@ -14,6 +14,8 @@ import carousel6 from "../images/hero_carousel/h15.jpg";
 import carousel7 from "../images/hero_carousel/h10.jpg";
 import carousel8 from "../images/hero_carousel/h7.jpg";
 import carousel9 from "../images/hero_carousel/h3.jpeg";
+import defaultStoryImage from "../images/stories/1.png";
+
 
 // Hero Section Component with Slider
 const HeroSection = () => {
@@ -118,14 +120,33 @@ const StoriesSection = () => {
     return acc;
   }, {});
 
-  const imagesContext = require.context("../images/stories", false, /\.png$/);
-  const getImageUrl = (storyId) => {
-    try {
-      return imagesContext(`./${storyId}.png`);
-    } catch (e) {
-      console.error(`Image not found: ${storyId}.png`);
-      return null;
+  const getImageUrl = (story) => {
+    if (story.image_data) {
+      return `data:${story.media_type};base64,${story.image_data}`;
     }
+    try {
+          const imagesContext = require.context(
+            "../images/stories",
+            false,
+            /\.png$/
+          );
+          const imageKeys = imagesContext.keys();
+    
+          if (imageKeys.length > 0) {
+            // Select a random image key from available images
+            const randomIndex = Math.floor(Math.random() * imageKeys.length);
+            return imagesContext(imageKeys[randomIndex]);
+          } else {
+            // If no images available in the folder
+            return defaultStoryImage;
+          }
+    
+          // const fallbackImage = require("../images/stories/fallback-story.png");
+          // return fallbackImage;
+        } catch (e) {
+          console.error("Error loading random story image:", e);
+          return defaultStoryImage;
+        }
   };
 
   const goToStories = () => {
@@ -149,7 +170,7 @@ const StoriesSection = () => {
           stories.map((story, index) => (
             <div className="story-card" key={index}>
               <img
-                src={getImageUrl(story.story_id)}
+                src={getImageUrl(story)}
                 alt={story.story_name}
                 className="story-image"
               />
