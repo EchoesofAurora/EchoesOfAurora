@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import "../styles/ManageStories.css";
-import "../styles/pagination.css"; // Make sure you have this import
+import "../styles/pagination.css";
 import storyBackground3 from "../images/stories/story-background1.png";
 import storyBackground1 from "../images/stories/story-background2.png";
 import storyBackground2 from "../images/stories/story-background3.png";
@@ -8,7 +8,7 @@ import Sidebar from "../components/Sidebar";
 import Header from "../components/AdminHeader";
 import { Modal, Button } from "react-bootstrap";
 import { useNavigate } from "react-router-dom";
-import AdminSearchBar from "../components/AdminSearchBar";
+import AdminStorySearchBar from "../components/AdminStorySearchBar"; // Import the story-specific search bar
 import Pagination from "../components/Pagination";
 
 const HeroManageStories = () => {
@@ -22,7 +22,7 @@ const HeroManageStories = () => {
   const [error, setError] = useState(null);
   // Pagination states
   const [currentPage, setCurrentPage] = useState(1);
-  const [storiesPerPage] = useState(7); // Show 6 stories per page
+  const [storiesPerPage] = useState(7); // Show 7 stories per page
   
   const navigate = useNavigate();
 
@@ -218,8 +218,8 @@ const HeroManageStories = () => {
           </Modal>
         )}
         
-        {/* Search bar component */}
-        <AdminSearchBar 
+        {/* Using the story-specific search bar */}
+        <AdminStorySearchBar 
           onSearch={handleSearch} 
           onSort={handleSort} 
           onFilter={handleFilter} 
