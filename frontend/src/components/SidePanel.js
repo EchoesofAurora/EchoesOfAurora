@@ -4,7 +4,7 @@ import tribesIcon from "../images/tribes/bg-tribe.png";
 import storiesIcon from "../images/stories/bg-stories.png";
 
 const SidePanel = ({ tribe, onClose }) => {
-  const [activeTab, setActiveTab] = useState("stories");
+  const [activeTab, setActiveTab] = useState("tribes");
   const [currentStoryIndex, setCurrentStoryIndex] = useState(0);
   const stories = tribe?.stories;
 
@@ -16,7 +16,7 @@ const SidePanel = ({ tribe, onClose }) => {
     if (image) {
       return `data:${image.media_type};base64,${image.image_data}`;
     }
-    return storiesIcon;
+    return activeTab === "stories" ? storiesIcon : tribesIcon;
   };
 
   return (
@@ -24,63 +24,99 @@ const SidePanel = ({ tribe, onClose }) => {
       {/* Navigation Tabs */}
       <div className="tabs">
         <button
-          className={activeTab === "stories" ? "tab active" : "tab"}
-          onClick={() => setActiveTab("stories")}
-        >
-          Stories
-        </button>
-        <button
           className={activeTab === "tribes" ? "tab active" : "tab"}
           onClick={() => setActiveTab("tribes")}
         >
           Tribes
         </button>
+        <button
+          className={activeTab === "stories" ? "tab active" : "tab"}
+          onClick={() => setActiveTab("stories")}
+        >
+          Stories
+        </button>
         {/* Close Button */}
         <button className="close-btn" onClick={onClose}>
-          &times; {/* HTML entity for "X" */}
+          &times;
         </button>
       </div>
 
       {/* Content Section */}
       <div className="content">
-        {activeTab === "stories" ? (
-          <div>
-            {stories && stories.length > 0 ? (
-              <div>
+        {activeTab === "tribes" ? (
+          // Tribes tab content
+          <div className="tribe-container">
+            {tribe ? (
+              <div key={tribe?.id}>
+                <img
+                  src={getStoryImage(tribe?.image)}
+                  alt="Tribe"
+                  className="tab-icon"
+                />
+                <h3 className="tribe-title">{tribe?.tribe_name}</h3>
+
+                <p className="tribe-text">
+                  <span className="section-label">Start year:</span>{" "}
+                  {tribe?.start_year}
+                </p>
+
+                <p className="tribe-text">
+                  <span className="section-label">End year:</span>{" "}
+                  {tribe?.end_year || new Date().getFullYear()}
+                </p>
+
+                <p className="tribe-text">{tribe?.tribe_text}</p>
+
+                <div className="references-section">
+                  <p className="section-label">References:</p>
+                  <p className="tribe-text">{tribe?.tribe_references}</p>
+                </div>
+              </div>
+            ) : (
+              <div className="empty-state">
+                No tribe information available...
+              </div>
+            )}
+          </div>
+        ) : (
+          <>
+            <div className="story-container">
+              {stories && stories.length > 0 ? (
                 <div key={stories[currentStoryIndex].properties?.id}>
                   <img
                     src={getStoryImage(stories[currentStoryIndex].image)}
-                    alt="Tribes"
+                    alt="Story"
                     className="tab-icon"
                   />
                   <h3 className="tribe-title">
                     {stories[currentStoryIndex]?.story_name}
                   </h3>
+
                   <p className="tribe-text">
-                    Year: {stories[currentStoryIndex]?.story_year}
+                    <span className="section-label">Year:</span>{" "}
+                    {stories[currentStoryIndex]?.story_year}
                   </p>
+
                   <p className="tribe-text">
-                    {stories[currentStoryIndex]?.story_text
-                      ?.split(" ")
-                      .slice(0, 40) // Approximately 4 lines (assuming ~12-13 words per line)
-                      .join(" ")}
-                    {stories[currentStoryIndex]?.story_text?.split(" ").length >
-                      50 && <span>...</span>}
+                    {stories[currentStoryIndex]?.story_text}
                   </p>
-                  <p className="tribe-text">References:</p>
-                  <p className="tribe-text">
-                    {stories[currentStoryIndex]?.story_references}
-                  </p>
+
+                  <div className="references-section">
+                    <p className="section-label">References:</p>
+                    <p className="tribe-text">
+                      {stories[currentStoryIndex]?.story_references}
+                    </p>
+                  </div>
                 </div>
-              </div>
-            ) : (
-              <div>No Stories available...</div>
-            )}
-            {/* Pagination Controls */}
-            <div className="pagination">
-              {stories &&
-                stories.length > 0 &&
-                stories?.map((_, index) => (
+              ) : (
+                <div className="empty-state">No stories available...</div>
+              )}
+            </div>
+
+            {/* Pagination Controls - only shown for stories */}
+            {stories && stories.length > 0 && (
+              <div className="pagination">
+                {stories?.map((_, index) => (
                   <button
                     key={index}
                     className={`page-btn ${
@@ -91,24 +127,9 @@ const SidePanel = ({ tribe, onClose }) => {
                     {index + 1}
                   </button>
                 ))}
-            </div>
-          </div>
-        ) : (
-          <div>
-            <div key={tribe?.id}>
-              <img
-                src={getStoryImage(tribe?.image)}
-                alt="Tribes"
-                className="tab-icon"
-              />
-              <h3 className="tribe-title">{tribe?.tribe_name}</h3>
-              <p className="tribe-text">Start year: {tribe?.start_year}</p>
-              <p className="tribe-text">End year: {tribe?.end_year || new Date().getFullYear()}</p>
-              <p className="tribe-text">{tribe?.tribe_text}</p>
-              <p className="tribe-text">References:</p>
-              <p className="tribe-text">{tribe?.tribe_references}</p>
-            </div>
-          </div>
+              </div>
+            )}
+          </>
         )}
       </div>
     </div>
