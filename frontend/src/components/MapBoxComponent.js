@@ -1,34 +1,37 @@
 import React, { useState, useCallback, useEffect, useRef } from "react";
-import MapGL, { Source, Layer, Popup, NavigationControl } from "react-map-gl";
+import MapGL, { Source, Layer, NavigationControl } from "react-map-gl";
 import { FlyToInterpolator } from "react-map-gl";
 import "mapbox-gl/dist/mapbox-gl.css";
-import geojsonData from "./final-tribes.json";
 import "../styles/mapBox.css";
-import storiesData from "./updated_stories.json";
 import SidePanel from "./SidePanel";
 
 const MapBoxComponent = () => {
   const [viewport, setViewport] = useState({
     latitude: 60,
     longitude: -100,
-    zoom: 1.5,
+    zoom: 1.6,
     width: "100%",
     height: "800px",
     transitionDuration: 500,
     transitionInterpolator: new FlyToInterpolator(),
   });
 
+  // Data states
+  const [tribesData, setTribesData] = useState(null);
+  const [storiesData, setStoriesData] = useState(null);
+
+  // UI states
   const [hoveredFeatureId, setHoveredFeatureId] = useState(null);
   const [is3dOn, setIs3dOn] = useState(false);
   const [isStoriesOn, setIsStoriesOn] = useState(true);
   const [mapStyle, setMapStyle] = useState(
     "mapbox://styles/kodalis2/cm7kvvsfl00x601qo0597eedp"
   );
-  const [selectedYear, setSelectedYear] = useState(1900); // Timeline state, no filtering
-  const timelineRef = useRef(null); // Ref for the timeline container to manage scrolling
-  const [filteredStories, setFilteredStories] = useState(storiesData);
+  const [selectedYear, setSelectedYear] = useState(1900);
+  const timelineRef = useRef(null);
+  const [filteredStories, setFilteredStories] = useState(null);
   const [selectedTribe, setSelectedTribe] = useState(null);
-  const [selectedStories, setSelectedStories] = useState(null);
+  const [isLoading, setIsLoading] = useState(true);
 
   // Define year sequence from 1000 to 2025
   const startYear = 1000;
@@ -44,16 +47,102 @@ const MapBoxComponent = () => {
     years.push(currentYear);
   }
 
-  const filterTribeStories = (tribeId) => {
-    const nextInterval = years.find((year) => year > selectedYear);
-          const tribeStories = filteredStories.features.filter(
-            (story) =>
-              story.properties.tribeid === tribeId &&
-              story.properties.year >= selectedYear &&
-              (nextInterval ? story.properties.year < nextInterval : true)
+  // Fetch tribes and stories data from API
+  useEffect(() => {
+    const fetchData = async () => {
+      setIsLoading(true);
+      try {
+        // Fetch tribes data
+        const tribesResponse = await fetch('api/mapData');
+        const data = await tribesResponse.json();
+
+        const tribesJson = data["tribes"];
+        console.log("Tribes data:", tribesJson);
+
+        // Transform tribes data to match expected format
+        const transformedTribesData = {
+          type: "FeatureCollection",
+          features: tribesJson.map(tribe => ({
+            type: "Feature",
+            id: tribe.tribe_id,
+            properties: {
+              id: tribe.tribe_id,
+              Name: tribe.tribe_name,
+              color: tribe.map_color,
+              description: tribe.description || `Information about ${tribe.tribe_name}`,
+            },
+            geometry: tribe.geojson_data
+          }))
+        };
+        setTribesData(transformedTribesData);
+        console.log("Transformed tribes data:", transformedTribesData);
+        
+        // Fetch stories data
+        const storiesJson = data["stories"];
+        console.log("stories data:", storiesData);
+
+
+        // Transform stories data to match expected format
+        const transformedStoriesData = {
+          type: "FeatureCollection",
+          features: storiesJson.map(story => ({
+            type: "Feature",
+            properties: {
+              title: story.story_name,
+              year: story.story_year,
+              description: story.description || "",
+              tribeid: story.tribe_id,
+              references: story.references || [],
+              location: story.location || "",
+            },
+            geometry: story.geometry
+          }))
+        };
+        console.log("Transformed stories data:", transformedStoriesData);
+        setStoriesData(transformedStoriesData);
+        setFilteredStories(transformedStoriesData);
+      } catch (error) {
+        console.error("Error fetching data:", error);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    fetchData();
+  }, []);
+
+  // Filter stories when selectedYear changes
+  useEffect(() => {
+    if (!storiesData) return;
+    
+    if (selectedYear !== null) {
+      const nextInterval = years.find((year) => year > selectedYear);
+      const filtered = {
+        ...storiesData,
+        features: storiesData.features.filter((story) => {
+          const storyYear = story.properties.year;
+          return (
+            storyYear >= selectedYear &&
+            (nextInterval ? storyYear < nextInterval : true)
           );
-         setSelectedStories(tribeStories);
-  };
+        }),
+      };
+      setFilteredStories(filtered);
+    }
+  }, [selectedYear, storiesData]);
+
+  // const filterTribeStories = useCallback((tribeId) => {
+  //   if (!filteredStories) return;
+    
+  //   const nextInterval = years.find((year) => year > selectedYear);
+  //   const tribeStories = filteredStories.features.filter(
+  //     (story) =>
+  //       story.properties.tribeid === tribeId &&
+  //       story.properties.year >= selectedYear &&
+  //       (nextInterval ? story.properties.year < nextInterval : true)
+  //   );
+  //   setSelectedStories(tribeStories);
+  // });
 
   // Update map style based on 3D toggle
   useEffect(() => {
@@ -64,31 +153,13 @@ const MapBoxComponent = () => {
     );
   }, [is3dOn]);
 
-  useEffect(() => {
-    if (!isStoriesOn){
-      setSelectedStories(null);
-    }
-    else if (selectedTribe){
-      filterTribeStories(selectedTribe.id);
-    }
-  }, [isStoriesOn]);
-
-  useEffect(() => {
-    if (selectedYear !== null) {
-      const nextInterval = years.find((year) => year > selectedYear);
-      const filtered = {
-        ...storiesData,
-        features: storiesData.features.filter((story) => {
-          const storyYear = story.properties.year; // Assuming 'year' is in properties
-          return (
-            storyYear >= selectedYear &&
-            (nextInterval ? storyYear < nextInterval : true)
-          );
-        }),
-      };
-      setFilteredStories(filtered);
-    }
-  }, [selectedYear]);
+  // useEffect(() => {
+  //   if (!isStoriesOn) {
+  //     setSelectedStories(null); }
+  //   // } else if (selectedTribe) {
+  //   //   filterTribeStories(selectedTribe.id);
+  //   // }
+  // }, [isStoriesOn,]);
 
   const handleToggle = () => setIs3dOn(!is3dOn);
   const handleStoriesToggle = () => setIsStoriesOn(!isStoriesOn);
@@ -99,33 +170,6 @@ const MapBoxComponent = () => {
       features && features.length > 0 ? features[0].id : null
     );
   }, []);
-
-  const handleClick = (event) => {
-    const features = event.features;
-    
-    if (features && features.length > 0) {
-      const feature = features[0];
-      const [lng, lat] = event.lngLat;
-      console.log("Feature....", feature);
-
-      if (feature.properties) {
-        const tribe = {
-          name: feature.properties.Name,
-          id: feature.properties.id,
-          description:
-            feature.properties.description || "No description available",
-          coordinates: { lng, lat },
-        };
-
-        // Filter stories related to the selected tribe in the chosen year range
-        if (isStoriesOn) {
-          filterTribeStories(tribe.id);
-        }
-
-        setSelectedTribe({ ...tribe });
-      }
-    }
-  };
 
   const fillLayer = {
     id: "tribe-fill",
@@ -200,6 +244,36 @@ const MapBoxComponent = () => {
     },
   };
 
+  if (isLoading) {
+    return <div className="loading">Loading map data...</div>;
+  }
+
+  const handleClick = (event) => {
+    console.log("Clicked on map:", event);
+    const features = event.features;
+    console.log("Clicked on features:", features);
+    if (features && features.length > 0) {
+      const clickedFeature = features[0];
+      const tribeId = clickedFeature.id;
+      console.log("Clicked on tribe:", tribeId);
+      fetchTribeStoriesData(tribeId);
+
+    }
+
+  }
+
+  const fetchTribeStoriesData = async (id) => {
+    try {
+      // Fetch tribes data
+      const tribesResponse = await fetch('api/mapData/tribes/' + id);
+      const data = await tribesResponse.json();
+      console.log("Tribe data:", data);
+      setSelectedTribe(data);
+    } catch (error) {
+      console.error("Error fetching data:", error);
+    } 
+  };
+
   return (
     <div style={{ width: "100%", height: "100vh", position: "relative" }}>
       <MapGL
@@ -219,19 +293,21 @@ const MapBoxComponent = () => {
         interactiveLayerIds={["tribe-fill"]}
       >
         {/* Tribes Source and Layers */}
-        <Source id="tribes" type="geojson" data={geojsonData}>
-          <Layer key="tribe-fill" {...fillLayer} />
-          {hoveredFeatureId && (
-            <Layer key="tribe-hover-fill" {...hoverFillLayer} />
-          )}
-          {hoveredFeatureId && (
-            <Layer key="tribe-hover-border" {...hoverBorderLayer} />
-          )}
-          <Layer key="tribe-label" {...labelLayer} />
-        </Source>
+        {tribesData && (
+          <Source id="tribes" type="geojson" data={tribesData}>
+            <Layer key="tribe-fill" {...fillLayer} />
+            {hoveredFeatureId && (
+              <Layer key="tribe-hover-fill" {...hoverFillLayer} />
+            )}
+            {hoveredFeatureId && (
+              <Layer key="tribe-hover-border" {...hoverBorderLayer} />
+            )}
+            <Layer key="tribe-label" {...labelLayer} />
+          </Source>
+        )}
 
         {/* Stories Source and Layer - Only shown if isStoriesOn is true */}
-        {isStoriesOn && (
+        {isStoriesOn && filteredStories && (
           <Source id="stories" type="geojson" data={filteredStories}>
             <Layer {...storiesLayer} />
           </Source>
@@ -245,7 +321,7 @@ const MapBoxComponent = () => {
         {/* 3D and Stories Toggle */}
         <div style={{ position: "absolute", top: 10, right: 10 }}>
           <div className="toggle-container">
-            <span className="status-text">{"3d"}</span>
+            <span className="status-text">{"3D"}</span>
             <label className="switch">
               <input type="checkbox" checked={is3dOn} onChange={handleToggle} />
               <span className="slider"></span>
@@ -314,7 +390,6 @@ const MapBoxComponent = () => {
         {selectedTribe && (
           <SidePanel
             tribe={selectedTribe}
-            stories={selectedStories}
             onClose={() => setSelectedTribe(null)}
           />
         )}
