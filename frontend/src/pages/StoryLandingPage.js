@@ -1,27 +1,26 @@
 import React, { useEffect, useState } from "react";
-import { useParams, useNavigate, Link } from "react-router-dom";
+import { useParams, Link } from "react-router-dom";
 import Header from "../components/Header";
 import Footer from "../components/Footer";
-import "../styles/tribeLandingPage.css";
+import "../styles/StoryLandingPage.css"; // Separate CSS file
 
 const StoryLandingPage = () => {
   const { storyId } = useParams();
-  const navigate = useNavigate();
   const [story, setStory] = useState(null);
+  const [tribes, setTribes] = useState([]);
+  const [activeImage, setActiveImage] = useState(null);
+  const [showGalleryModal, setShowGalleryModal] = useState(false);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
   useEffect(() => {
     const fetchStory = async () => {
-      setLoading(true);
       try {
         const response = await fetch(`/api/stories/${storyId}`);
         if (!response.ok) {
-          const errorData = await response.json().catch(() => ({ message: "Story not found or not published" }));
-          throw new Error(errorData.message || `HTTP error! Status: ${response.status}`);
+          throw new Error(`HTTP error! Status: ${response.status}`);
         }
         const data = await response.json();
-        console.log("Fetched story:", data); // Debug log
         setStory(data);
       } catch (err) {
         console.error("Error fetching story:", err);
@@ -31,33 +30,185 @@ const StoryLandingPage = () => {
       }
     };
 
+    const fetchTribes = async () => {
+      try {
+        const response = await fetch("/api/tribes");
+        if (!response.ok) {
+          throw new Error(`HTTP error! Status: ${response.status}`);
+        }
+        const data = await response.json();
+        setTribes(data);
+      } catch (error) {
+        console.error("Error fetching tribes:", error);
+      }
+    };
+
     fetchStory();
+    fetchTribes();
   }, [storyId]);
 
-  if (loading) return <p>Loading...</p>;
-  if (error) return <p>Error: {error}</p>;
-  if (!story) return <p>Story not found or not published.</p>;
+  const getTribeName = (tribeId) => {
+    const tribe = tribes.find(t => t.tribe_id === tribeId);
+    return tribe ? tribe.tribe_name : "";
+  };
+
+  const openGalleryModal = (image) => {
+    setActiveImage(image);
+    setShowGalleryModal(true);
+  };
+
+  const closeGalleryModal = () => {
+    setShowGalleryModal(false);
+    setActiveImage(null);
+  };
+
+  // Get hero image from database or static files
+  const getHeroImage = () => {
+    if (story?.images && story.images.length > 0) {
+      return `data:${story.images[0].media_type};base64,${story.images[0].image_data}`;
+    }
+    
+    try {
+      const imagesContext = require.context("../images/stories", false, /\.png$/);
+      return imagesContext(`./${storyId}.png`);
+    } catch (e) {
+      console.error(`Image not found: ${storyId}.png`);
+      return null;
+    }
+  };
+
+  // Get remaining images for gallery
+  const getGalleryImages = () => {
+    if (story?.images && story.images.length > 1) {
+      return story.images.slice(1);
+    }
+    return [];
+  };
+
+  // Format references as clickable links if they are URLs
+  const formatReferences = (references) => {
+    if (!references) return null;
+    
+    // Check if reference is a URL
+    if (references.startsWith('http://') || references.startsWith('https://')) {
+      // Extract domain name for display
+      let domain = '';
+      try {
+        domain = new URL(references).hostname.replace('www.', '');
+      } catch (e) {
+        domain = references;
+      }
+      
+      return (
+        <a 
+          href={references} 
+          target="_blank" 
+          rel="noopener noreferrer" 
+          className="story-landing-reference-link"
+        >
+          {domain}
+        </a>
+      );
+    }
+    
+    // If not a URL, just return the text
+    return references;
+  };
+
+  if (loading) return <div className="user-frontend"><Header /><p>Loading...</p></div>;
+  if (error) return <div className="user-frontend"><Header /><p>Error: {error}</p></div>;
+  if (!story) return <div className="user-frontend"><Header /><p>Story not found.</p></div>;
+
+  const galleryImages = getGalleryImages();
+  const tribeName = getTribeName(story.tribe_id);
+  const heroImage = getHeroImage();
 
   return (
-    <div className="tribe-landing-page">
+    <div className="user-frontend">
       <Header />
-      <Link to="/stories" className="back-button">← Back</Link>
-      <h1>{story.story_name}</h1>
-      <div className="hero-image-container">
-        {story.images && story.images.length > 0 ? (
-          <img
-            src={`data:${story.images[0].media_type};base64,${story.images[0].image_data}`}
-            alt={story.story_name}
-            className="hero-image"
-          />
-        ) : (
-          <img src="/default-story-image.png" alt={story.story_name} className="hero-image" />
+      
+      <div className="story-landing-container">
+        <Link to="/stories" className="story-landing-back">← Back to Stories</Link>
+        
+        {/* Hero Image with Overlay Text */}
+        <div className="story-landing-hero-container">
+          {heroImage ? (
+            <>
+              <img 
+                src={heroImage} 
+                alt={story.story_name} 
+                className="story-landing-hero-image"
+              />
+              <div className="story-landing-hero-overlay">
+                <h1 className="story-landing-title">{story.story_name}</h1>
+                <div className="story-landing-subtitle">{tribeName} | {story.story_year}</div>
+              </div>
+            </>
+          ) : (
+            <div className="hero-placeholder">
+              <h1 className="story-landing-title">{story.story_name}</h1>
+              <div className="story-landing-subtitle">{tribeName} | {story.story_year}</div>
+            </div>
+          )}
+        </div>
+        
+        {/* Story Content */}
+        <div className="story-landing-details">
+          <h2>Story Details</h2>
+          <div className="story-landing-text">{story.story_text}</div>
+          
+          {/* References Section */}
+          {story.story_references && (
+            <div className="story-landing-references">
+              <h3>References</h3>
+              <div className="reference-container">
+                {formatReferences(story.story_references)}
+              </div>
+            </div>
+          )}
+        </div>
+        
+        {/* Media Gallery - Only shown if there are additional images */}
+        {galleryImages.length > 0 && (
+          <div className="story-landing-gallery">
+            <h2>Media Gallery</h2>
+            <div className="story-landing-grid">
+              {galleryImages.map((image, index) => (
+                <div 
+                  key={index} 
+                  className="story-landing-item"
+                  onClick={() => openGalleryModal(image)}
+                >
+                  <img
+                    src={`data:${image.media_type};base64,${image.image_data}`}
+                    alt={`${story.story_name} - Image ${index + 2}`}
+                    className="story-landing-gallery-image"
+                  />
+                  {image.caption && <p className="story-landing-caption">{image.caption}</p>}
+                </div>
+              ))}
+            </div>
+          </div>
         )}
       </div>
-      <div className="section">
-        <h2>Story Details</h2>
-        <p>{story.story_text}</p>
-      </div>
+      
+      {/* Gallery Modal */}
+      {showGalleryModal && activeImage && (
+        <div className="story-landing-modal">
+          <div className="story-landing-modal-content">
+            <span className="story-landing-close" onClick={closeGalleryModal}>&times;</span>
+            <img 
+              src={`data:${activeImage.media_type};base64,${activeImage.image_data}`} 
+              alt="Gallery image" 
+              className="story-landing-modal-image"
+            />
+            {activeImage.caption && (
+              <p className="story-landing-modal-caption">{activeImage.caption}</p>
+            )}
+          </div>
+        </div>
+      )}
+      
       <Footer />
     </div>
   );

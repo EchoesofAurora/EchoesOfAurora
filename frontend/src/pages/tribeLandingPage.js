@@ -84,19 +84,7 @@ function TribeLandingPage() {
       {/* References Section */}
       <div className="section">
         <h2>References</h2>
-        {tribe.tribe_references ? (
-          <ul>
-            {tribe.tribe_references.map((reference, index) => (
-              <li key={index}>
-                <a href={reference.url} target="_blank" rel="noopener noreferrer">
-                  {reference.title}
-                </a>
-              </li>
-            ))}
-          </ul>
-        ) : (
-          <p>No references available for this tribe.</p>
-        )}
+          <p>tribe.tribe_references</p>
       </div>
  
       <Footer />
@@ -106,3 +94,17 @@ function TribeLandingPage() {
  
 export default TribeLandingPage;
  
+
+
+//  {tribe.tribe_references ? (
+//   <ul>
+//   {/* {tribe.tribe_references.map((reference, index) => ( */}
+//     <li key={index}>
+//       <a href={reference.url} target="_blank" rel="noopener noreferrer">
+//         {tribe.tribe_references.title}
+//       </a>
+//     </li>
+// </ul>
+// ) : (
+// <p>No references available for this tribe.</p>
+// )}

@@ -27,8 +27,7 @@
 .stories-table {
   border: 1px solid #ddd;
   border-radius: 5px;
-  overflow: hidden;
-  height: 944px;
+  height: fit-content;
   display: flex;
   flex-direction: column;
   box-shadow: 0px 4px 4px #00000040;

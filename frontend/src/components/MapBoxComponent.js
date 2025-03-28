@@ -17,7 +17,6 @@ const MapBoxComponent = () => {
     transitionInterpolator: new FlyToInterpolator(),
   });
 
-  const [popupInfo, setPopupInfo] = useState(null);
   const [hoveredFeatureId, setHoveredFeatureId] = useState(null);
   const [is3dOn, setIs3dOn] = useState(false);
   const [isStoriesOn, setIsStoriesOn] = useState(false);

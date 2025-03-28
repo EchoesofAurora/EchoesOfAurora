@@ -25,7 +25,6 @@ const MapWithDrawing = ({ isDrawingEnabled, onShapeUpdate, drawnShape, tempMarke
   });
 
   useEffect(() => {
-    console.log("MapWithDrawing drawnShape:", drawnShape);
   }, [drawnShape]);
 
   return (
@@ -292,6 +291,7 @@ const HeroEditTribe = () => {
     if (!isDrawingEnabled) {
       setDrawnShape([]);
       setTempMarkers([]);
+      tribeData.geojson_data.coordinates = "";
     } else {
       setDrawnShape((prevShape) => (prevShape.length > 2 ? [...prevShape, prevShape[0]] : prevShape));
       
@@ -554,7 +554,7 @@ const HeroEditTribe = () => {
                 </div>
               )}
             </div>
-
+            {/* tribeColor */}
             <div className="edit-tribe-form-group">
               <label htmlFor="tribeColor" className="edit-tribe-label">
                 Choose Tribe Color *
@@ -569,17 +569,29 @@ const HeroEditTribe = () => {
               />
               <span className="color-code-display">{tribeData.map_color}</span>
             </div>
-
+            {/* tribe map */}
             <div className="edit-tribe-map-section">
-              <p className="edit-tribe-map-instruction">Select tribe area on the map *</p>
-              <button
-                type="button"
-                className="edit-tribe-map-button"
-                onClick={toggleDrawing}
-                style={{ backgroundColor: isDrawingEnabled ? "red" : "" }}
-              >
-                {isDrawingEnabled ? "Disable Drawing" : "Enable Drawing"}
-              </button>
+
+              <p className="edit-tribe-map-instruction">Select tribe area on the map</p>
+              <div className="map-controls">
+                            <button
+                              type="button"
+                              className={`map-control-btn ${isDrawingEnabled ? 'active' : ''}`}
+                              onClick={toggleDrawing}
+                              aria-pressed={isDrawingEnabled}
+                            >
+                              {isDrawingEnabled ? 'Finish Drawing' : 'Start Drawing'}
+                            </button>
+                            
+                            <button
+                              type="button"
+                              className="map-control-btn"
+                              onClick={toggleDrawing}
+                              disabled={drawnShape.length === 0}
+                            >
+                              Reset Map
+                            </button>
+                          </div>
               <MapContainer
                 center={[40.736, -74.172]}
                 zoom={5}
@@ -628,35 +640,41 @@ const HeroEditTribe = () => {
                 </div>
               )}
             </div>
-
-            <div className="edit-tribe-form-group">
-              <label className="edit-tribe-label">Uploaded Images</label>
-              <div className="image-preview-container">
-                {[...tribeData.uploadedImages, ...tribeData.newImages].map((image, index) => (
-                  <div key={index} className="tribe-image">
-                    <img
-                      src={image.src || image.url}
-                      alt={`Tribe image ${index + 1}`}
-                      width="100"
-                      height="100"
-                      onError={(e) => {
-                        e.target.src = "/images/placeholder.png";
-                      }}
-                    />
-                    <button
-                      type="button"
-                      className="remove-image-button"
-                      onClick={() => handleRemoveImage(index)}
-                    >
-                      Remove
-                    </button>
-                  </div>
-                ))}
-                {[...tribeData.uploadedImages, ...tribeData.newImages].length === 0 && (
-                  <p>No images uploaded for this tribe.</p>
-                )}
+           
+           {/* upload images */}
+            <section  className="edit-tribe-form-group"
+            >
+              <div className="images-container">
+                <label className="edit-tribe-label">Current Images</label>
+                <div className="image-preview-gallery">
+                  {[...tribeData.uploadedImages, ...tribeData.newImages].length > 0 ? (
+                    [...tribeData.uploadedImages, ...tribeData.newImages].map((image, index) => (
+                      <div key={index} className="image-preview-item">
+                        <div className="image-preview">
+                          <img
+                            src={image.src || image.url}
+                            alt={`Tribe image ${index + 1}`}
+                            onError={(e) => {
+                              e.target.src = "/images/placeholder.png";
+                            }}
+                          />
+                        </div>
+                        <button
+                          type="button"
+                          className="remove-image-btn"
+                          onClick={() => handleRemoveImage(index)}
+                          aria-label={`Remove image ${index + 1}`}
+                        >
+                          Remove
+                        </button>
+                      </div>
+                    ))
+                  ) : (
+                    <p className="no-images-message">No images uploaded for this tribe.</p>
+                  )}
+                </div>
               </div>
-            </div>
+            </section>
 
             <div className="edit-tribe-form-group">
               <label className="edit-tribe-label">Upload New Images</label>
@@ -669,7 +687,7 @@ const HeroEditTribe = () => {
                 Supported formats: JPG, PNG (Max 5MB per file)
               </p>
             </div>
-
+                {/* References */}
             <div className="edit-tribe-form-group">
               <label htmlFor="referenceLinks" className="edit-tribe-label">
                 Reference *

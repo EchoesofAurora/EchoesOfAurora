@@ -1,6 +1,9 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom"; // Import useNavigate for navigation
 import "../styles/ManageTribes.css";
+import storyBackground1 from "../images/stories/story-background1.png";
+import storyBackground2 from "../images/stories/story-background2.png";
+import storyBackground3 from "../images/stories/story-background3.png";
 import Sidebar from "../components/Sidebar";
 import Header from "../components/AdminHeader";
 import Footer from "../components/AdminFooter";
@@ -13,6 +16,9 @@ const HeroManageTribes = () => {
   const [showDeletePopup, setShowDeletePopup] = useState(false);
   const [selectedTribe, setSelectedTribe] = useState(null);
   const navigate = useNavigate(); // Initialize useNavigate
+
+  const backgrounds = [storyBackground1, storyBackground2, storyBackground3];
+
 
   // Fetch tribes from the backend
   useEffect(() => {
@@ -85,13 +91,12 @@ const HeroManageTribes = () => {
           </div>
 
           <div className="Tribes-table-body">
-            {tribes.map((tribe) => (
+            {tribes.map((tribe, index) => (
               <div
                 key={tribe.tribe_id} // Use tribe_id as the unique key
                 className="Tribes-table-row"
-                style={{
-                  backgroundImage: `url(${tribe.tribe_images || "default-image-url.png"})`,
-                }}
+                style={{ backgroundImage: `url(${backgrounds[index % backgrounds.length]})` }}
+
               >
                 <a href={tribe.tribe_references || "#"} target="_blank" rel="noopener noreferrer">
                   {tribe.tribe_name}

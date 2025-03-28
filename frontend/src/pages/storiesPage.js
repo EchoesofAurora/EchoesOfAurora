@@ -2,9 +2,14 @@ import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import "../styles/storiesPage.css";
 import "../styles/styles.css";
+import "../styles/pagination.css";
 import Header from "../components/Header";
 import Footer from "../components/Footer";
 import SearchBar from "../components/StorySearchBar";
+import Pagination from "../components/Pagination";
+
+// Import a default image as fallback
+import defaultStoryImage from "../images/stories/1.png";
 
 function StoriesPage() {
   const [stories, setStories] = useState([]);
@@ -12,19 +17,22 @@ function StoriesPage() {
   const [searchResults, setSearchResults] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [storiesPerPage] = useState(6);
   const navigate = useNavigate();
 
   useEffect(() => {
-    const fetchStories = async () => {
+    const fetchStoriesWithImages = async () => {
       try {
         const response = await fetch("/api/stories");
         if (!response.ok) {
           throw new Error(`HTTP error! Status: ${response.status}`);
         }
         const data = await response.json();
-        console.log("Fetched stories:", data); // Debug log
         setStories(data);
-        setSearchResults(data.sort((a, b) => a.story_name.localeCompare(b.story_name))); // Initialize search results with all stories
+        setSearchResults(
+          data.sort((a, b) => a.story_name.localeCompare(b.story_name))
+        );
       } catch (error) {
         console.error("Error fetching stories:", error);
         setError(error.message);
@@ -33,11 +41,9 @@ function StoriesPage() {
       }
     };
 
-    fetchStories();
-
     const fetchTribes = async () => {
       try {
-        const response = await fetch("/api/tribes"); // Fetch stories from backend
+        const response = await fetch("/api/tribes");
         if (!response.ok) {
           throw new Error(`HTTP error! Status: ${response.status}`);
         }
@@ -45,16 +51,15 @@ function StoriesPage() {
         setTribes(data);
       } catch (error) {
         setError(error.message);
-      } finally {
-        setLoading(false);
       }
     };
 
+    fetchStoriesWithImages();
     fetchTribes();
   }, []);
 
   const tribeDictionary = tribes.reduce((acc, tribe) => {
-    acc[tribe.tribe_name] = tribe.tribe_id;  // Use tribe_name as the key and tribe_id as the value
+    acc[tribe.tribe_name] = tribe.tribe_id;
     return acc;
   }, {});
 
@@ -62,21 +67,42 @@ function StoriesPage() {
     Object.entries(tribeDictionary).map(([name, id]) => [id, name])
   );
 
-  const imagesContext = require.context("../images/stories", false, /\.png$/);
+  // Get the first image for a story or return a default image
+  const getStoryImage = (story) => {
+    if (story.image_data) {
+      return `data:${story.media_type};base64,${story.image_data}`;
+    }
 
-  const getImageUrl = (storyId) => {
+    // Get a random image from the stories folder
     try {
-      return imagesContext(`./${storyId}.png`);
+      const imagesContext = require.context(
+        "../images/stories",
+        false,
+        /\.png$/
+      );
+      const imageKeys = imagesContext.keys();
+
+      if (imageKeys.length > 0) {
+        // Select a random image key from available images
+        const randomIndex = Math.floor(Math.random() * imageKeys.length);
+        return imagesContext(imageKeys[randomIndex]);
+      } else {
+        // If no images available in the folder
+        return defaultStoryImage;
+      }
+
+      // const fallbackImage = require("../images/stories/fallback-story.png");
+      // return fallbackImage;
     } catch (e) {
-      console.error(`Image not found: ${storyId}.png`);
-      return null;
+      console.error("Error loading random story image:", e);
+      return defaultStoryImage;
     }
   };
 
   const handleLearnMore = (story) => {
     navigate(`/story/${story.story_id}`, { state: { story } });
   };
-  
+
   const handleSearch = (searchTerm) => {
     if (!searchTerm) {
       setSearchResults(stories);
@@ -86,6 +112,7 @@ function StoriesPage() {
       story.story_name.toLowerCase().includes(searchTerm.toLowerCase())
     );
     setSearchResults(filteredStories);
+    setCurrentPage(1); // Reset to first page when searching
   };
 
   const handleSort = (sortOption) => {
@@ -113,6 +140,7 @@ function StoriesPage() {
         break;
     }
     setSearchResults(sortedStories);
+    setCurrentPage(1); // Reset to first page when sorting
   };
 
   const handleFilter = (tribeName, timeRange) => {
@@ -120,17 +148,32 @@ function StoriesPage() {
 
     if (tribeName && tribeDictionary[tribeName] !== undefined) {
       const tribeId = tribeDictionary[tribeName];
-      filteredStories = filteredStories.filter(story => story.tribe_id === tribeId);
+      filteredStories = filteredStories.filter(
+        (story) => story.tribe_id === tribeId
+      );
     }
 
     if (timeRange && timeRange.length === 2) {
-      filteredStories = filteredStories.filter(story => 
-        story.story_year >= timeRange[0] && story.story_year <= timeRange[1]
+      filteredStories = filteredStories.filter(
+        (story) =>
+          story.story_year >= timeRange[0] && story.story_year <= timeRange[1]
       );
     }
 
     setSearchResults(filteredStories);
+    setCurrentPage(1); // Reset to first page when filtering
   };
+
+  // Calculate the current stories to display
+  const indexOfLastStory = currentPage * storiesPerPage;
+  const indexOfFirstStory = indexOfLastStory - storiesPerPage;
+  const currentStories = searchResults.slice(
+    indexOfFirstStory,
+    indexOfLastStory
+  );
+
+  // Change page
+  const paginate = (pageNumber) => setCurrentPage(pageNumber);
 
   return (
     <div className="user-frontend stories-page user-section-background long-section-background user-section-shadow">
@@ -140,40 +183,65 @@ function StoriesPage() {
       </div>
       <div className="stories-list user-section-shadow">
         <div className="user-searchbar-container">
-          <SearchBar tribes={tribes} onSearch={handleSearch} onSort={handleSort} onFilter={handleFilter} />
+          <SearchBar
+            tribes={tribes}
+            onSearch={handleSearch}
+            onSort={handleSort}
+            onFilter={handleFilter}
+          />
         </div>
         {loading ? (
           <p>Loading stories...</p>
         ) : error ? (
           <p>Error: {error}</p>
         ) : searchResults.length > 0 ? (
-          searchResults.map((story, index) => (
-            <div className="story-card" key={index}>
-              <img
-                src={getImageUrl(story.story_id) || "/default-story-image.png"}
-                alt={story.story_name}
-                className="story-image"
-              />
-              <div className="story-content">
-                <div className="story-card-top-bar">
-                  <h3 className="story-title">{story.story_name}</h3>
-                  <h2 className="story-tribe">{reverseTribeDictionary[story.tribe_id]}</h2>
+          <>
+            <div className="stories-container">
+              {currentStories.map((story, index) => (
+                <div className="story-card" key={index}>
+                  <img
+                    src={getStoryImage(story)}
+                    alt={story.story_name}
+                    className="story-image"
+                    onError={(e) => {
+                      console.log(
+                        `Error loading image for story ${story.story_id}, using default`
+                      );
+                      e.target.onerror = null; // Prevent infinite loops
+                      e.target.src = defaultStoryImage;
+                    }}
+                  />
+                  <div className="story-content">
+                    <div className="story-card-top-bar">
+                      <h3 className="story-title">{story.story_name}</h3>
+                      <h2 className="story-tribe">
+                        {reverseTribeDictionary[story.tribe_id]}
+                      </h2>
+                    </div>
+                    <p className="story-description">
+                      <strong>Description:</strong>{" "}
+                      {story.story_text.slice(0, 150)}...
+                    </p>
+                    <div className="story-card-bottom-bar">
+                      <button
+                        className="learn-more-button"
+                        onClick={() => handleLearnMore(story)}
+                      >
+                        Learn more
+                      </button>
+                      <h2 className="story-year">Year: {story.story_year}</h2>
+                    </div>
+                  </div>
                 </div>
-                <p className="story-description">
-                  <strong>Description:</strong> {story.story_text.slice(0, 150)}...
-                </p>
-                <div className="story-card-bottom-bar">
-                  <button
-                    className="learn-more-button"
-                    onClick={() => handleLearnMore(story)}
-                  >
-                    Learn more
-                  </button>
-                  <h2 className="story-year">Year: {story.story_year}</h2>
-                </div>
-              </div>
+              ))}
             </div>
-          ))
+            <Pagination
+              storiesPerPage={storiesPerPage}
+              totalStories={searchResults.length}
+              paginate={paginate}
+              currentPage={currentPage}
+            />
+          </>
         ) : (
           <p>No published stories available.</p>
         )}

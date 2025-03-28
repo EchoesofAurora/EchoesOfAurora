@@ -2,15 +2,19 @@ import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import "../styles/tribesection.css";
 import "../styles/styles.css";
+import "../styles/pagination.css"; // Import the pagination CSS
 import Header from '../components/Header';
 import Footer from '../components/Footer';
 import SearchBar from "../components/TribeSearchBar";
+import Pagination from "../components/Pagination"; // Import the Pagination component
  
 function TribesSection() {
   const [tribes, setTribes] = useState([]);
   const [searchResults, setSearchResults] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [tribesPerPage] = useState(6);
   const navigate = useNavigate();
  
   useEffect(() => {
@@ -22,7 +26,7 @@ function TribesSection() {
         }
         const data = await response.json();
         setTribes(data);
-        setSearchResults(data); // Initialize search results with all stories
+        setSearchResults(data); // Initialize search results with all tribes
       } catch (error) {
         setError(error.message);
       } finally {
@@ -50,6 +54,7 @@ function TribesSection() {
       tribe.tribe_name.toLowerCase().includes(searchTerm.toLowerCase())
     );
     setSearchResults(filteredTribes);
+    setCurrentPage(1); // Reset to first page when searching
   };
 
   const handleSort = (sortOption) => {
@@ -71,6 +76,7 @@ function TribesSection() {
         break;
     }
     setSearchResults(sortedTribes);
+    setCurrentPage(1); // Reset to first page when sorting
   };
 
   const handleFilter = (timeRange) => {
@@ -83,7 +89,16 @@ function TribesSection() {
     }
 
     setSearchResults(filteredTribes);
+    setCurrentPage(1); // Reset to first page when filtering
   };
+
+  // Calculate the current tribes to display
+  const indexOfLastTribe = currentPage * tribesPerPage;
+  const indexOfFirstTribe = indexOfLastTribe - tribesPerPage;
+  const currentTribes = searchResults.slice(indexOfFirstTribe, indexOfLastTribe);
+  
+  // Change page
+  const paginate = (pageNumber) => setCurrentPage(pageNumber);
  
   return (
     <div className="user-frontend tribes-section user-section-background long-section-background user-section-shadow">
@@ -91,7 +106,6 @@ function TribesSection() {
       <div className="hero hero-section tribe-hero smaller-hero-header">
         <h1 className='user-hero-title'>Indigenous Tribes</h1>
       </div>
-      <div></div>
       <div className="tribes-list user-section-shadow">
         <div className="user-searchbar-container">
           <SearchBar onSearch={handleSearch} onSort={handleSort} onFilter={handleFilter} />
@@ -101,30 +115,40 @@ function TribesSection() {
         ) : error ? (
           <p>Error: {error}</p>
         ) : searchResults.length > 0 ? (
-          searchResults.map((tribe, index) => (
-            <div className="tribe-card" key={index}>
-              <img
-                src={getImageUrl(tribe.tribe_id)}
-                alt={tribe.tribe_name}
-                className="tribe-image"
-              />
-              <div className="tribe-info">
-                <h3>{tribe.tribe_name}</h3>
-                <p>
-                  <strong>Location:</strong> {tribe.tribe_text.slice(0, 150)}...
-                </p>
-                <div className="tribe-card-bottom-bar">
-                  <button
-                    className="learn-more"
-                    onClick={() => handleLearnMore(tribe)}
-                  >
-                    Learn more
-                  </button>
-                  <h2 className="tribe-year">Year: {tribe.start_year}</h2>
+          <>
+            <div className="tribes-list">
+              {currentTribes.map((tribe, index) => (
+                <div className="tribe-card" key={index}>
+                  <img
+                    src={getImageUrl(1)}
+                    alt={tribe.tribe_name}
+                    className="tribe-image"
+                  />
+                  <div className="tribe-info">
+                    <h3>{tribe.tribe_name.charAt(0).toUpperCase() + tribe.tribe_name.slice(1)}</h3>
+                    <p>
+                      <strong>Location:</strong> {tribe.tribe_text.slice(0, 150)}...
+                    </p>
+                    <div className="tribe-card-bottom-bar">
+                      <button
+                        className="learn-more"
+                        onClick={() => handleLearnMore(tribe)}
+                      >
+                        Learn more
+                      </button>
+                      <h2 className="tribe-year">Year: {tribe.start_year}</h2>
+                    </div>
+                  </div>
                 </div>
-              </div>
+              ))}
             </div>
-          ))
+            <Pagination
+              storiesPerPage={tribesPerPage}
+              totalStories={searchResults.length}
+              paginate={paginate}
+              currentPage={currentPage}
+            />
+          </>
         ) : (
           <p>No tribes found.</p>
         )}
