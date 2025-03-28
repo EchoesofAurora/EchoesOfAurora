@@ -112,9 +112,9 @@ const About = () => {
   
         <div className="stories-container"> {stories.map((story, index) => ( <div className={`story-card-func ${index % 2 === 0 ? "image-left" : "image-right"}`} key={index}>
         <img src={story.image} alt={story.title} className="story-img" />
-        <div className="about-section-story-content">
-          <h2 className="about-section-story-title">{story.title}</h2>
-          <p className="about-section-story-description">{story.description}</p>
+        <div className="story-content">
+          <h2 className="story-title">{story.title}</h2>
+          <p className="story-description">{story.description}</p>
         </div>
             </div>
           ))}

@@ -8,18 +8,57 @@ import map from '../images/contactus/map.png';
 import emailjs from '@emailjs/browser';
 
 function ContactPage() {
+
     return (
         <div className="contact-page long-section-background user-section-background long-section-background">
             <Header />
             <div className="hero hero-section contact-hero">
                 <h1 className='hero-title'>Contact us</h1>
                 <p>Have questions, feedback, or stories to share?</p>
+
             </div>
             <div className="contactus-page-body-section">
-                {/* ... existing contact details ... */}
+                <div className="contact-details">
+                    <div class="line-container">
+                        <div class="line-wrapper">
+                            <div class="circle"></div>
+                            <div class="line"></div>
+                            <div class="circle"></div>
+                        </div>
+                        <h2 class="line-text">Get in Touch</h2>
+                        <div class="line-wrapper">
+                            <div class="circle"></div>
+                            <div class="line"></div>
+                            <div class="circle"></div>
+                        </div>
+                    </div>
+                    <p>Reach out to us! Our team is here to help and connect with you. Whether you’re curious about collaborations, partnerships, or just want to learn more about our mission, don’t hesitate to get in touch. We’ll get back to you as soon as possible.</p>
+                </div>
                 <div className="contactus-page-contact-section">
                     <div className="contact-info">
-                        {/* ... existing contact info ... */}
+                        <div className="head">
+                            <div className="detail-item">
+                                <img src={envelope} alt="Email" width="24" height="24" />
+                                <div>
+                                    <h3>Email</h3>
+                                    <p>contact@aurora.com</p>
+                                </div>
+                            </div>
+                            <div className="detail-item">
+                                <img src={phone} alt="Phone" width="24" height="24" />
+                                <div>
+                                    <h3>Phone</h3>
+                                    <p>+15551234567</p>
+                                </div>
+                            </div>
+                            <div className="detail-item">
+                                <img src={map} alt="Office" width="24" height="24" />
+                                <div>
+                                    <h3>Office</h3>
+                                    <p>123 Montclair, New Jersey NSW 2000, United States</p>
+                                </div>
+                            </div>
+                        </div>
                     </div>
                     <ContactForm />
                 </div>
@@ -31,61 +70,21 @@ function ContactPage() {
 
 const ContactForm = () => {
     const form = useRef();
-
-    const sendToDatabase = async (formData) => {
-        try {
-            const response = await fetch('/api/submissions', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify(formData),
-            });
-            
-            if (!response.ok) {
-                throw new Error(await response.text());
-            }
-            return true;
-        } catch (error) {
-            console.error('Database submission error:', error);
-            return false;
-        }
-    };
-
-    const sendEmail = async (e) => {
+    const sendEmail = (e) => {
         e.preventDefault();
-
-        const formData = {
-            name: form.current.name.value,
-            email: form.current.email.value,
-            phone: form.current.phone.value,
-            topic: form.current.topic.value,
-            message: form.current.message.value,
-        };
-
-        // Send to database first
-        const dbSuccess = await sendToDatabase(formData);
-
-        // Send to EmailJS regardless of database success
-        await emailjs
+        emailjs
             .sendForm('service_5ijc70w', 'template_o06dq1v', form.current, {
                 publicKey: '2e0jRzB7-14bf3-Ir',
             })
             .then(
                 () => {
-                    console.log('Email sent successfully!');
+                    console.log('SUCCESS!');
                 },
                 (error) => {
-                    console.log('Email failed...', error.text);
-                }
+                    console.log('FAILED...', error.text);
+                },
             );
-
-        if (dbSuccess) {
-            e.target.reset();
-            // You might want to add a success message here
-        } else {
-            // You might want to add an error message here
-        }
+        e.target.reset();
     };
 
     return (
@@ -93,15 +92,15 @@ const ContactForm = () => {
             <form ref={form} onSubmit={sendEmail}>
                 <div className="form-group">
                     <label htmlFor="name">Your name</label>
-                    <input type="text" id="name" name="name" placeholder="John Smith" required />
+                    <input type="text" id="name" name="name" placeholder="John Smith" />
                 </div>
                 <div className="form-group">
                     <label htmlFor="email">Your email</label>
-                    <input type="email" id="email" name="email" placeholder="email@gmail.com" required />
+                    <input type="email" id="email" name="email" placeholder="email@gmail.com" />
                 </div>
                 <div className="form-group">
                     <label htmlFor="topic">Your Topic</label>
-                    <select id="topic" name="topic" required>
+                    <select id="topic" name="topic">
                         <option value="">Selection</option>
                         <option value="general">General Inquiry</option>
                         <option value="support">Support</option>
@@ -110,15 +109,17 @@ const ContactForm = () => {
                 </div>
                 <div className="form-group">
                     <label htmlFor="phone">Your phone no</label>
-                    <input type="tel" id="phone" name="phone" placeholder="+12332432333" required />
+                    <input type="tel" id="phone" name="phone" placeholder="+12332432333" />
                 </div>
                 <div className="form-group">
                     <label htmlFor="message">Your message</label>
-                    <textarea id="message" name="message" placeholder="Type your message here..." required></textarea>
+                    <textarea id="message" name="message" placeholder="Type your message here..."></textarea>
                 </div>
                 <button type="submit">Send Message</button>
             </form>
         </div>
+
+
     );
 };
 

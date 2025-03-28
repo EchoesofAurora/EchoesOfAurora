@@ -24,6 +24,7 @@ router.get('/:tribeId', async (req, res) => {
     const tribe = result.rows[0];
 
     // Fetch associated images from image_store using tribe_id (avoiding tribe_images)
+    console.log(`Fetching images for tribe_id ${tribeId} from image_store...`);
     const imagesResult = await pool.query(
       'SELECT media_id, media_name, media_type, image_data FROM image_store WHERE tribe_id = $1',
       [tribeId]

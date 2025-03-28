@@ -12,13 +12,13 @@ const ProfileDropdown = () => {
         <ul className="admin-dropdown-list">
           <li
             className="admin-dropdown-item"
-            onClick={() => handleItemClick("/Admin/EditProfile")}
+            onClick={() => handleItemClick("profile")}
           >
             My Profile
           </li>
           <li
             className="admin-dropdown-item"
-            onClick={() => handleItemClick("/Admin/changePassword")}
+            onClick={() => handleItemClick("changePassword")}
           >
             Change Password
           </li>

@@ -57,7 +57,7 @@
   }
   
   input:checked + .slider:before {
-    transform: translateX(13px);
+    transform: translateX(26px);
   }
  /* src/styles/timeline.css */
 

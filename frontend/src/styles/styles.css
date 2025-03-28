@@ -17,7 +17,7 @@
 .user-hero {
     text-align: center;
     position: relative;
-    height: 85vh;
+    height: 70vh;
     display: flex;
     flex-direction: column;
     justify-content: center;
@@ -63,6 +63,43 @@
     padding: 0 20%;
     color: #cecece;
     text-shadow: 2px 2px 5px rgba(0, 0, 0, 0.8);
+}
+
+@media (max-width: 912px) {
+    .user-hero {
+        height: 90vh;
+    }
+
+    .user-hero h1 {
+        font-size: 2.5rem;
+        padding: 0 10%;
+        line-height: 1.1;
+    }
+}
+
+@media (max-width: 768px) {
+    .user-hero {
+        height: 82vh;
+    }
+
+    .user-hero h1 {
+        font-size: 2.5rem;
+        padding: 0 10%;
+        line-height: 1.1;
+    }
+}
+
+@media (max-width: 480px) {
+    .user-hero h1 {
+        font-size: 1.8rem;
+        padding: 0 10%;
+        line-height: 1.1;
+    }
+    .user-hero p {
+        font-size: 0.9rem;
+        line-height: 1.2;
+        padding: 0 10%;
+    }
 }
 
 .carousel {
@@ -243,30 +280,4 @@
     justify-content: center;
     align-items: center;
     height: 45vh;
-}
-
-@media (max-width: 768px) {
-
-    .user-hero-title {
-        font-size: 4rem;
-        line-height: 1.2;
-        margin: 0px 10%;
-    }
-
-    .user-hero-subtext {
-        font-size: 1rem;
-        padding-top: 20px;
-    }
-
-    .about-content {
-        flex-direction: column-reverse;
-    }
-
-    .about-image {
-        width: 80%;
-    }
-
-    .about-text {
-        width: 100%;
-    }
 }

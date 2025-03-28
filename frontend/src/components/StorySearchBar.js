@@ -101,7 +101,6 @@ const SearchBar = ({ onSearch, onSort, onFilter, tribes }) => {
         <div className="time-range">
           <label className="year-range-label">From:</label>
           <input
-            className="year-input-field"
             type="number"
             min="0"
             max={new Date().getFullYear()}
@@ -116,7 +115,6 @@ const SearchBar = ({ onSearch, onSort, onFilter, tribes }) => {
           />
           <label className="year-range-label">To:</label>
           <input
-            className="year-input-field"
             type="number"
             min="0"
             max={new Date().getFullYear()}
