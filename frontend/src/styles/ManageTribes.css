@@ -16,7 +16,6 @@
 .Tribes-table {
   border: 1px solid #ddd;
   border-radius: 5px;
-  overflow: hidden;
   height: 944px;
   display: flex;
   flex-direction: column;
