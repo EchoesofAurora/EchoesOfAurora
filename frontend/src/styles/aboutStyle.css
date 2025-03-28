@@ -153,7 +153,7 @@
     transform: translateY(-5px); /* Lift effect on hover */
   }
   
-  .story-img {
+  .about-section-story-img {
     width: 850px !important; /* Fixed width for images */
     height: 400px;
     /*height: 100px; /* Fixed height */
@@ -183,7 +183,7 @@
     border-bottom-right-radius: 100px;
   }
   
-  .story-content,
+  .about-section-story-content,
   .features-content,
   .commitment-content {
     display: flex;
@@ -195,7 +195,7 @@
     padding: 20px;
   }
   
-  .story-title,
+  .about-section-story-title,
   .features-title,
   .commitment-title {
     font-size: 2rem; /* Larger title */
@@ -222,7 +222,7 @@
     margin: 10 auto; /* Center the text horizontally */
   }
   
-  .story-description,
+  .about-section-story-description,
   .features-description,
   .commitment-description {
     font-size: 1.5rem; /* Adjust size to match */

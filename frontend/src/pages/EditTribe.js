@@ -141,7 +141,6 @@ const HeroEditTribe = () => {
   const { id } = useParams();
   const navigate = useNavigate();
   const mapRef = useRef(null);
-  const formRef = useRef(null);
 
   const [tribeData, setTribeData] = useState({
     tribe_name: "",
@@ -167,16 +166,6 @@ const HeroEditTribe = () => {
   const [error, setError] = useState(null);
   const [imagesUploaded, setImagesUploaded] = useState(false);
   const [imagesToRemove, setImagesToRemove] = useState([]);
-  
-  // Add validation state
-  const [formErrors, setFormErrors] = useState({
-    tribe_name: false,
-    tribe_text: false,
-    start_year: false,
-    end_year: false,
-    map_coordinates: false,
-    tribe_references: false,
-  });
 
   // Effect for fetching tribe data
   useEffect(() => {
@@ -222,22 +211,11 @@ const HeroEditTribe = () => {
 
   // State update handlers
   const handleInputChange = (e) => {
-    const { name, value } = e.target;
-    setTribeData({ ...tribeData, [name]: value });
-    
-    // Clear error for this field when user starts typing
-    if (formErrors[name]) {
-      setFormErrors({ ...formErrors, [name]: false });
-    }
+    setTribeData({ ...tribeData, [e.target.name]: e.target.value });
   };
 
   const handleDateChange = (date, field) => {
     setTribeData({ ...tribeData, [field]: date });
-    
-    // Clear error for this field when user makes a selection
-    if (formErrors[field]) {
-      setFormErrors({ ...formErrors, [field]: false });
-    }
   };
 
   const handleGeojsonChange = (e, field) => {
@@ -248,11 +226,6 @@ const HeroEditTribe = () => {
         [field]: e.target.value,
       },
     });
-
-    // Clear map coordinates error when user enters coordinates
-    if (field === "coordinates" && e.target.value && formErrors.map_coordinates) {
-      setFormErrors({ ...formErrors, map_coordinates: false });
-    }
 
     if (field === "coordinates" && e.target.value) {
       // Simplified: Removed try-catch since parsing failure doesn't break the app
@@ -294,11 +267,6 @@ const HeroEditTribe = () => {
       tribeData.geojson_data.coordinates = "";
     } else {
       setDrawnShape((prevShape) => (prevShape.length > 2 ? [...prevShape, prevShape[0]] : prevShape));
-      
-      // Clear map coordinates error when user completes drawing
-      if (formErrors.map_coordinates) {
-        setFormErrors({ ...formErrors, map_coordinates: false });
-      }
     }
     setIsDrawingEnabled(!isDrawingEnabled);
   };
@@ -315,37 +283,9 @@ const HeroEditTribe = () => {
 
   const handleClose = () => setShowModal(false);
 
-  // Form validation function
-  const validateForm = () => {
-    const newErrors = {
-      tribe_name: !tribeData.tribe_name.trim(),
-      tribe_text: !tribeData.tribe_text.trim(),
-      start_year: !tribeData.start_year,
-      end_year: !tribeData.end_year,
-      map_coordinates: drawnShape.length < 3,
-      tribe_references: !tribeData.tribe_references.trim(),
-    };
-
-    setFormErrors(newErrors);
-    
-    const hasErrors = Object.values(newErrors).some(error => error);
-    
-    if (hasErrors) {
-      // Scroll to top to show errors
-      window.scrollTo({ top: 0, behavior: 'smooth' });
-    }
-    
-    return !hasErrors;
-  };
-
   // Form submission handler
   const handleSubmit = async (e, publishStatus) => {
     e.preventDefault();
-    
-    // Validate form before submission
-    if (!validateForm()) {
-      return;
-    }
 
     try {
       const tribeId = parseInt(id, 10);
@@ -468,96 +408,65 @@ const HeroEditTribe = () => {
         <div className="edit-tribe-frame">
           <h1 className="edit-tribe-title">Edit Tribe</h1>
           <p className="edit-tribe-subtitle">You are editing tribe ID: {id}</p>
-          
-          {/* Display form-wide error message if any errors exist */}
-          {Object.values(formErrors).some(error => error) && (
-            <div className="form-error-message" style={{ color: 'red', marginBottom: '15px', fontWeight: 'bold' }}>
-              Please fill in all required fields marked with an asterisk (*).
-            </div>
-          )}
 
-          <form className="edit-tribe-form" ref={formRef}>
+          <form className="edit-tribe-form">
             <div className="edit-tribe-form-group">
               <label htmlFor="tribeName" className="edit-tribe-label">
-                Tribe Name *
+                Tribe Name
               </label>
               <input
                 type="text"
                 id="tribeName"
                 name="tribe_name"
-                className={`edit-tribe-input ${formErrors.tribe_name ? 'error-field' : ''}`}
+                className="edit-tribe-input"
                 value={tribeData.tribe_name}
                 onChange={handleInputChange}
-                style={formErrors.tribe_name ? { borderColor: 'red' } : {}}
               />
-              {formErrors.tribe_name && (
-                <div className="error-message" style={{ color: 'red', fontSize: '0.85em' }}>
-                  Tribe name is required
-                </div>
-              )}
             </div>
 
             <div className="edit-tribe-form-group">
               <div className="tribeRange">
                 <div className="year-range">
-                  <label className="edit-tribe-label">Start Year *</label>
+                  <label className="edit-tribe-label">Start Year</label>
                   <DatePicker
                     selected={tribeData.start_year}
                     onChange={(date) => handleDateChange(date, "start_year")}
                     showYearPicker
                     dateFormat="yyyy"
-                    className={`edit-tribe-input ${formErrors.start_year ? 'error-field' : ''}`}
+                    className="edit-tribe-input"
                     placeholderText="Select start year"
-                    style={formErrors.start_year ? { borderColor: 'red' } : {}}
                   />
-                  {formErrors.start_year && (
-                    <div className="error-message" style={{ color: 'red', fontSize: '0.85em' }}>
-                      Start year is required
-                    </div>
-                  )}
                 </div>
                 <div className="year-range">
-                  <label className="edit-tribe-label">End Year *</label>
+                  <label className="edit-tribe-label">End Year</label>
                   <DatePicker
                     selected={tribeData.end_year}
                     onChange={(date) => handleDateChange(date, "end_year")}
                     showYearPicker
                     dateFormat="yyyy"
-                    className={`edit-tribe-input ${formErrors.end_year ? 'error-field' : ''}`}
+                    className="edit-tribe-input"
                     placeholderText="Select end year"
-                    style={formErrors.end_year ? { borderColor: 'red' } : {}}
                   />
-                  {formErrors.end_year && (
-                    <div className="error-message" style={{ color: 'red', fontSize: '0.85em' }}>
-                      End year is required
-                    </div>
-                  )}
                 </div>
               </div>
             </div>
 
             <div className="edit-tribe-form-group">
               <label htmlFor="description" className="edit-tribe-label">
-                Description *
+                Description
               </label>
               <textarea
                 id="description"
                 name="tribe_text"
-                className={`edit-tribe-textarea ${formErrors.tribe_text ? 'error-field' : ''}`}
+                className="edit-tribe-textarea"
                 value={tribeData.tribe_text}
                 onChange={handleInputChange}
-                style={formErrors.tribe_text ? { borderColor: 'red' } : {}}
               />
-              {formErrors.tribe_text && (
-                <div className="error-message" style={{ color: 'red', fontSize: '0.85em' }}>
-                  Description is required
-                </div>
-              )}
             </div>
             {/* tribeColor */}
             <div className="edit-tribe-form-group">
               <label htmlFor="tribeColor" className="edit-tribe-label">
-                Choose Tribe Color *
+                Choose Tribe Color
               </label>
               <input
                 type="color"
@@ -571,7 +480,6 @@ const HeroEditTribe = () => {
             </div>
             {/* tribe map */}
             <div className="edit-tribe-map-section">
-
               <p className="edit-tribe-map-instruction">Select tribe area on the map</p>
               <div className="map-controls">
                             <button
@@ -596,9 +504,8 @@ const HeroEditTribe = () => {
                 center={[40.736, -74.172]}
                 zoom={5}
                 scrollWheelZoom={true}
-                className={`edit-tribe-map ${formErrors.map_coordinates ? 'error-field' : ''}`}
+                className="edit-tribe-map"
                 ref={mapRef}
-                style={formErrors.map_coordinates ? { border: '2px solid red' } : {}}
               >
                 <TileLayer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" />
                 <MapWithDrawing
@@ -607,38 +514,24 @@ const HeroEditTribe = () => {
                   onShapeUpdate={(newShape) => {
                     setDrawnShape(newShape);
                     updateGeojsonCoordinates(newShape);
-                    if (formErrors.map_coordinates && newShape.length >= 3) {
-                      setFormErrors({ ...formErrors, map_coordinates: false });
-                    }
                   }}
                   drawnShape={drawnShape}
                   tempMarkers={tempMarkers}
                   setTempMarkers={setTempMarkers}
                 />
               </MapContainer>
-              {formErrors.map_coordinates && (
-                <div className="error-message" style={{ color: 'red', fontSize: '0.85em' }}>
-                  Please draw a valid area on the map (at least 3 points)
-                </div>
-              )}
               <p>Drawn Shape Coordinates: {JSON.stringify(drawnShape)}</p>
             </div>
 
             <div className="edit-tribe-form-group">
-              <label className="edit-tribe-label">Coordinates *</label>
+              <label className="edit-tribe-label">Coordinates</label>
               <textarea
-                className={`edit-tribe-textarea ${formErrors.map_coordinates ? 'error-field' : ''}`}
+                className="edit-tribe-textarea"
                 name="coordinates"
                 placeholder="Enter coordinates (e.g., [[[-74, 40], [-73, 40], [-73, 41], [-74, 40]]])"
                 value={tribeData.geojson_data.coordinates}
                 onChange={(e) => handleGeojsonChange(e, "coordinates")}
-                style={formErrors.map_coordinates ? { borderColor: 'red' } : {}}
               />
-              {formErrors.map_coordinates && (
-                <div className="error-message" style={{ color: 'red', fontSize: '0.85em' }}>
-                  Valid coordinates are required
-                </div>
-              )}
             </div>
            
            {/* upload images */}
@@ -690,22 +583,16 @@ const HeroEditTribe = () => {
                 {/* References */}
             <div className="edit-tribe-form-group">
               <label htmlFor="referenceLinks" className="edit-tribe-label">
-                Reference *
+                Reference
               </label>
               <input
                 type="text"
                 id="referenceLinks"
                 name="tribe_references"
-                className={`edit-tribe-input ${formErrors.tribe_references ? 'error-field' : ''}`}
+                className="edit-tribe-input"
                 value={tribeData.tribe_references}
                 onChange={handleInputChange}
-                style={formErrors.tribe_references ? { borderColor: 'red' } : {}}
               />
-              {formErrors.tribe_references && (
-                <div className="error-message" style={{ color: 'red', fontSize: '0.85em' }}>
-                  Reference is required
-                </div>
-              )}
             </div>
 
             <div className="edit-tribe-button-group">

@@ -12,7 +12,6 @@ import SignIn from "./pages/LoginPage";
 import ForgotPassword from "./pages/forgotPassword";
 import PasswordChanged from "./pages/PasswordChanged";
 import SetNewPassword from "./pages/SetNewPassword";
-import SignUp from "./pages/SignUp";
 import Dashboard from "./pages/Dashboard";
 import ManageStories from "./pages/ManageStories";
 import ManageTribes from "./pages/ManageTribes";
@@ -23,6 +22,8 @@ import EditProfile from "./pages/profileEdit";
 import AddingStory from "./pages/AddingStory";
 import EditStory from "./pages/EditStory";
 import SubmissionDetail from './pages/SubmissionDetail'; // New component for detailed view
+import AdminAddUser from "./pages/AddNewUser";
+import ChangePassword from "./pages/changePassword";
 
 import "bootstrap/dist/css/bootstrap.min.css";
 
@@ -42,7 +43,6 @@ const App = () => {
                 <Route path="/Admin/ForgotPassword" element={<ForgotPassword />} />
                 <Route path="/Admin/PasswordChanged" element={<PasswordChanged />} />
                 <Route path="/Admin/SetNewPassword" element={<SetNewPassword />} />
-                <Route path="/Admin/SignUp" element={<SignUp />} />
                 <Route path="/Admin/Dashboard" element={<Dashboard />} />
                 <Route path="/Admin/ManageStories" element={<ManageStories />} />
                 <Route path="/Admin/ManageTribes" element={<ManageTribes />} />
@@ -54,6 +54,8 @@ const App = () => {
                 <Route path="/EditStory/:id" element={<EditStory />} />
                 <Route path="/ManageTribes" element={<ManageTribes />} />
                 <Route path="/Admin/EditProfile" element={<EditProfile />} />
+                <Route path="/Admin/AddUser" element={<AdminAddUser />} />
+                <Route path="/Admin/changePassword" element={<ChangePassword />} />
             </Routes>
         </Router>
     );

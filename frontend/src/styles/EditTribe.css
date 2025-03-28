@@ -332,7 +332,8 @@
   max-width: 90vw;
   max-height: 90vh;
 }
- /* Images Section */
+
+  /* Images Section */
   .images-container {
     margin-bottom: 2rem;
   }
