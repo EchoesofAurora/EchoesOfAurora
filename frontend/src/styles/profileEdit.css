@@ -217,3 +217,26 @@ width: 100%;
   opacity: 0.9;
 }
 
+
+.input-wrapper {
+  margin-top: 4px;
+  display: flex;
+  border-bottom: 1px solid #E5E5E5;
+  padding: 12px 0px;
+  gap: 10px;
+  border-radius: 4px;
+  transition: border-color 0.3s ease-in-out;
+}
+
+/* Error styling */
+.input-wrapper.error {
+  border-bottom: 2px solid rgba(255, 77, 77, 0.7);
+  background-color: rgba(255, 77, 77, 0.1);
+  border-radius: 5px;
+}
+
+.error-text {
+  font-size: 14px;
+  color: rgb(255, 77, 77);
+  margin-top: 4px;
+}
