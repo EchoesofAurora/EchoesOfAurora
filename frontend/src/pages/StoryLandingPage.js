@@ -1,11 +1,13 @@
 import React, { useEffect, useState } from "react";
-import { useParams, Link } from "react-router-dom";
+import { useParams, Link, useNavigate } from "react-router-dom";
 import Header from "../components/Header";
 import Footer from "../components/Footer";
 import "../styles/StoryLandingPage.css"; // Separate CSS file
 
 const StoryLandingPage = () => {
   const { storyId } = useParams();
+    const navigate = useNavigate();
+  
   const [story, setStory] = useState(null);
   const [tribes, setTribes] = useState([]);
   const [activeImage, setActiveImage] = useState(null);
@@ -128,7 +130,7 @@ const StoryLandingPage = () => {
       <Header />
       
       <div className="story-landing-container">
-        <Link to="/stories" className="story-landing-back">← Back to Stories</Link>
+        <Link to="/stories" className="story-landing-back" onClick={() => navigate(-1)}>← Back</Link>
         
         {/* Hero Image with Overlay Text */}
         <div className="story-landing-hero-container">

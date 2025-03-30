@@ -25,7 +25,7 @@ function TribeLandingPage() {
       {/* Back Button */}
       <Link to="/tribes">
 
-      <a href="/" className="back-button">
+      <a href="/" className="back-button" onClick={() => navigate(-1)}>
         ← Back
       </a>
  
@@ -93,18 +93,3 @@ function TribeLandingPage() {
 }
  
 export default TribeLandingPage;
- 
-
-
-//  {tribe.tribe_references ? (
-//   <ul>
-//   {/* {tribe.tribe_references.map((reference, index) => ( */}
-//     <li key={index}>
-//       <a href={reference.url} target="_blank" rel="noopener noreferrer">
-//         {tribe.tribe_references.title}
-//       </a>
-//     </li>
-// </ul>
-// ) : (
-// <p>No references available for this tribe.</p>
-// )}

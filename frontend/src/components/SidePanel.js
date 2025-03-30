@@ -1,9 +1,11 @@
 import { useState } from "react";
+import { useNavigate } from "react-router-dom"; // Import useNavigate
 import "../styles/SidePanel.css";
 import tribesIcon from "../images/tribes/bg-tribe.png";
 import storiesIcon from "../images/stories/bg-stories.png";
 
 const SidePanel = ({ tribe, onClose }) => {
+  const navigate = useNavigate(); // Initialize navigate function
   const [activeTab, setActiveTab] = useState("tribes");
   const [currentStoryIndex, setCurrentStoryIndex] = useState(0);
   const stories = tribe?.stories;
@@ -53,8 +55,16 @@ const SidePanel = ({ tribe, onClose }) => {
                   alt="Tribe"
                   className="tab-icon"
                 />
-                <h3 className="tribe-title">{tribe.tribe_name.charAt(0).toUpperCase() + tribe.tribe_name.slice(1)}</h3>
-               
+                {/* Tribe Name Clickable for Navigation */}
+                <h3
+                  className="tribe-title"
+                  onClick={() =>
+                    navigate(`/tribe/${tribe.tribe_id}`, { state: { tribe } })
+                  }
+                >
+                  {tribe.tribe_name.charAt(0).toUpperCase() + tribe.tribe_name.slice(1)}
+                </h3>
+
                 <p className="tribe-text">
                   <span className="section-label">Start year:</span>{" "}
                   {tribe?.start_year}
@@ -88,7 +98,10 @@ const SidePanel = ({ tribe, onClose }) => {
                     alt="Story"
                     className="tab-icon"
                   />
-                  <h3 className="tribe-title">
+                  <h3 className="tribe-title"
+                  onClick={() =>
+                    navigate(`/story/${stories[currentStoryIndex]?.story_id}`, { state: { tribe } })
+                  }>
                     {stories[currentStoryIndex]?.story_name}
                   </h3>
 

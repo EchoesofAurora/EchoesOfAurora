@@ -85,6 +85,8 @@
   text-align: center;
   display: block;
   letter-spacing: 0.5px;
+  cursor: "pointer";
+  text-decoration: underline;
 }
 
 .tribe-text {
