@@ -53,8 +53,8 @@ const SidePanel = ({ tribe, onClose }) => {
                   alt="Tribe"
                   className="tab-icon"
                 />
-                <h3 className="tribe-title">{tribe?.tribe_name}</h3>
-
+                <h3 className="tribe-title">{tribe.tribe_name.charAt(0).toUpperCase() + tribe.tribe_name.slice(1)}</h3>
+               
                 <p className="tribe-text">
                   <span className="section-label">Start year:</span>{" "}
                   {tribe?.start_year}
@@ -84,7 +84,7 @@ const SidePanel = ({ tribe, onClose }) => {
               {stories && stories.length > 0 ? (
                 <div key={stories[currentStoryIndex].properties?.id}>
                   <img
-                    src={getStoryImage(stories[currentStoryIndex].image)}
+                    src={getStoryImage(stories[currentStoryIndex]?.image)}
                     alt="Story"
                     className="tab-icon"
                   />

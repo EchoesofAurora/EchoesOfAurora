@@ -62,8 +62,7 @@
  /* src/styles/timeline.css */
 
 .timeline-container {
-  position: absolute;
-  bottom: 20px;
+  /* position: absolute; */
   left: 50%;
   transform: translateX(-50%);
   width: 40%;
@@ -71,7 +70,7 @@
   padding: 10px 15px;
   border-radius: 8px;
   box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
-  display: flex;
+  display: flex; 
   align-items: center;
   gap: 10px;
   max-width: 1200px;

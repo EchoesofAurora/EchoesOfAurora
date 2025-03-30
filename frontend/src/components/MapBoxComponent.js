@@ -131,19 +131,6 @@ const MapBoxComponent = () => {
     }
   }, [selectedYear, storiesData]);
 
-  // const filterTribeStories = useCallback((tribeId) => {
-  //   if (!filteredStories) return;
-    
-  //   const nextInterval = years.find((year) => year > selectedYear);
-  //   const tribeStories = filteredStories.features.filter(
-  //     (story) =>
-  //       story.properties.tribeid === tribeId &&
-  //       story.properties.year >= selectedYear &&
-  //       (nextInterval ? story.properties.year < nextInterval : true)
-  //   );
-  //   setSelectedStories(tribeStories);
-  // });
-
   // Update map style based on 3D toggle
   useEffect(() => {
     setMapStyle(
@@ -152,14 +139,6 @@ const MapBoxComponent = () => {
         : "mapbox://styles/kodalis2/cm7kvvsfl00x601qo0597eedp"
     );
   }, [is3dOn]);
-
-  // useEffect(() => {
-  //   if (!isStoriesOn) {
-  //     setSelectedStories(null); }
-  //   // } else if (selectedTribe) {
-  //   //   filterTribeStories(selectedTribe.id);
-  //   // }
-  // }, [isStoriesOn,]);
 
   const handleToggle = () => setIs3dOn(!is3dOn);
   const handleStoriesToggle = () => setIsStoriesOn(!isStoriesOn);
@@ -314,7 +293,7 @@ const MapBoxComponent = () => {
         )}
 
         {/* Navigation Control */}
-        <div style={{ position: "absolute", top: 10, left: 10 }}>
+        <div style={{ position: "absolute", bottom: 100, right: 50 }}>
           <NavigationControl showZoom showCompass />
         </div>
 
