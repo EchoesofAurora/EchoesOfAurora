@@ -56,7 +56,7 @@
     flex-direction: column;
     align-items: center;
     padding: 0 20px;
-    gap: 40px; /* Space between image and text */
+    gap: 30px; /* Space between image and text */
     transition: transform 0.3s ease;
     padding: 20px; /* Internal padding */
     width: 100%
@@ -66,14 +66,14 @@
     display: flex;
     flex-direction: column;
     align-items: center;
-    gap: 100px; /* Space between image and text */
+    gap: 30px; /* Space between image and text */
     transition: transform 0.3s ease;
   }
   .commitment-card-func {
     display: flex;
     flex-direction: column;
     align-items: center;
-    gap: 100px; /* Space between image and text */
+    gap: 30px; /* Space between image and text */
     transition: transform 0.3s ease;
     margin-bottom: 20px;
   }
@@ -121,30 +121,25 @@
   }
   
   .about-section-story-img {
-    width: 850px !important; /* Fixed width for images */
-    height: 400px;
     /*height: 100px; /* Fixed height */
     object-fit: cover; /* Ensure the image is properly cropped */
     /* border-radius: 20px; Rounded corners for images */
-    margin-right: 50px;
     border: 15px solid black;
   }
   .features-img {
-    width: 500px !important; /* Fixed width for images */
-    height: 500px;
-    /*height: 100px; /* Fixed height */
+    width: 40%;
+    margin: 0 5%;
+    height: auto;
     object-fit: cover; /* Ensure the image is properly cropped */
-    /* border-radius: 20px; Rounded corners for images */
-    margin-right: 50px;
     border: 15px solid black;
   }
   .commitment-img {
-    width: 500px !important; /* Fixed width for images */
-    height: 500px;
+    width: 40%;
+    margin: 0 5%;
+    min-height: 400px;
     /*height: 100px; /* Fixed height */
     object-fit: cover; /* Ensure the image is properly cropped */
     /* border-radius: 20px; Rounded corners for images */
-    margin-right: 50px;
     border: 5px solid black;
     border-top-left-radius: 100px;
     border-bottom-right-radius: 100px;
@@ -201,4 +196,46 @@
     letter-spacing: 1px; /* Slightly increase spacing for impact */
     text-align: center;
   }
+
+  .About-line {
+    width: 35%;
+  }
   
+
+@media (max-width: 768px) {
+  .story-card-func.image-left, 
+  .story-card-func.image-right,
+  .features-card-func.image-left, 
+  .features-card-func.image-right,
+  .commitment-card-func.image-left,
+  .commitment-card-func.image-right {
+    flex-direction: column; /* Stack on smaller screens */
+  }
+
+  .story-card-func.image-left img, 
+  .story-card-func.image-right img,
+  .features-card-func.image-left img, 
+  .features-card-func.image-right img,
+  .commitment-card-func.image-left img,
+  .commitment-card-func.image-right img {
+    width: 90%; /* Full width */
+    margin: 0px;
+  }
+
+  .story-card-func.image-left img, 
+  .story-card-func.image-right img,
+  .commitment-card-func.image-left img,
+  .commitment-card-func.image-right img {
+    border-radius: 50px;
+  }
+
+  .about-section-story-content,
+  .features-content,
+  .commitment-content {
+    width: 100%;
+  }
+
+  .About-line {
+    width: 20%;
+  }
+}

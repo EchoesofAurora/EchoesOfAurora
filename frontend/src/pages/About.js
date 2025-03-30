@@ -18,8 +18,9 @@ import c4 from '../images/rectangle-37.png'
 const About = () => {
     const stories = [
       {
+        title: "Welcome to Echoes of Aurora",
         description:
-          "“Welcome to the Indigenous Stories and Space Weather Platform, where ancient wisdom meets scientific discovery. Our journey began with a fascinating revelation: long before modern technology could track space weather, Indigenous peoples across North America were documenting the dancing lights in the sky through their rich oral traditions and stories.”",
+          "Welcome to Echoes of Aurora, where ancient wisdom meets scientific discovery. Our journey began with a fascinating revelation: long before modern technology could track space weather, Indigenous peoples across North America were documenting the dancing lights in the sky through their rich oral traditions and stories.",
         image: s1, 
       },
       {
@@ -55,12 +56,6 @@ const About = () => {
         description:
           "Discover a rich collection of stories passed down by indigenous tribes, illuminating their cultural connections to the aurora borealis. Each story offers unique insights into how indigenous communities interpreted these celestial phenomena.",
         image: e2, 
-      },
-      {
-        title: "Historical Space Weather Data",
-        description:
-          "Gain access to meticulously curated space weather data, capturing historical auroral events and solar weather phenomena. This dataset provides valuable context for understanding past interactions between the Earth and space.",
-        image: e3, 
       },
       
     ];
@@ -99,7 +94,7 @@ const About = () => {
         <div className="About-hero-section">
           <h1 className="user-hero-title">About Our Platform</h1>
           <p className="user-hero-subtext">
-            "Bridging Indigenous Knowledge and Scientific Exploration to Educate and Inspire."
+            Bridging Indigenous Knowledge and Scientific Exploration to Educate and Inspire
           </p>
         </div>
   
