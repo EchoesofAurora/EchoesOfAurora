@@ -4,8 +4,8 @@ import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 import "../styles/EditStory.css";
 import "../styles/ManageStories.css";
-import Sidebar from "../components/Sidebar";
-import Header from "../components/AdminHeader";
+import "../styles/DashboardLayout.css";
+import DashboardLayout from "../components/DashboardLayout";
 import { Modal, Button } from "react-bootstrap";
 import Footer from "../components/AdminFooter";
 
