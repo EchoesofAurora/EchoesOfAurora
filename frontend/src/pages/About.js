@@ -98,53 +98,58 @@ const About = () => {
           </p>
         </div>
   
-        <div className="title-In-lines">
-          <img className="About-line" alt="Divider Line" src={line1} />
-          <h2 className="text-wrapper-6">Our Story</h2>
-          <img className="About-line" alt="Divider Line" src={line1} />
+        <div className="user-section-background long-section-background user-section-shadow">
+          <div className="title-In-lines">
+            <img className="About-line" alt="Divider Line" src={line1} />
+            <h2 className="text-wrapper-6">Our Story</h2>
+            <img className="About-line" alt="Divider Line" src={line1} />
+          </div>
+    
+          <div className="stories-container"> {stories.map((story, index) => ( <div className={`story-card-func ${index % 2 === 0 ? "image-left" : "image-right"}`} key={index}>
+          <img src={story.image} alt={story.title} className="story-img" />
+          <div className="about-section-story-content">
+            <h2 className="about-section-story-title">{story.title}</h2>
+            <p className="about-section-story-description">{story.description}</p>
+          </div>
+              </div>
+            ))}
+          </div>
         </div>
   
-        <div className="stories-container"> {stories.map((story, index) => ( <div className={`story-card-func ${index % 2 === 0 ? "image-left" : "image-right"}`} key={index}>
-        <img src={story.image} alt={story.title} className="story-img" />
-        <div className="about-section-story-content">
-          <h2 className="about-section-story-title">{story.title}</h2>
-          <p className="about-section-story-description">{story.description}</p>
-        </div>
-            </div>
-          ))}
-        </div>
-  
-  
-        <div className="title-In-lines">
-          <img className="About-line" alt="Divider Line" src={line1} />
-          <h2 className="text-wrapper-6">What we Offer</h2>
-          <img className="About-line" alt="Divider Line" src={line1} />
-        </div>
+        <div className="user-section-background long-section-background user-section-shadow">
+          <div className="title-In-lines">
+            <img className="About-line" alt="Divider Line" src={line1} />
+            <h2 className="text-wrapper-6">What we Offer</h2>
+            <img className="About-line" alt="Divider Line" src={line1} />
+          </div>
 
-        <div className="stories-container"> {features.map((feature, index) => ( <div className={`features-card-func ${index % 2 === 0 ? "image-left" : "image-right"}`} key={index}>
-        <img src={feature.image} alt={feature.title} className="features-img" />
-        <div className="features-content">
-          <h2 className="features-title">{feature.title}</h2>
-          <p className="features-description">{feature.description}</p>
-        </div>
-            </div>
-          ))}
-        </div>
-  
-        <div className="title-In-lines">
-          <img className="About-line" alt="Divider Line" src={line1} />
-          <h2 className="text-wrapper-6">Our Commitment</h2>
-          <img className="About-line" alt="Divider Line" src={line1} />
+          <div className="stories-container"> {features.map((feature, index) => ( <div className={`features-card-func ${index % 2 === 0 ? "image-left" : "image-right"}`} key={index}>
+          <img src={feature.image} alt={feature.title} className="features-img" />
+          <div className="features-content">
+            <h2 className="features-title">{feature.title}</h2>
+            <p className="features-description">{feature.description}</p>
+          </div>
+              </div>
+            ))}
+          </div>
         </div>
   
-        <div className="stories-container"> {commitments.map((commitment, index) => ( <div className={`commitment-card-func ${index % 2 === 0 ? "image-left" : "image-right"}`} key={index}>
-        <img src={commitment.image} alt={commitment.title} className="commitment-img" />
-        <div className="commitment-content">
-          <h2 className="commitment-title">{commitment.title}</h2>
-          <p className="commitment-description">{commitment.description}</p>
-        </div>
-            </div>
-          ))}
+        <div className="user-section-background long-section-background user-section-shadow">
+          <div className="title-In-lines">
+            <img className="About-line" alt="Divider Line" src={line1} />
+            <h2 className="text-wrapper-6">Our Commitment</h2>
+            <img className="About-line" alt="Divider Line" src={line1} />
+          </div>
+    
+          <div className="stories-container"> {commitments.map((commitment, index) => ( <div className={`commitment-card-func ${index % 2 === 0 ? "image-left" : "image-right"}`} key={index}>
+          <img src={commitment.image} alt={commitment.title} className="commitment-img" />
+          <div className="commitment-content">
+            <h2 className="commitment-title">{commitment.title}</h2>
+            <p className="commitment-description">{commitment.description}</p>
+          </div>
+              </div>
+            ))}
+          </div>
         </div>
   
   
