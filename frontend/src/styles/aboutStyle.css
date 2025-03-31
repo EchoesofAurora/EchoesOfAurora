@@ -125,6 +125,13 @@
     /* border-radius: 20px; Rounded corners for images */
     border: 15px solid black;
   }
+
+  .story-img {
+    height: 500px;
+    width: 800px;
+    object-fit: cover;
+  }
+
   .features-img {
     width: 40%;
     margin: 0 5%;

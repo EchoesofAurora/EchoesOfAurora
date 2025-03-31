@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
@@ -7,6 +7,7 @@ import "../styles/ManageStories.css";
 import Sidebar from "../components/Sidebar";
 import Header from "../components/AdminHeader";
 import { Modal, Button } from "react-bootstrap";
+import Footer from "../components/AdminFooter";
 
 const HeroEditStory = () => {
   const { id } = useParams();
@@ -24,15 +25,129 @@ const HeroEditStory = () => {
   const [imagesToRemove, setImagesToRemove] = useState([]); // Images to delete
   const [imagesUploaded, setImagesUploaded] = useState(false); // Track if new images were uploaded
   const [loading, setLoading] = useState(true);
-  const [showErrorModal, setShowErrorModal] = useState(false);
-  const [error, setError] = useState(null);
+  
+  // Form validation states
+  const [errors, setErrors] = useState({});
+  const [formError, setFormError] = useState("");
+  const [touched, setTouched] = useState({});
+  
+  // Refs for scrolling to error fields
+  const formRef = useRef(null);
+  const titleRef = useRef(null);
+  const tribeRef = useRef(null);
+  const yearRef = useRef(null);
+  const descriptionRef = useRef(null);
+  const referenceRef = useRef(null);
+
+  // Modal state
+  const [showModal, setShowModal] = useState(false);
+  const [modalMessage, setModalMessage] = useState("");
+  const [navigateAfterClose, setNavigateAfterClose] = useState(false);
 
   console.log("id from useParams:", id);
 
+  const handleClose = () => {
+    setShowModal(false);
+    if (navigateAfterClose) {
+      window.scrollTo(0, 0);
+      navigate("/Admin/ManageStories");
+    }
+  };
+
+  // Handle field touch events
+  const handleBlur = (field) => {
+    setTouched((prev) => ({ ...prev, [field]: true }));
+    validateField(field);
+  };
+
+  // Validate a single field
+  const validateField = (field) => {
+    let newErrors = { ...errors };
+    
+    switch (field) {
+      case 'storyTitle':
+        if (!storyTitle.trim()) {
+          newErrors.storyTitle = "Story title is required";
+        } else {
+          delete newErrors.storyTitle;
+        }
+        break;
+      case 'selectedTribe':
+        if (!selectedTribe) {
+          newErrors.selectedTribe = "Tribe selection is required";
+        } else {
+          delete newErrors.selectedTribe;
+        }
+        break;
+      case 'startDate':
+        if (!startDate) {
+          newErrors.startDate = "Story year is required";
+        } else {
+          delete newErrors.startDate;
+        }
+        break;
+      case 'description':
+        if (!description.trim()) {
+          newErrors.description = "Description is required";
+        } else {
+          delete newErrors.description;
+        }
+        break;
+      case 'referenceLinks':
+        if (!referenceLinks.trim()) {
+          newErrors.referenceLinks = "Reference is required";
+        } else {
+          delete newErrors.referenceLinks;
+        }
+        break;
+      default:
+        break;
+    }
+    
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
+  };
+
+  // Validate all fields
+  const validateForm = () => {
+    const newErrors = {};
+    const newTouched = {};
+    
+    // Mark all fields as touched
+    ['storyTitle', 'selectedTribe', 'startDate', 'description', 'referenceLinks'].forEach(field => {
+      newTouched[field] = true;
+    });
+    setTouched(newTouched);
+    
+    // Validate each field
+    if (!storyTitle.trim()) newErrors.storyTitle = "Story title is required";
+    if (!selectedTribe) newErrors.selectedTribe = "Tribe selection is required";
+    if (!startDate) newErrors.startDate = "Story year is required";
+    if (!description.trim()) newErrors.description = "Description is required";
+    if (!referenceLinks.trim()) newErrors.referenceLinks = "Reference is required";
+    
+    setErrors(newErrors);
+    
+    // Set form-wide error if any fields have errors
+    if (Object.keys(newErrors).length > 0) {
+      setFormError("Please fill in all required fields");
+      
+      // Scroll to the first field with error
+      if (formRef.current) {
+        formRef.current.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }
+      
+      return false;
+    }
+    
+    setFormError("");
+    return true;
+  };
+
   useEffect(() => {
     if (!id) {
-      setError("Invalid story ID. Please navigate to this page from the Manage Stories page.");
-      setShowErrorModal(true);
+      setModalMessage("Invalid story ID. Please navigate to this page from the Manage Stories page.");
+      setShowModal(true);
       setLoading(false);
       return;
     }
@@ -83,8 +198,8 @@ const HeroEditStory = () => {
         setSelectedTribe(tribe ? tribe.tribe_name : "");
       } catch (err) {
         console.error("Error fetching story:", err);
-        setError(`Failed to load story: ${err.message}`);
-        setShowErrorModal(true);
+        setModalMessage(`Failed to load story: ${err.message}`);
+        setShowModal(true);
       } finally {
         setLoading(false);
       }
@@ -93,8 +208,20 @@ const HeroEditStory = () => {
   }, [id]);
 
   const handleImageUpload = async (e) => {
-    const files = Array.from(e.target.files);
-    const newImagePreviews = files.map((file) => URL.createObjectURL(file));
+    const files = Array.from(e.target.files).filter(file => 
+      file.type === "image/jpeg" || file.type === "image/png"
+    );
+    
+    if (files.length !== e.target.files.length) {
+      setModalMessage("Only JPG and PNG files are supported.");
+      setShowModal(true);
+      return;
+    }
+    
+    const newImagePreviews = files.map((file) => ({
+      src: URL.createObjectURL(file),
+      file
+    }));
     setNewImages((prev) => [...prev, ...newImagePreviews]);
 
     const formData = new FormData();
@@ -133,14 +260,13 @@ const HeroEditStory = () => {
           }).filter(preview => preview !== null);
         }
         setUploadedImages(refreshedImagePreviews);
-        setNewImages((prev) => [...prev, ...newImagePreviews]);
       } else {
         throw new Error("Failed to upload images.");
       }
     } catch (error) {
       console.error("Error uploading images:", error);
-      setError(`Failed to upload images: ${error.message}`);
-      setShowErrorModal(true);
+      setModalMessage(`Failed to upload images: ${error.message}`);
+      setShowModal(true);
     }
   };
 
@@ -149,7 +275,15 @@ const HeroEditStory = () => {
     if (index >= uploadedImages.length) {
       // Handle removal of new (unuploaded) images
       const newIndex = index - uploadedImages.length;
-      setNewImages((prev) => prev.filter((_, i) => i !== newIndex));
+      setNewImages((prev) => {
+        const updatedImages = [...prev];
+        const imageToRemove = updatedImages[newIndex];
+        if (imageToRemove && imageToRemove.src) {
+          URL.revokeObjectURL(imageToRemove.src);
+        }
+        updatedImages.splice(newIndex, 1);
+        return updatedImages;
+      });
     } else {
       // Mark persisted (uploaded) images for removal
       const imageToRemove = uploadedImages[index];
@@ -160,16 +294,27 @@ const HeroEditStory = () => {
     }
   };
 
-  const handleSubmit = async (e, publishStatus) => {
+  // Get input class based on validation state
+  const getInputClassName = (field) => {
+    return `edit-story-input ${touched[field] && errors[field] ? "input-error" : ""}`;
+  };
+
+  const handleFormSubmit = async (e, publishStatus) => {
     e.preventDefault();
-    const tribe = tribes.find((t) => t.tribe_name === selectedTribe);
-    if (!tribe) {
-      setError("Invalid tribe selection.");
-      setShowErrorModal(true);
+
+    // Validate the form
+    if (!validateForm()) {
       return;
     }
 
-    const storyYear = startDate ? startDate.getFullYear().toString() : endDate ? endDate.getFullYear().toString() : null;
+    const tribe = tribes.find((t) => t.tribe_name === selectedTribe);
+    if (!tribe) {
+      setModalMessage("Invalid tribe selection.");
+      setShowModal(true);
+      return;
+    }
+
+    const storyYear = startDate ? startDate.getFullYear().toString() : null;
 
     try {
       // Handle deletion of marked images first
@@ -198,6 +343,33 @@ const HeroEditStory = () => {
         throw new Error(`Some images could not be deleted: ${deletionErrors.join('; ')}`);
       }
 
+      // Upload new images if any
+      if (newImages.length > 0 && !imagesUploaded) {
+        try {
+          const formData = new FormData();
+          formData.append("story_id", id);
+          newImages.forEach(img => {
+            if (img.file) {
+              formData.append("images", img.file);
+            }
+          });
+          
+          const uploadResponse = await fetch("/api/images/upload", {
+            method: "POST",
+            body: formData,
+          });
+          
+          if (!uploadResponse.ok) {
+            throw new Error("Failed to upload images");
+          }
+          
+          setImagesUploaded(true);
+        } catch (err) {
+          console.error("Failed to upload images:", err);
+          throw new Error(`Failed to upload images: ${err.message}`);
+        }
+      }
+
       const storyData = {
         story_name: storyTitle,
         tribe_id: tribe.tribe_id,
@@ -218,21 +390,22 @@ const HeroEditStory = () => {
         throw new Error(errorData.error || "Failed to update story");
       }
 
-      let successMessage = publishStatus
-        ? `"${storyTitle}" has been successfully published.`
-        : "The changes have been saved successfully.";
-
+      let statusMessage = publishStatus
+        ? `"${storyTitle}" has been successfully Published.`
+        : `"${storyTitle}" has been updated in Editing mode.`;
+        
       if (imagesUploaded) {
-        successMessage += " New images have been uploaded and associated with the story.";
+        statusMessage += " New images have been uploaded and associated with the story.";
         setImagesUploaded(false);
       }
 
-      alert(successMessage);
-      navigate("/Admin/ManageStories");
+      setModalMessage(statusMessage);
+      setNavigateAfterClose(true);
+      setShowModal(true);
     } catch (err) {
       console.error("Error updating story:", err);
-      setError(`Failed to update story: ${err.message}`);
-      setShowErrorModal(true);
+      setModalMessage(`Failed to update story: ${err.message}`);
+      setShowModal(true);
     }
   };
 
@@ -243,148 +416,228 @@ const HeroEditStory = () => {
         <div className="edit-story-frame">
           <h1 className="edit-story-title">Edit Story</h1>
           <p className="edit-story-subtitle">You are editing story ID: {id}</p>
+          
+          {formError && (
+            <div className="form-error-message" style={{ 
+              color: "#dc3545", 
+              padding: "10px", 
+              marginBottom: "15px", 
+              backgroundColor: "#f8d7da", 
+              borderRadius: "4px",
+              borderLeft: "4px solid #dc3545"
+            }}>
+              {formError}
+            </div>
+          )}
+          
           {loading && <div className="loading">Loading story...</div>}
-          <form className="edit-story-form">
-            <div className="edit-story-form-group">
-              <label htmlFor="storyTitle" className="edit-story-label">Story Title</label>
-              <input
-                type="text"
-                id="storyTitle"
-                className="edit-story-input"
-                value={storyTitle}
-                onChange={(e) => setStoryTitle(e.target.value)}
-              />
-            </div>
-
-            <div className="edit-story-form-group">
-              <label htmlFor="tribeSelect" className="edit-story-label">Select Tribe</label>
-              <select
-                id="tribeSelect"
-                className="edit-story-input"
-                value={selectedTribe}
-                onChange={(e) => setSelectedTribe(e.target.value)}
-              >
-                <option value="">Select a tribe</option>
-                {tribes.map((tribe, index) => (
-                  <option key={index} value={tribe.tribe_name}>{tribe.tribe_name}</option>
-                ))}
-              </select>
-            </div>
-
-            <div className="edit-story-form-group">
-              <div className="storyRange">
-                <div className="year-range">
-                  <label className="edit-story-label">Start Year</label>
-                  <DatePicker
-                    selected={startDate}
-                    onChange={(date) => setStartDate(date)}
-                    showYearPicker
-                    dateFormat="yyyy"
-                    className="edit-story-input"
-                  />
-                </div>
-                <div className="year-range">
-                  <label className="edit-story-label">End Year</label>
-                  <DatePicker
-                    selected={endDate}
-                    onChange={(date) => setEndDate(date)}
-                    showYearPicker
-                    dateFormat="yyyy"
-                    className="edit-story-input"
-                  />
-                </div>
-              </div>
-            </div>
-
-            <div className="edit-story-form-group">
-              <label htmlFor="description" className="edit-story-label">Description</label>
-              <textarea
-                id="description"
-                className="edit-story-textarea"
-                value={description}
-                onChange={(e) => setDescription(e.target.value)}
-              ></textarea>
-            </div>
-
-            {/* Uploaded Image Previews (Persisted and New) */}
-            <div className="edit-story-form-group">
-              <label className="edit-story-label">Uploaded Images</label>
-              <div className="image-preview-container">
-                {[...uploadedImages, ...newImages].map((image, index) => (
-                  <div key={index} className="story-image"> {/* Changed from tribe-image to story-image */}
-                    <img
-                      src={image.src}
-                      alt={`Image ${index + 1}`}
-                      width="100"
-                      height="100"
-                      onError={(e) => {
-                        e.target.src = "/images/placeholder.png";
-                      }}
-                    />
-                    <button
-                      type="button"
-                      className="remove-image-button"
-                      onClick={() => handleRemoveImage(index)}
-                    >
-                      Remove
-                    </button>
+          
+          {!loading && (
+            <form className="edit-story-form" ref={formRef}>
+              <div className="edit-story-form-group">
+                <label htmlFor="storyTitle" className="edit-story-label">
+                  Story Title <span style={{ color: "#dc3545" }}>*</span>
+                </label>
+                <input 
+                  type="text" 
+                  id="storyTitle" 
+                  ref={titleRef}
+                  className={getInputClassName('storyTitle')}
+                  value={storyTitle} 
+                  onChange={(e) => setStoryTitle(e.target.value)}
+                  onBlur={() => handleBlur('storyTitle')}
+                  style={touched.storyTitle && errors.storyTitle ? { borderColor: "#dc3545" } : {}}
+                />
+                {touched.storyTitle && errors.storyTitle && (
+                  <div className="error-message" style={{ color: "#dc3545", fontSize: "0.875rem", marginTop: "5px" }}>
+                    {errors.storyTitle}
                   </div>
-                ))}
-                {[...uploadedImages, ...newImages].length === 0 && (
-                  <p>No images uploaded for this story.</p>
                 )}
               </div>
-            </div>
 
-            {/* Image Upload */}
-            <div className="edit-story-form-group">
-              <label htmlFor="uploadImages" className="edit-story-label">Upload New Images</label>
-              <input
-                type="file"
-                id="uploadImages"
-                className="edit-story-upload-input"
-                multiple
-                accept="image/jpeg,image/png"
-                onChange={handleImageUpload}
-              />
-              <p className="edit-story-upload-instruction">Supported formats: JPG, PNG (Max 5MB per file)</p>
-            </div>
+              <div className="edit-story-form-group">
+                <label htmlFor="tribeSelect" className="edit-story-label">
+                  Select Tribe <span style={{ color: "#dc3545" }}>*</span>
+                </label>
+                <select 
+                  id="tribeSelect" 
+                  ref={tribeRef}
+                  className={getInputClassName('selectedTribe')}
+                  value={selectedTribe} 
+                  onChange={(e) => setSelectedTribe(e.target.value)}
+                  onBlur={() => handleBlur('selectedTribe')}
+                  style={touched.selectedTribe && errors.selectedTribe ? { borderColor: "#dc3545" } : {}}
+                >
+                  <option value="">Select a tribe</option>
+                  {tribes.map((tribe, index) => (
+                    <option key={index} value={tribe.tribe_name}>{tribe.tribe_name}</option>
+                  ))}
+                </select>
+                {touched.selectedTribe && errors.selectedTribe && (
+                  <div className="error-message" style={{ color: "#dc3545", fontSize: "0.875rem", marginTop: "5px" }}>
+                    {errors.selectedTribe}
+                  </div>
+                )}
+              </div>
 
-            <div className="edit-story-form-group">
-              <label htmlFor="referenceLinks" className="edit-story-label">Reference</label>
-              <input
-                type="text"
-                id="referenceLinks"
-                className="edit-story-input"
-                value={referenceLinks}
-                onChange={(e) => setReferenceLinks(e.target.value)}
-              />
-            </div>
+              <div className="edit-story-form-group">
+                <div className="storyRange">
+                  <div className="year-range">
+                    <label className="edit-story-label">
+                      Year <span style={{ color: "#dc3545" }}>*</span>
+                    </label>
+                    <DatePicker 
+                      id="storyYear"
+                      ref={yearRef}
+                      selected={startDate} 
+                      onChange={(date) => setStartDate(date)} 
+                      showYearPicker 
+                      dateFormat="yyyy" 
+                      className={getInputClassName('startDate')}
+                      placeholderText="Select year"
+                      onBlur={() => handleBlur('startDate')}
+                      style={touched.startDate && errors.startDate ? { borderColor: "#dc3545" } : {}}
+                    />
+                    {touched.startDate && errors.startDate && (
+                      <div className="error-message" style={{ color: "#dc3545", fontSize: "0.875rem", marginTop: "5px" }}>
+                        {errors.startDate}
+                      </div>
+                    )}
+                  </div>
+                  <div className="year-range">
+                    <label className="edit-story-label">End Year (Optional)</label>
+                    <DatePicker
+                      selected={endDate}
+                      onChange={(date) => setEndDate(date)}
+                      showYearPicker
+                      dateFormat="yyyy"
+                      className="edit-story-input"
+                      placeholderText="Select end year (optional)"
+                    />
+                  </div>
+                </div>
+              </div>
 
-            <div className="edit-story-button-group">
-              <button type="button" className="edit-story-back-button" onClick={() => navigate("/Admin/ManageStories")}>
-                Back
-              </button>
-              <button type="button" className="edit-story-save-button" onClick={(e) => handleSubmit(e, false)}>
-                Save
-              </button>
-              <button type="button" className="edit-story-publish-button" onClick={(e) => handleSubmit(e, true)}>
-                Save & Publish
-              </button>
-            </div>
-          </form>
+              <div className="edit-story-form-group">
+                <label htmlFor="description" className="edit-story-label">
+                  Description <span style={{ color: "#dc3545" }}>*</span>
+                </label>
+                <textarea 
+                  id="description" 
+                  ref={descriptionRef}
+                  className={`edit-story-textarea ${touched.description && errors.description ? "input-error" : ""}`}
+                  value={description} 
+                  onChange={(e) => setDescription(e.target.value)}
+                  onBlur={() => handleBlur('description')}
+                  style={touched.description && errors.description ? { borderColor: "#dc3545" } : {}}
+                ></textarea>
+                {touched.description && errors.description && (
+                  <div className="error-message" style={{ color: "#dc3545", fontSize: "0.875rem", marginTop: "5px" }}>
+                    {errors.description}
+                  </div>
+                )}
+              </div>
+              
+              <div className="edit-story-form-group">
+                <label className="edit-story-label">Uploaded Images</label>
+                <div className="image-preview-container">
+                  {[...uploadedImages, ...newImages].map((image, index) => (
+                    <div key={index} className="story-image">
+                      <img
+                        src={image.src}
+                        alt={`Image ${index + 1}`}
+                        width="100"
+                        height="100"
+                        onError={(e) => {
+                          e.target.src = "/images/placeholder.png";
+                        }}
+                      />
+                      <button
+                        type="button"
+                        className="remove-image-button"
+                        onClick={() => handleRemoveImage(index)}
+                      >
+                        Remove
+                      </button>
+                    </div>
+                  ))}
+                  {[...uploadedImages, ...newImages].length === 0 && (
+                    <p>No images uploaded for this story.</p>
+                  )}
+                </div>
+              </div>
+
+              <div className="edit-story-form-group">
+                <label htmlFor="uploadImages" className="edit-story-label">Upload Images</label>
+                <input 
+                  type="file" 
+                  id="uploadImages" 
+                  className="edit-story-upload-input"
+                  multiple 
+                  accept="image/jpeg,image/png"
+                  onChange={handleImageUpload} 
+                />
+                <p className="edit-story-upload-instruction">Supported formats: JPG, PNG (Max 5MB per file)</p>
+              </div>
+              
+              <div className="edit-story-form-group">
+                <label htmlFor="referenceLinks" className="edit-story-label">
+                  Reference <span style={{ color: "#dc3545" }}>*</span>
+                </label>
+                <input 
+                  type="text" 
+                  id="referenceLinks" 
+                  ref={referenceRef}
+                  className={getInputClassName('referenceLinks')}
+                  value={referenceLinks} 
+                  onChange={(e) => setReferenceLinks(e.target.value)}
+                  onBlur={() => handleBlur('referenceLinks')}
+                  style={touched.referenceLinks && errors.referenceLinks ? { borderColor: "#dc3545" } : {}}
+                />
+                {touched.referenceLinks && errors.referenceLinks && (
+                  <div className="error-message" style={{ color: "#dc3545", fontSize: "0.875rem", marginTop: "5px" }}>
+                    {errors.referenceLinks}
+                  </div>
+                )}
+              </div>
+
+              <div className="edit-story-button-group">
+                <button 
+                  type="button" 
+                  className="edit-story-back-button" 
+                  onClick={() => {
+                    window.scrollTo(0, 0);
+                    navigate("/Admin/ManageStories");
+                  }}
+                >
+                  Back
+                </button>
+                <button 
+                  type="button" 
+                  className="edit-story-save-button" 
+                  onClick={(e) => handleFormSubmit(e, false)}
+                >
+                  Save
+                </button>
+                <button 
+                  type="button" 
+                  className="edit-story-publish-button" 
+                  onClick={(e) => handleFormSubmit(e, true)}
+                >
+                  Save & Publish
+                </button>
+              </div>
+            </form>
+          )}
         </div>
 
-        {/* Error Modal */}
-        <Modal show={showErrorModal} onHide={() => setShowErrorModal(false)} centered>
+        <Modal show={showModal} onHide={handleClose} centered dialogClassName="modal-dialog-centered custom-modal">
           <Modal.Header closeButton>
-            <Modal.Title>Error</Modal.Title>
+            <Modal.Title>Story Status</Modal.Title>
           </Modal.Header>
-          <Modal.Body>{error}</Modal.Body>
+          <Modal.Body>{modalMessage}</Modal.Body>
           <Modal.Footer>
-            <Button variant="secondary" onClick={() => setShowErrorModal(false)}>
-              Close
-            </Button>
+            <Button variant="secondary" onClick={handleClose}>Close</Button>
           </Modal.Footer>
         </Modal>
       </main>
@@ -399,6 +652,7 @@ const EditStory = () => {
         <Header />
         <HeroEditStory />
       </div>
+      <Footer />
     </div>
   );
 };

@@ -1,0 +1,145 @@
+/* AdminStorySearchBar.css */
+.admin-filter-sort-bar {
+  background-color: white; /* White background for the container */
+  border: 1px solid #ddd;
+  border-radius: 5px;
+  padding: 15px;
+  margin-bottom: 1rem;
+  box-shadow: 0px 4px 4px #00000040;
+}
+
+/* First row: Search and Sort */
+.admin-search-and-sort-container {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 10px;
+  gap: 10px;
+}
+
+.admin-search-bar-container {
+  position: relative;
+  flex: 2;
+} 
+
+.admin-search-bar {
+  width: 100%;
+  padding: 10px;
+  border: 1px solid #ddd;
+  border-radius: 5px;
+  background-color: #e9e6f5; /* Lighter purple background matching screenshot */
+}
+
+.admin-search-button {
+  position: absolute;
+  right: 10px;
+  top: 50%;
+  transform: translateY(-50%);
+  background: none;
+  border: none;
+  color: #a49cbe;
+  cursor: pointer;
+}
+
+.admin-sort-dropdown {
+  flex: 1;
+  min-width: 150px;
+  padding: 10px;
+  border: 1px solid #ddd;
+  border-radius: 5px;
+  background-color: #e9e6f5; /* Lighter purple background matching screenshot */
+}
+
+/* Second row: Filters */
+.admin-filters-container {
+  display: flex;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+.admin-tribe-filter {
+  flex: 1;
+}
+
+.admin-filter-input {
+  width: 100%;
+  padding: 10px;
+  border: 1px solid #ddd;
+  border-radius: 5px;
+  background-color: #e9e6f5; /* Lighter purple background matching screenshot */
+}
+
+.admin-time-range {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  flex: 1 1;
+}
+
+.admin-year-range-label {
+  white-space: nowrap;
+}
+
+.admin-time-range input {
+  width: 80px;
+  padding: 8px;
+  border: 1px solid #ddd;
+  border-radius: 5px;
+  background-color: #e9e6f5; /* Lighter purple background matching screenshot */
+}
+
+.admin-status-filter {
+  flex: 1;
+  min-width: 150px;
+}
+
+.admin-status-dropdown {
+  width: 100%;
+  padding: 10px;
+  border: 1px solid #ddd;
+  border-radius: 5px;
+  background-color: #e9e6f5; /* Lighter purple background matching screenshot */
+}
+
+/* New styles for the date range fields */
+.admin-time-range-container {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.admin-date-field {
+  display: flex;
+  align-items: center;
+}
+
+.admin-date-label {
+  margin-right: 5px;
+  color: #666;
+}
+
+.admin-date-input {
+  width: 80px;
+  padding: 8px;
+  border: 1px solid #ddd;
+  border-radius: 5px;
+  background-color: #e9e6f5; /* Lighter purple background matching screenshot */
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .admin-search-and-sort-container,
+  .admin-filters-container {
+    flex-direction: column;
+  }
+
+  .admin-search-bar-container,
+  .admin-sort-dropdown,
+  .admin-filter-input,
+  .admin-status-dropdown,
+  .admin-tribe-filter,
+  .admin-time-range,
+  .admin-status-filter {
+    width: 100%;
+    margin-bottom: 10px;
+  }
+}

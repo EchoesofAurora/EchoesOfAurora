@@ -33,13 +33,13 @@ const AdminHeader = () => {
       <div className="admin-header-left-flowers">
         <img
           src={leftFlower}
-          alt="Left Flower Decoration"
+          alt="Left Flower"
           className="admin-header-left-flower-img"
         />
       </div>
       <div className="admin-header-container">
         <div className="admin-header-logo">
-          <img src={logo} alt="Aurora Logo" className="admin-header-logo-img" />
+          <img src={logo} alt="Aurora" className="admin-header-logo-img" />
         </div>
         <div
           className="admin-header-profile-button"
@@ -48,11 +48,11 @@ const AdminHeader = () => {
         >
           <img
             className="admin-header-icon-left-wrapper"
-            alt="Icon Left Wrapper"
+            alt=""
             src={iconLeftWrapper}
           />
           <div className="admin-header-label">Lynn</div>
-          <img className="admin-header-icon" alt="Profile Icon" src={icon} />
+          <img className="admin-header-icon" alt="" src={icon} />
         </div>
         {showDropdown && (
           <div
@@ -68,7 +68,7 @@ const AdminHeader = () => {
       <div className="admin-header-right-flowers">
         <img
           src={rightFlower}
-          alt="Right Flower Decoration"
+          alt="Right Flower"
           className="admin-header-right-flower-img"
         />
       </div>
