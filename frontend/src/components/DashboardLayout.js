@@ -30,12 +30,12 @@ const DashboardLayout = ({ children, activeTab = "dashboard" }) => {
     }
   ];
 
+  // Updated to match sidebar navigation
   const tabs = [
-    { id: "dashboard", label: "Overview" },
-    { id: "stories", label: "Stories" },
-    { id: "tribes", label: "Tribes" },
-    { id: "submissions", label: "Submissions" },
-    { id: "settings", label: "Settings" },
+    { id: "stories", label: "Manage Stories", link: "/Admin/ManageStories" },
+    { id: "tribes", label: "Manage Tribes", link: "/Admin/ManageTribes" },
+    { id: "submissions", label: "User Submissions", link: "/Admin/UserSubmissions" },
+    { id: "settings", label: "Settings", link: "/Admin/EditProfile" },
   ];
 
   useEffect(() => {
@@ -44,8 +44,8 @@ const DashboardLayout = ({ children, activeTab = "dashboard" }) => {
     }));
   }, []);
 
-  const handleTabClick = (tabId) => {
-    navigate(`/${tabId}`);
+  const handleTabClick = (tabLink) => {
+    navigate(tabLink);
   };
 
   return (
@@ -87,7 +87,7 @@ const DashboardLayout = ({ children, activeTab = "dashboard" }) => {
                 <button
                   key={tab.id}
                   className={`tab ${activeTab === tab.id ? "active" : ""}`}
-                  onClick={() => handleTabClick(tab.id)}
+                  onClick={() => handleTabClick(tab.link)}
                 >
                   {tab.label}
                 </button>

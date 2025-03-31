@@ -37,7 +37,7 @@ const HeroSection = () => {
           <Link to="/Admin/ForgotPassword" className="forgot-password">Forget Password?</Link>
         </div>
 
-        <Link to="/Admin/Dashboard" className="signIn-button-link">
+        <Link to="/Admin/ManageStories" className="signIn-button-link">
           <button className="button-style">Sign In</button>
         </Link>
       </div>

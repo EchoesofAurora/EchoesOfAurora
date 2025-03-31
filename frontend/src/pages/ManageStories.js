@@ -173,6 +173,7 @@ const ManageStories = () => {
     setCurrentPage(1);
   };
 
+  // Get current stories for pagination
   const indexOfLastStory = currentPage * storiesPerPage;
   const indexOfFirstStory = indexOfLastStory - storiesPerPage;
   const currentStories = searchResults.slice(indexOfFirstStory, indexOfLastStory);

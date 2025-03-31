@@ -3,9 +3,8 @@ import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 import "../styles/AddingStory.css";
 import "../styles/ManageStories.css";
-import Sidebar from "../components/Sidebar";
-import Header from "../components/AdminHeader";
-import Footer from "../components/AdminFooter";
+import "../styles/DashboardLayout.css";
+import DashboardLayout from "../components/DashboardLayout";
 import { Modal, Button } from "react-bootstrap";
 import { useNavigate } from "react-router-dom";
 
@@ -293,255 +292,249 @@ const HeroAddingStory = () => {
   };
 
   return (
-    <div className="overlap">
-      <Sidebar />
-      <main className="rightFrame-5" style={{ minHeight: "calc(100vh - 80px)", paddingBottom: "80px" }}>
-        <div className="adding-story-frame">
-          <h1 className="adding-story-title">Add Story</h1>
-          <p className="adding-story-subtitle">You are adding a new story.</p>
-          
-          {formError && (
-            <div className="form-error-message" style={{ 
-              color: "#dc3545", 
-              padding: "10px", 
-              marginBottom: "15px", 
-              backgroundColor: "#f8d7da", 
-              borderRadius: "4px",
-              borderLeft: "4px solid #dc3545"
-            }}>
-              {formError}
+    <div className="adding-story-frame">
+      <h1 className="adding-story-title">Add Story</h1>
+      <p className="adding-story-subtitle">You are adding a new story.</p>
+      
+      {formError && (
+        <div className="form-error-message" style={{ 
+          color: "#dc3545", 
+          padding: "10px", 
+          marginBottom: "15px", 
+          backgroundColor: "#f8d7da", 
+          borderRadius: "4px",
+          borderLeft: "4px solid #dc3545"
+        }}>
+          {formError}
+        </div>
+      )}
+      
+      <form className="adding-story-form" ref={formRef}>
+        <div className="adding-story-form-group">
+          <label htmlFor="storyTitle" className="adding-story-label">
+            Story Title <span style={{ color: "#dc3545" }}>*</span>
+          </label>
+          <input
+            type="text"
+            id="storyTitle"
+            ref={titleRef}
+            className={getInputClassName('storyTitle')}
+            placeholder="Enter story title"
+            value={storyTitle}
+            onChange={(e) => setStoryTitle(e.target.value)}
+            onBlur={() => handleBlur('storyTitle')}
+            style={touched.storyTitle && errors.storyTitle ? { borderColor: "#dc3545" } : {}}
+          />
+          {touched.storyTitle && errors.storyTitle && (
+            <div className="error-message" style={{ color: "#dc3545", fontSize: "0.875rem", marginTop: "5px" }}>
+              {errors.storyTitle}
             </div>
           )}
-          
-          <form className="adding-story-form" ref={formRef}>
-            <div className="adding-story-form-group">
-              <label htmlFor="storyTitle" className="adding-story-label">
-                Story Title <span style={{ color: "#dc3545" }}>*</span>
-              </label>
-              <input
-                type="text"
-                id="storyTitle"
-                ref={titleRef}
-                className={getInputClassName('storyTitle')}
-                placeholder="Enter story title"
-                value={storyTitle}
-                onChange={(e) => setStoryTitle(e.target.value)}
-                onBlur={() => handleBlur('storyTitle')}
-                style={touched.storyTitle && errors.storyTitle ? { borderColor: "#dc3545" } : {}}
-              />
-              {touched.storyTitle && errors.storyTitle && (
-                <div className="error-message" style={{ color: "#dc3545", fontSize: "0.875rem", marginTop: "5px" }}>
-                  {errors.storyTitle}
-                </div>
-              )}
-            </div>
-
-            <div className="adding-story-form-group">
-              <label htmlFor="tribeSelect" className="adding-story-label">
-                Select Tribe <span style={{ color: "#dc3545" }}>*</span>
-              </label>
-              <select
-                id="tribeSelect"
-                ref={tribeRef}
-                className={getInputClassName('selectedTribe')}
-                value={selectedTribe}
-                onChange={(e) => setSelectedTribe(e.target.value)}
-                onBlur={() => handleBlur('selectedTribe')}
-                style={touched.selectedTribe && errors.selectedTribe ? { borderColor: "#dc3545" } : {}}
-              >
-                <option value="">Select a tribe</option>
-                {tribes.map((tribe, index) => (
-                  <option key={index} value={tribe}>{tribe}</option>
-                ))}
-              </select>
-              {touched.selectedTribe && errors.selectedTribe && (
-                <div className="error-message" style={{ color: "#dc3545", fontSize: "0.875rem", marginTop: "5px" }}>
-                  {errors.selectedTribe}
-                </div>
-              )}
-            </div>
-
-            <div className="adding-story-form-group">
-              <div className="storyRange">
-                <div className="year-range">
-                  <label className="adding-story-label">
-                    Start Year <span style={{ color: "#dc3545" }}>*</span>
-                  </label>
-                  <DatePicker
-                    ref={startYearRef}
-                    selected={startDate}
-                    onChange={(date) => setStartDate(date)}
-                    showYearPicker
-                    dateFormat="yyyy"
-                    className={getInputClassName('startDate')}
-                    placeholderText="Select start year"
-                    onBlur={() => handleBlur('startDate')}
-                    style={touched.startDate && errors.startDate ? { borderColor: "#dc3545" } : {}}
-                  />
-                  {touched.startDate && errors.startDate && (
-                    <div className="error-message" style={{ color: "#dc3545", fontSize: "0.875rem", marginTop: "5px" }}>
-                      {errors.startDate}
-                    </div>
-                  )}
-                </div>
-                <div className="year-range">
-                  <label className="adding-story-label">
-                    End Year 
-                  </label>
-                  <DatePicker
-                    ref={endYearRef}
-                    selected={endDate}
-                    onChange={(date) => setEndDate(date)}
-                    showYearPicker
-                    dateFormat="yyyy"
-                    className={getInputClassName('endDate')}
-                    placeholderText="Select end year"
-                    onBlur={() => handleBlur('endDate')}
-                    style={touched.endDate && errors.endDate ? { borderColor: "#dc3545" } : {}}
-                  />
-                  {touched.endDate && errors.endDate && (
-                    <div className="error-message" style={{ color: "#dc3545", fontSize: "0.875rem", marginTop: "5px" }}>
-                      {errors.endDate}
-                    </div>
-                  )}
-                </div>
-              </div>
-              <p className="form-hint" style={{ fontSize: "0.8rem", color: "#6c757d", marginTop: "5px" }}>
-                At least one year field is required.
-              </p>
-            </div>
-
-            <div className="adding-story-form-group">
-              <label htmlFor="description" className="adding-story-label">
-                Description <span style={{ color: "#dc3545" }}>*</span>
-              </label>
-              <textarea
-                id="description"
-                ref={descriptionRef}
-                className={`adding-story-textarea ${touched.description && errors.description ? "input-error" : ""}`}
-                placeholder="Enter description"
-                value={description}
-                onChange={(e) => setDescription(e.target.value)}
-                onBlur={() => handleBlur('description')}
-                style={touched.description && errors.description ? { borderColor: "#dc3545" } : {}}
-              ></textarea>
-              {touched.description && errors.description && (
-                <div className="error-message" style={{ color: "#dc3545", fontSize: "0.875rem", marginTop: "5px" }}>
-                  {errors.description}
-                </div>
-              )}
-            </div>
-
-            <div className="adding-story-form-group">
-              <label className="adding-story-label">Uploaded Images</label>
-              <div className="image-preview-container">
-                {imagePreviews.length > 0 ? (
-                  imagePreviews.map((preview, index) => (
-                    <div key={index} className="story-image">
-                      <img
-                        src={preview}
-                        alt={`Preview ${index + 1}`}
-                        width="100"
-                        height="100"
-                        onError={(e) => { e.target.src = "/images/placeholder.png"; }}
-                      />
-                      <button
-                        type="button"
-                        className="remove-image-button"
-                        onClick={() => handleRemoveImage(index)}
-                        aria-label={`Remove image ${index + 1}`}
-                      >
-                        Remove
-                      </button>
-                    </div>
-                  ))
-                ) : (
-                  <p>No images selected.</p>
-                )}
-              </div>
-            </div>
-
-            <div className="adding-story-form-group">
-              <label htmlFor="uploadImages" className="adding-story-label">Upload Images</label>
-              <input type="file" id="uploadImages" multiple onChange={handleImageChange} />
-              <p className="adding-story-upload-instruction">Supported formats: JPG, PNG</p>
-            </div>
-
-            <div className="adding-story-form-group">
-              <label htmlFor="referenceLinks" className="adding-story-label">
-                Reference <span style={{ color: "#dc3545" }}>*</span>
-              </label>
-              <input
-                type="text"
-                id="referenceLinks"
-                ref={referenceRef}
-                className={getInputClassName('referenceLinks')}
-                placeholder="Enter reference links"
-                value={referenceLinks}
-                onChange={(e) => setReferenceLinks(e.target.value)}
-                onBlur={() => handleBlur('referenceLinks')}
-                style={touched.referenceLinks && errors.referenceLinks ? { borderColor: "#dc3545" } : {}}
-              />
-              {touched.referenceLinks && errors.referenceLinks && (
-                <div className="error-message" style={{ color: "#dc3545", fontSize: "0.875rem", marginTop: "5px" }}>
-                  {errors.referenceLinks}
-                </div>
-              )}
-            </div>
-
-            <div className="adding-story-button-group">
-              <button
-                type="button"
-                className="adding-story-back-button"
-                onClick={() => {
-                  window.scrollTo(0, 0);
-                  navigate("/Admin/ManageStories");
-                }}
-              >
-                Back
-              </button>
-              <button
-                type="button"
-                className="adding-story-save-button"
-                onClick={(e) => handleFormSubmit(e, false)}
-              >
-                Save
-              </button>
-              <button
-                type="button"
-                className="adding-story-publish-button"
-                onClick={(e) => handleFormSubmit(e, true)}
-              >
-                Save & Publish
-              </button>
-            </div>
-          </form>
         </div>
-        <Modal show={showModal} onHide={handleClose} centered dialogClassName="modal-dialog-centered custom-modal">
-          <Modal.Header closeButton>
-            <Modal.Title>Story Status</Modal.Title>
-          </Modal.Header>
-          <Modal.Body>{modalMessage}</Modal.Body>
-          <Modal.Footer>
-            <Button variant="secondary" onClick={handleClose}>
-              Close
-            </Button>
-          </Modal.Footer>
-        </Modal>
-      </main>
+
+        <div className="adding-story-form-group">
+          <label htmlFor="tribeSelect" className="adding-story-label">
+            Select Tribe <span style={{ color: "#dc3545" }}>*</span>
+          </label>
+          <select
+            id="tribeSelect"
+            ref={tribeRef}
+            className={getInputClassName('selectedTribe')}
+            value={selectedTribe}
+            onChange={(e) => setSelectedTribe(e.target.value)}
+            onBlur={() => handleBlur('selectedTribe')}
+            style={touched.selectedTribe && errors.selectedTribe ? { borderColor: "#dc3545" } : {}}
+          >
+            <option value="">Select a tribe</option>
+            {tribes.map((tribe, index) => (
+              <option key={index} value={tribe}>{tribe}</option>
+            ))}
+          </select>
+          {touched.selectedTribe && errors.selectedTribe && (
+            <div className="error-message" style={{ color: "#dc3545", fontSize: "0.875rem", marginTop: "5px" }}>
+              {errors.selectedTribe}
+            </div>
+          )}
+        </div>
+
+        <div className="adding-story-form-group">
+          <div className="storyRange">
+            <div className="year-range">
+              <label className="adding-story-label">
+                Start Year <span style={{ color: "#dc3545" }}>*</span>
+              </label>
+              <DatePicker
+                ref={startYearRef}
+                selected={startDate}
+                onChange={(date) => setStartDate(date)}
+                showYearPicker
+                dateFormat="yyyy"
+                className={getInputClassName('startDate')}
+                placeholderText="Select start year"
+                onBlur={() => handleBlur('startDate')}
+                style={touched.startDate && errors.startDate ? { borderColor: "#dc3545" } : {}}
+              />
+              {touched.startDate && errors.startDate && (
+                <div className="error-message" style={{ color: "#dc3545", fontSize: "0.875rem", marginTop: "5px" }}>
+                  {errors.startDate}
+                </div>
+              )}
+            </div>
+            <div className="year-range">
+              <label className="adding-story-label">
+                End Year 
+              </label>
+              <DatePicker
+                ref={endYearRef}
+                selected={endDate}
+                onChange={(date) => setEndDate(date)}
+                showYearPicker
+                dateFormat="yyyy"
+                className={getInputClassName('endDate')}
+                placeholderText="Select end year"
+                onBlur={() => handleBlur('endDate')}
+                style={touched.endDate && errors.endDate ? { borderColor: "#dc3545" } : {}}
+              />
+              {touched.endDate && errors.endDate && (
+                <div className="error-message" style={{ color: "#dc3545", fontSize: "0.875rem", marginTop: "5px" }}>
+                  {errors.endDate}
+                </div>
+              )}
+            </div>
+          </div>
+          <p className="form-hint" style={{ fontSize: "0.8rem", color: "#6c757d", marginTop: "5px" }}>
+            At least one year field is required.
+          </p>
+        </div>
+
+        <div className="adding-story-form-group">
+          <label htmlFor="description" className="adding-story-label">
+            Description <span style={{ color: "#dc3545" }}>*</span>
+          </label>
+          <textarea
+            id="description"
+            ref={descriptionRef}
+            className={`adding-story-textarea ${touched.description && errors.description ? "input-error" : ""}`}
+            placeholder="Enter description"
+            value={description}
+            onChange={(e) => setDescription(e.target.value)}
+            onBlur={() => handleBlur('description')}
+            style={touched.description && errors.description ? { borderColor: "#dc3545" } : {}}
+          ></textarea>
+          {touched.description && errors.description && (
+            <div className="error-message" style={{ color: "#dc3545", fontSize: "0.875rem", marginTop: "5px" }}>
+              {errors.description}
+            </div>
+          )}
+        </div>
+
+        <div className="adding-story-form-group">
+          <label className="adding-story-label">Uploaded Images</label>
+          <div className="image-preview-container">
+            {imagePreviews.length > 0 ? (
+              imagePreviews.map((preview, index) => (
+                <div key={index} className="story-image">
+                  <img
+                    src={preview}
+                    alt={`Preview ${index + 1}`}
+                    width="100"
+                    height="100"
+                    onError={(e) => { e.target.src = "/images/placeholder.png"; }}
+                  />
+                  <button
+                    type="button"
+                    className="remove-image-button"
+                    onClick={() => handleRemoveImage(index)}
+                    aria-label={`Remove image ${index + 1}`}
+                  >
+                    Remove
+                  </button>
+                </div>
+              ))
+            ) : (
+              <p>No images selected.</p>
+            )}
+          </div>
+        </div>
+
+        <div className="adding-story-form-group">
+          <label htmlFor="uploadImages" className="adding-story-label">Upload Images</label>
+          <input type="file" id="uploadImages" multiple onChange={handleImageChange} />
+          <p className="adding-story-upload-instruction">Supported formats: JPG, PNG</p>
+        </div>
+
+        <div className="adding-story-form-group">
+          <label htmlFor="referenceLinks" className="adding-story-label">
+            Reference <span style={{ color: "#dc3545" }}>*</span>
+          </label>
+          <input
+            type="text"
+            id="referenceLinks"
+            ref={referenceRef}
+            className={getInputClassName('referenceLinks')}
+            placeholder="Enter reference links"
+            value={referenceLinks}
+            onChange={(e) => setReferenceLinks(e.target.value)}
+            onBlur={() => handleBlur('referenceLinks')}
+            style={touched.referenceLinks && errors.referenceLinks ? { borderColor: "#dc3545" } : {}}
+          />
+          {touched.referenceLinks && errors.referenceLinks && (
+            <div className="error-message" style={{ color: "#dc3545", fontSize: "0.875rem", marginTop: "5px" }}>
+              {errors.referenceLinks}
+            </div>
+          )}
+        </div>
+
+        <div className="adding-story-button-group">
+          <button
+            type="button"
+            className="adding-story-back-button"
+            onClick={() => {
+              window.scrollTo(0, 0);
+              navigate("/Admin/ManageStories");
+            }}
+          >
+            Back
+          </button>
+          <button
+            type="button"
+            className="adding-story-save-button"
+            onClick={(e) => handleFormSubmit(e, false)}
+          >
+            Save
+          </button>
+          <button
+            type="button"
+            className="adding-story-publish-button"
+            onClick={(e) => handleFormSubmit(e, true)}
+          >
+            Save & Publish
+          </button>
+        </div>
+      </form>
+      
+      <Modal show={showModal} onHide={handleClose} centered dialogClassName="modal-dialog-centered custom-modal">
+        <Modal.Header closeButton>
+          <Modal.Title>Story Status</Modal.Title>
+        </Modal.Header>
+        <Modal.Body>{modalMessage}</Modal.Body>
+        <Modal.Footer>
+          <Button variant="secondary" onClick={handleClose}>
+            Close
+          </Button>
+        </Modal.Footer>
+      </Modal>
     </div>
   );
 };
 
 const AddingStory = () => {
   return (
-    <div className="ManageStories" style={{ minHeight: "100vh", display: "flex", flexDirection: "column" }}>
-      <div className="div" style={{ flexGrow: 1 }}>
-        <Header />
+    <DashboardLayout activeTab="stories">
+      <div className="manage-stories-container">
         <HeroAddingStory />
       </div>
-      <Footer />
-    </div>
+    </DashboardLayout>
   );
 };
 

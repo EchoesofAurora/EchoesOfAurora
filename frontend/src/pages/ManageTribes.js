@@ -2,16 +2,12 @@ import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import "../styles/ManageTribes.css";
 import "../styles/pagination.css";
-import storyBackground1 from "../images/stories/story-background1.png";
-import storyBackground2 from "../images/stories/story-background2.png";
-import storyBackground3 from "../images/stories/story-background3.png";
-import Sidebar from "../components/Sidebar";
-import Header from "../components/AdminHeader";
-import Footer from "../components/AdminFooter";
-import AdminTribeSearchBar from "../components/AdminTribeSearchBar"; // Import the tribe-specific search bar
+import "../styles/DashboardLayout.css";
+import DashboardLayout from "../components/DashboardLayout";
+import AdminTribeSearchBar from "../components/AdminTribeSearchBar"; 
 import Pagination from "../components/Pagination";
 
-const HeroManageTribes = () => {
+const ManageTribes = () => {
   const [tribes, setTribes] = useState([]);
   const [searchResults, setSearchResults] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -25,7 +21,12 @@ const HeroManageTribes = () => {
   
   const navigate = useNavigate();
 
-  const backgrounds = [storyBackground1, storyBackground2, storyBackground3];
+  // Background colors for alternating rows - only 3 colors
+  const rowBackgroundColors = [
+    "#f9fafb", // Very light gray (almost white)
+    "#f3f4f6", // Light gray
+    "#fff7ed"  // Very light beige
+  ];
 
   // Fetch tribes from the backend
   useEffect(() => {
@@ -162,105 +163,114 @@ const HeroManageTribes = () => {
   // Change page
   const paginate = (pageNumber) => setCurrentPage(pageNumber);
 
-  if (loading) {
-    return <p>Loading tribes...</p>;
-  }
-
-  if (error) {
-    return <p>{error}</p>;
-  }
-
   return (
-    <div className="overlap">
-      <Sidebar />
-      <main className="rightFrame-5">
-        <div className="manage-Tribe-header">
-          <button className="back-btn" onClick={() => navigate("/Admin/Dashboard")}>Back</button>
-          <button className="new-Tribe-btn" onClick={() => navigate("/ManageTribe/AddingTribe")}>+ New Tribe</button>
+    <DashboardLayout activeTab="tribes">
+      <div className="manage-stories-container">
+        <div className="search-filter-container">
+          <AdminTribeSearchBar 
+            onSearch={handleSearch} 
+            onSort={handleSort} 
+            onFilter={handleFilter} 
+          />
+          <button 
+            className="new-story-btn"
+            onClick={() => navigate("/ManageTribe/AddingTribe")}
+          >
+            + New Tribe
+          </button>
         </div>
 
-        {/* Using the tribe-specific search bar */}
-        <AdminTribeSearchBar 
-          onSearch={handleSearch} 
-          onSort={handleSort} 
-          onFilter={handleFilter} 
-        />
+        {loading ? (
+          <div className="loading">Loading tribes...</div>
+        ) : (
+          <>
+            <table className="stories-table">
+              <thead>
+                <tr>
+                  <th>Tribe Name</th>
+                  <th>Timeline</th>
+                  <th>Status</th>
+                  <th>Actions</th>
+                </tr>
+              </thead>
+              <tbody>
+                {currentTribes.length > 0 ? (
+                  currentTribes.map((tribe, index) => (
+                    <tr 
+                      key={tribe.tribe_id}
+                      style={{ backgroundColor: rowBackgroundColors[index % rowBackgroundColors.length] }}
+                    >
+                      <td>{tribe.tribe_name}</td>
+                      <td>{`${tribe.start_year || "Unknown"} - ${tribe.end_year || "Present"}`}</td>
+                      <td>
+                        <span className={`status-badge ${tribe.published ? "published" : "editing"}`}>
+                          {tribe.published ? "Published" : "Editing"}
+                        </span>
+                      </td>
+                      <td>
+                        <div className="action-buttons">
+                          <button
+                            className="action-btn edit-btn"
+                            onClick={() => navigate(`/EditTribe/${tribe.tribe_id}`)}
+                          >
+                            Edit
+                          </button>
+                          <button
+                            className="action-btn delete-btn"
+                            onClick={() => handleDeleteClick(tribe)}
+                          >
+                            Delete
+                          </button>
+                        </div>
+                      </td>
+                    </tr>
+                  ))
+                ) : (
+                  <tr>
+                    <td colSpan="4" style={{ textAlign: 'center', padding: '2rem' }}>
+                      No tribes found
+                    </td>
+                  </tr>
+                )}
+              </tbody>
+            </table>
 
-        <div className="Tribes-table">
-          <div className="Tribes-table-header">
-            <span>Tribe</span>
-            <span>Timeline</span>
-            <span>Status</span>
-            <span>Actions</span>
-          </div>
+            <div className="pagination-container">
+              <Pagination
+                storiesPerPage={tribesPerPage}
+                totalStories={searchResults.length}
+                paginate={paginate}
+                currentPage={currentPage}
+              />
+            </div>
+          </>
+        )}
+      </div>
 
-          <div className="Tribes-table-body">
-            {currentTribes.length > 0 ? (
-              currentTribes.map((tribe, index) => (
-                <div
-                  key={tribe.tribe_id}
-                  className="Tribes-table-row"
-                  style={{ backgroundImage: `url(${backgrounds[index % backgrounds.length]})` }}
-                >
-                  <a href={tribe.tribe_references || "#"} target="_blank" rel="noopener noreferrer">
-                    {tribe.tribe_name}
-                  </a>
-                  <span>{`${tribe.start_year || "Unknown"} - ${tribe.end_year || "Present"}`}</span>
-                  <span className={`status ${tribe.published ? "published" : "editing"}`}>
-                    {tribe.published ? "Published" : "Editing"}
-                  </span>
-                  <div className="actions">
-                    <button onClick={() => navigate(`/EditTribe/${tribe.tribe_id}`)}>Edit</button>
-                    <button onClick={() => handleDeleteClick(tribe)}>Delete</button>
-                  </div>
-                </div>
-              ))
-            ) : (
-              <div className="Tribes-table-row empty-row">
-                <span>No tribes available.</span>
-              </div>
-            )}
-          </div>
-        </div>
-
-        {/* Pagination component */}
-        <Pagination
-          storiesPerPage={tribesPerPage}
-          totalStories={searchResults.length}
-          paginate={paginate}
-          currentPage={currentPage}
-        />
-
-        {/* Delete Confirmation Popup */}
-        {showDeletePopup && (
-          <div className="delete-popup-overlay">
-            <div className="delete-popup">
-              <p>
-                Are you sure you want to delete <strong>{selectedTribe.tribe_name}</strong>?
-              </p>
-              <div className="delete-popup-buttons">
-                <button className="cancel-button" onClick={() => setShowDeletePopup(false)}>
-                  Cancel
-                </button>
-                <button className="confirm-button" onClick={confirmDelete}>Delete</button>
-              </div>
+      {/* Delete Confirmation Modal */}
+      {showDeletePopup && (
+        <div className="modal-overlay">
+          <div className="modal-content">
+            <h3>Confirm Deletion</h3>
+            <p>Are you sure you want to delete "{selectedTribe?.tribe_name}"?</p>
+            <div className="modal-buttons">
+              <button 
+                className="action-btn edit-btn"
+                onClick={() => setShowDeletePopup(false)}
+              >
+                Cancel
+              </button>
+              <button 
+                className="action-btn delete-btn"
+                onClick={confirmDelete}
+              >
+                Delete
+              </button>
             </div>
           </div>
-        )}
-      </main>
-    </div>
-  );
-};
-
-const ManageTribes = () => {
-  return (
-    <div className="ManageTribes">
-      <div className="div">
-        <Header />
-        <HeroManageTribes />
-      </div>
-      <Footer />
-    </div>
+        </div>
+      )}
+    </DashboardLayout>
   );
 };
 
