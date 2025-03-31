@@ -1,9 +1,10 @@
-import React, { useState, useCallback, useEffect, useRef } from "react";
+import React, { useState, useCallback, useEffect } from "react";
 import MapGL, { Source, Layer, NavigationControl } from "react-map-gl";
 import { FlyToInterpolator } from "react-map-gl";
 import "mapbox-gl/dist/mapbox-gl.css";
 import "../styles/mapBox.css";
 import SidePanel from "./SidePanel";
+import TimelineSlider from "./TimelineSlider";
 
 const MapBoxComponent = () => {
   const [viewport, setViewport] = useState({
@@ -27,8 +28,10 @@ const MapBoxComponent = () => {
   const [mapStyle, setMapStyle] = useState(
     "mapbox://styles/kodalis2/cm7kvvsfl00x601qo0597eedp"
   );
-  const [selectedYear, setSelectedYear] = useState(1900);
-  const timelineRef = useRef(null);
+  const [yearRange, setYearRange] = useState({
+    startYear: 1900,
+    endYear: new Date().getFullYear()
+  });
   const [filteredStories, setFilteredStories] = useState(null);
   const [selectedTribe, setSelectedTribe] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
@@ -111,25 +114,19 @@ const MapBoxComponent = () => {
     fetchData();
   }, []);
 
-  // Filter stories when selectedYear changes
+  // Filter stories when year range changes
   useEffect(() => {
     if (!storiesData) return;
     
-    if (selectedYear !== null) {
-      const nextInterval = years.find((year) => year > selectedYear);
-      const filtered = {
-        ...storiesData,
-        features: storiesData.features.filter((story) => {
-          const storyYear = story.properties.year;
-          return (
-            storyYear >= selectedYear &&
-            (nextInterval ? storyYear < nextInterval : true)
-          );
-        }),
-      };
-      setFilteredStories(filtered);
-    }
-  }, [selectedYear, storiesData]);
+    const filtered = {
+      ...storiesData,
+      features: storiesData.features.filter((story) => {
+        const storyYear = story.properties.year;
+        return storyYear >= yearRange.startYear && storyYear <= yearRange.endYear;
+      }),
+    };
+    setFilteredStories(filtered);
+  }, [yearRange, storiesData]);
 
   // Update map style based on 3D toggle
   useEffect(() => {
@@ -149,6 +146,13 @@ const MapBoxComponent = () => {
       features && features.length > 0 ? features[0].id : null
     );
   }, []);
+
+  const handleYearRangeChange = (startYear, endYear) => {
+    setYearRange({
+      startYear: startYear,
+      endYear: endYear
+    });
+  };
 
   const fillLayer = {
     id: "tribe-fill",
@@ -201,16 +205,6 @@ const MapBoxComponent = () => {
     },
   };
 
-  // Handle scrolling left/right without triggering map interactions
-  const scrollTimeline = (direction, event) => {
-    if (timelineRef.current) {
-      event.preventDefault(); // Prevent default browser behavior
-      event.stopPropagation(); // Prevent map click events
-      const scrollAmount = timelineRef.current.offsetWidth / 2; // Scroll half the container width
-      timelineRef.current.scrollLeft += direction * scrollAmount;
-    }
-  };
-
   // Define Layer for Stories (will only be shown when isStoriesOn is true)
   const storiesLayer = {
     id: "stories-layer",
@@ -236,10 +230,8 @@ const MapBoxComponent = () => {
       const tribeId = clickedFeature.id;
       console.log("Clicked on tribe:", tribeId);
       fetchTribeStoriesData(tribeId);
-
     }
-
-  }
+  };
 
   const fetchTribeStoriesData = async (id) => {
     try {
@@ -317,54 +309,21 @@ const MapBoxComponent = () => {
           </div>
         </div>
 
-        {/* Timeline */}
-        <div
-          className="timeline-container"
-          style={{ position: "absolute", bottom: 80 }}
-        >
-          <button
-            className="timeline-arrow left"
-            onClick={(e) => {
-              scrollTimeline(-1, e);
-              e.stopPropagation();
-            }}
-            onDoubleClick={(e) => {
-              e.preventDefault();
-              e.stopPropagation();
-            }}
-          >
-            &lt;
-          </button>
-
-          <div className="timeline-years" ref={timelineRef}>
-            {years.map((year) => (
-              <span
-                key={year}
-                className={`timeline-year ${
-                  selectedYear === year ? "active" : ""
-                }`}
-                onClick={() => setSelectedYear(year)}
-              >
-                {year}
-              </span>
-            ))}
-          </div>
-
-          <button
-            className="timeline-arrow right"
-            onClick={(e) => {
-              scrollTimeline(1, e);
-              e.stopPropagation();
-            }}
-            onDoubleClick={(e) => {
-              e.preventDefault();
-              e.stopPropagation();
-            }}
-          >
-            &gt;
-          </button>
-        </div>
-
+        {/* Timeline Slider */}
+        {isStoriesOn && filteredStories && (
+           <div
+           className="timeline-slider-wrapper"
+           style={{ position: "absolute", bottom: 20, left: 0, right: 0, margin: "0 auto", width: "80%" }}
+         >
+           <TimelineSlider 
+             years={years}
+             onRangeChange={handleYearRangeChange}
+             initialStartYear={yearRange.startYear}
+             initialEndYear={yearRange.endYear}
+           />
+         </div>
+        )}
+       
         {/* Side Panel for tribes and stories */}
         {selectedTribe && (
           <SidePanel
