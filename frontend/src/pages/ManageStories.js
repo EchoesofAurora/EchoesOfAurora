@@ -18,8 +18,16 @@ const ManageStories = () => {
   const [error, setError] = useState(null);
   const [currentPage, setCurrentPage] = useState(1);
   const [storiesPerPage] = useState(10);
+  const [statusUpdating, setStatusUpdating] = useState(false);
   
   const navigate = useNavigate();
+
+  // Background colors for alternating rows - matching ManageTribes
+  const rowBackgroundColors = [
+    "#f9f0ff", // Lavender whisper  
+    "#f0f9ff", // Baby blue  
+    "#f0fff4"  // Mint cream  
+  ];
 
   useEffect(() => {
     const fetchTribes = async () => {
@@ -60,7 +68,8 @@ const ManageStories = () => {
     fetchStories();
   }, []);
 
-  const handleDeleteClick = (story) => {
+  const handleDeleteClick = (story, e) => {
+    e.stopPropagation(); // Prevent row click navigation
     setSelectedStory(story);
     setShowDeleteModal(true);
   };
@@ -179,9 +188,77 @@ const ManageStories = () => {
   const currentStories = searchResults.slice(indexOfFirstStory, indexOfLastStory);
   const paginate = (pageNumber) => setCurrentPage(pageNumber);
 
+  // Handle row click to navigate to edit page
+  const handleRowClick = (story) => {
+    navigate(`/EditStory/${story.story_id}`);
+  };
+
+  const handleStatusChange = async (story, newPublishStatus, e) => {
+    e.stopPropagation(); // Prevent row click navigation
+    
+    setStatusUpdating(true);
+    try {
+      // First, get the full story data
+      const getResponse = await fetch(`/api/admin/stories/${story.story_id}`);
+      if (!getResponse.ok) {
+        throw new Error(`Failed to fetch story data: ${getResponse.statusText}`);
+      }
+      const fullStory = await getResponse.json();
+      
+      // Update only the published field
+      const storyData = {
+        story_name: fullStory.story_name,
+        tribe_id: fullStory.tribe_id,
+        story_year: fullStory.story_year,
+        story_text: fullStory.story_text,
+        story_references: fullStory.story_references,
+        published: newPublishStatus
+      };
+      
+      // Use the existing PUT endpoint
+      const response = await fetch(`/api/admin/stories/${story.story_id}`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(storyData),
+      });
+      
+      if (!response.ok) {
+        throw new Error(`Failed to update story status: ${response.statusText}`);
+      }
+      
+      // Update state locally
+      const updatedStories = stories.map(s => {
+        if (s.story_id === story.story_id) {
+          return { ...s, published: newPublishStatus };
+        }
+        return s;
+      });
+      
+      setStories(updatedStories);
+      setSearchResults(
+        searchResults.map(s => {
+          if (s.story_id === story.story_id) {
+            return { ...s, published: newPublishStatus };
+          }
+          return s;
+        })
+      );
+      
+      // Show success message
+      setError(`"${story.story_name}" has been ${newPublishStatus ? "published" : "unpublished"} successfully.`);
+      setShowErrorModal(true);
+      
+    } catch (err) {
+      console.error("Error updating story status:", err);
+      setError(`Failed to update story status: ${err.message}`);
+      setShowErrorModal(true);
+    } finally {
+      setStatusUpdating(false);
+    }
+  };
+
   return (
     <DashboardLayout activeTab="stories">
-      {/* Stories Management Content */}
       <div className="manage-stories-container">
         <div className="search-filter-container">
           <AdminStorySearchBar 
@@ -213,8 +290,16 @@ const ManageStories = () => {
               </thead>
               <tbody>
                 {currentStories.length > 0 ? (
-                  currentStories.map((story) => (
-                    <tr key={story.story_id}>
+                  currentStories.map((story, index) => (
+                    <tr 
+                      key={story.story_id}
+                      style={{ 
+                        backgroundColor: rowBackgroundColors[index % rowBackgroundColors.length],
+                        cursor: 'pointer'
+                      }}
+                      onClick={() => handleRowClick(story)}
+                      className="story-row"
+                    >
                       <td>{story.story_name}</td>
                       <td>{tribes[story.tribe_id] || "Unknown"}</td>
                       <td>{story.story_year || "N/A"}</td>
@@ -225,15 +310,24 @@ const ManageStories = () => {
                       </td>
                       <td>
                         <div className="action-buttons">
-                          <button
-                            className="action-btn edit-btn"
-                            onClick={() => navigate(`/EditStory/${story.story_id}`)}
-                          >
-                            Edit
-                          </button>
+                          {story.published ? (
+                            <button
+                              className="action-btn unpublish-btn"
+                              onClick={(e) => handleStatusChange(story, false, e)}
+                            >
+                              Unpublish
+                            </button>
+                          ) : (
+                            <button
+                              className="action-btn publish-btn"
+                              onClick={(e) => handleStatusChange(story, true, e)}
+                            >
+                              Publish
+                            </button>
+                          )}
                           <button
                             className="action-btn delete-btn"
-                            onClick={() => handleDeleteClick(story)}
+                            onClick={(e) => handleDeleteClick(story, e)}
                           >
                             Delete
                           </button>
@@ -287,10 +381,10 @@ const ManageStories = () => {
         </div>
       )}
 
-      {/* Error Modal */}
+      {/* Status/Error Modal */}
       <Modal show={showErrorModal} onHide={() => setShowErrorModal(false)} centered>
         <Modal.Header closeButton>
-          <Modal.Title>Error</Modal.Title>
+          <Modal.Title>{error && error.includes("Failed") ? "Error" : "Status Update"}</Modal.Title>
         </Modal.Header>
         <Modal.Body>{error}</Modal.Body>
         <Modal.Footer>
@@ -302,6 +396,14 @@ const ManageStories = () => {
           </button>
         </Modal.Footer>
       </Modal>
+      
+      {/* Loading overlay for status updates */}
+      {statusUpdating && (
+        <div className="status-updating-overlay">
+          <div className="status-updating-spinner"></div>
+          <p>Updating story status...</p>
+        </div>
+      )}
     </DashboardLayout>
   );
 };
