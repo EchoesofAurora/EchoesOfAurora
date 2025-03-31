@@ -10,6 +10,7 @@ import "leaflet/dist/leaflet.css";
 import { Modal, Button } from "react-bootstrap";
 import { useNavigate } from "react-router-dom"; 
 import ImageUpload from "../components/ImageUpload"; 
+import ReferenceLinks from "../components/ReferenceLinks";
 
 const MapWithDrawing = ({ isDrawingEnabled, onShapeUpdate, drawnShape, tempMarkers, setTempMarkers }) => {
   useMapEvents({
@@ -349,7 +350,7 @@ const HeroAddingTribe = () => {
                       setEndDate(date);
                       if (date) {
                         setErrors({...errors, endDate: ""});
-                      }
+                      } 
                     }} 
                     showYearPicker 
                     dateFormat="yyyy" 
@@ -455,22 +456,22 @@ const HeroAddingTribe = () => {
             </div>
 
             <div className="adding-tribe-form-group" ref={referencesRef}>
-              <label htmlFor="referenceLinks" className="adding-tribe-label">Reference <span style={{ color: 'red' }}>*</span></label>
-              <input
-                type="text"
-                id="referenceLinks"
-                className={`adding-tribe-input ${errors.referenceLinks ? 'input-error' : ''}`}
-                placeholder="Enter reference links"
-                value={referenceLinks}
-                onChange={(e) => {
-                  setReferenceLinks(e.target.value);
-                  if (e.target.value.trim()) {
+              <label className="adding-tribe-label">References <span style={{ color: 'red' }}>*</span></label>
+              <ReferenceLinks 
+                initialLinks={referenceLinks} 
+                onChange={(links) => {
+                  setReferenceLinks(links);
+                  if (links.trim()) {
                     setErrors({...errors, referenceLinks: ""});
                   }
-                }}
-                style={errors.referenceLinks ? { border: '2px solid red' } : {}}
+                }} 
               />
-              {errors.referenceLinks && <div className="error-message" style={{ color: 'red', fontSize: '0.8rem', marginTop: '5px' }}>{errors.referenceLinks}</div>}
+              <p className="adding-tribe-upload-instruction">Add one or more reference links</p>
+              {errors.referenceLinks && (
+                <div className="error-message" style={{ color: 'red', fontSize: '0.8rem', marginTop: '5px' }}>
+                  {errors.referenceLinks}
+                </div>
+              )}
             </div>
 
             <div className="adding-tribe-button-group">
