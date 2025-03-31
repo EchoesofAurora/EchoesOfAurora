@@ -1,17 +1,12 @@
   
   /* Hero section styles */
-   .contact-hero {   
-    background-image: url('../images/contactus/img32.jpg');
+  .contact-hero {   
+    background-image: linear-gradient(rgba(0, 0, 0, 0.2), rgba(0, 0, 0, 0.2)), 
+                      url('../images/contactus/img32.jpg');
     opacity: 80%;
     background-size: cover;
     background-position: center;
-  }
-  
-  .contact-hero h1 {
-    font-size: 4rem;
-    margin-bottom: 20px;
-    font-family: 'Texturina', serif;
-  }
+}
   
   /* Contact section styles */
   .contactus-page-contact-section {
@@ -81,28 +76,29 @@
     /* transition: border-color 0.3s, background-color 0.3s; */
   }
   
-  .form-group {
+  .contact-form-group {
     margin-bottom: 20px;
   }
   
-  .form-group label {
+  .contact-form-group label {
     display: block;
     margin-bottom: 5px;
     color: #333;
+    font-size: 1.5rem;
   }
   
-  .form-group input,
-  .form-group select,
-  .form-group textarea {
+  .contact-form-group input,
+  .contact-form-group select,
+  .contact-form-group textarea {
     width: 100%;
     padding: 10px;
-    /* border-radius: 5px; */
+    border: 2px solid #000;
+    border-radius: 5px;
     font-size: 16px;
     border-bottom: 2px solid #1a1a2e; /* Highlight color on focus */
-    background-color: transparent;
-  
-  
+    background-color: rgba(255, 255, 255, 0.7); /* Light background */
   }
+
   .line-container {
     display: flex;
     align-items: center;

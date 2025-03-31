@@ -11,9 +11,8 @@ function ContactPage() {
     return (
         <div className="contact-page long-section-background user-section-background long-section-background">
             <Header />
-            <div className="hero hero-section contact-hero">
-                <h1 className='hero-title'>Contact us</h1>
-                <p>Have questions, feedback, or stories to share?</p>
+            <div className="hero hero-section contact-hero smaller-hero-header user-section-shadow">
+                <h1 className='user-hero-title'>Contact us</h1>
             </div>
             <div className="contactus-page-body-section">
                 {/* ... existing contact details ... */}
@@ -91,15 +90,15 @@ const ContactForm = () => {
     return (
         <div className="contact-form">
             <form ref={form} onSubmit={sendEmail}>
-                <div className="form-group">
+                <div className="contact-form-group">
                     <label htmlFor="name">Your name</label>
                     <input type="text" id="name" name="name" placeholder="John Smith" required />
                 </div>
-                <div className="form-group">
+                <div className="contact-form-group">
                     <label htmlFor="email">Your email</label>
                     <input type="email" id="email" name="email" placeholder="email@gmail.com" required />
                 </div>
-                <div className="form-group">
+                <div className="contact-form-group">
                     <label htmlFor="topic">Your Topic</label>
                     <select id="topic" name="topic" required>
                         <option value="">Selection</option>
@@ -108,15 +107,15 @@ const ContactForm = () => {
                         <option value="feedback">Feedback</option>
                     </select>
                 </div>
-                <div className="form-group">
+                <div className="contact-form-group">
                     <label htmlFor="phone">Your phone no</label>
                     <input type="tel" id="phone" name="phone" placeholder="+12332432333" required />
                 </div>
-                <div className="form-group">
+                <div className="contact-form-group">
                     <label htmlFor="message">Your message</label>
                     <textarea id="message" name="message" placeholder="Type your message here..." required></textarea>
                 </div>
-                <button type="submit">Send Message</button>
+                <button className="button" type="submit">Send Message</button>
             </form>
         </div>
     );

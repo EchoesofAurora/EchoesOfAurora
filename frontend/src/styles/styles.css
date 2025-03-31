@@ -108,7 +108,7 @@
 .button {
     background: #48d4e7;
     padding: 10px 20px;
-    border: none;
+    border: 1px solid #28a4b7;
     border-radius: 5px;
     color: #fff;
     text-transform: uppercase;
