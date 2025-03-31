@@ -31,14 +31,11 @@ const HeroSection = () => {
 
   return (
 
-    <section className="user-hero user-hero-section user-section-background"
+    <section className="user-hero user-hero-section user-section-background smaller-hero-header"
              style={{
                background: `url(${images[currentImageIndex]}) no-repeat center center/cover`,
              }}>
       <h1 className="user-hero-title">Echoes of Aurora</h1>
-      <p className="user-hero-subtext">
-        Welcome to "Echoes of Aurora", where we catalog and display North American indigenous storytelling about the aurora borealis with historical space weather data.
-      </p>
     </section>
   );
 };
@@ -58,7 +55,7 @@ const AboutSection = () => {
         <div className="about-text">
           <h2 className="user-section-title">About This Project</h2>
           <p className='user-section-intro-description block-align'>
-            Welcome to a unique fusion of science, culture, and storytelling. This platform brings together indigenous knowledge and modern space weather research to explore the fascinating phenomena of the aurora borealis. Through interactive tools and real-life stories, we aim to educate, inspire, and celebrate the rich cultural heritage connected to the northern lights.
+            Welcome to "Echoes of Aurora", where we catalog and display North American indigenous storytelling about the aurora borealis with historical space weather data. This platform brings together indigenous knowledge and modern space weather research to explore the fascinating phenomena of the aurora borealis. Through interactive tools and real-life stories, we aim to educate, inspire, and celebrate the rich cultural heritage connected to the northern lights.
             <br></br>
             Discover more about auroras and the legends that surround them, as we bridge the gap between ancient traditions and cutting-edge science.
           </p>
