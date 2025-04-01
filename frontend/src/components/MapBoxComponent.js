@@ -243,7 +243,7 @@ const MapBoxComponent = () => {
     type: "circle",
     paint: {
       "circle-radius": screenSize.isMobile ? 4 : 6, // Smaller circles on mobile
-      "circle-color": "#1E90FF", // Blue color for stories
+      "circle-color": "#B366FF", // Blue color for stories
       "circle-stroke-width": screenSize.isMobile ? 1 : 2, // Thinner stroke on mobile
       "circle-stroke-color": "#ffffff",
     },
@@ -288,7 +288,7 @@ const MapBoxComponent = () => {
       } else {
         // For desktop: move timeline to right side
         return {
-          bottom: 100,
+          bottom: 10,
           right: 350, // Adjust based on your side panel width
           left: 'auto',
           width: "40%"
@@ -297,7 +297,7 @@ const MapBoxComponent = () => {
     } else {
       // Default position when side panel is closed
       return {
-        bottom: screenSize.isMobile ? 60 : 100,
+        bottom: screenSize.isMobile ? 60 : 50,
         left: 0,
         right: 0,
         margin: "0 auto",
@@ -514,16 +514,17 @@ const MapBoxComponent = () => {
               zIndex: 5,
               paddingBottom: "10px",
               transition: "all 0.3s ease-in-out",
+
               ...timelinePosition
             }}
           >
-            <TimelineSlider 
+            {/* <TimelineSlider 
               years={years}
               onRangeChange={handleYearRangeChange}
               initialStartYear={yearRange.startYear}
               initialEndYear={yearRange.endYear}
               isMobile={screenSize.isMobile}
-            />
+            /> */}
           </div>
         )}
        

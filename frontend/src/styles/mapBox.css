@@ -404,3 +404,7 @@ input:checked + .slider:before {
     font-size: 18px;
   }
 }
+
+.switch input:checked + .slider {
+  background-color: purple; /* Or use a specific purple hex/rgb value */
+}
