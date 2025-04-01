@@ -273,6 +273,42 @@ const MapBoxComponent = () => {
     } 
   };
 
+  // Calculate timeline position based on whether side panel is open
+  const getTimelinePosition = () => {
+    if (selectedTribe) {
+      // When side panel is open
+      if (screenSize.isMobile) {
+        // For mobile: move timeline to bottom-right
+        return {
+          bottom: 60,
+          right: 10,
+          left: 'auto',
+          width: "60%"
+        };
+      } else {
+        // For desktop: move timeline to right side
+        return {
+          bottom: 100,
+          right: 350, // Adjust based on your side panel width
+          left: 'auto',
+          width: "40%"
+        };
+      }
+    } else {
+      // Default position when side panel is closed
+      return {
+        bottom: screenSize.isMobile ? 60 : 100,
+        left: 0,
+        right: 0,
+        margin: "0 auto",
+        width: screenSize.isMobile ? "95%" : "50%"
+      };
+    }
+  };
+
+  // Get timeline position
+  const timelinePosition = getTimelinePosition();
+
   return (
     <div 
       ref={mapContainerRef} 
@@ -316,20 +352,107 @@ const MapBoxComponent = () => {
           </Source>
         )}
 
-        {/* Navigation Control - Responsive position */}
+        {/* Custom Horizontal Navigation Controls */}
         <div 
           style={{ 
             position: "absolute", 
             top: screenSize.isMobile ? 60 : 90, 
             right: screenSize.isMobile ? 10 : 50,
-            zIndex: 5 
+            zIndex: 5,
+            display: "flex",
+            flexDirection: "row",
+            backgroundColor: "white",
+            borderRadius: "4px",
+            padding: "0",
+            boxShadow: "0 0 0 2px rgba(0,0,0,0.1)",
           }}
         >
-          <NavigationControl 
-            showZoom 
-            showCompass 
-            style={{ width: screenSize.isMobile ? "28px" : "38px" }} 
-          />
+          {/* Custom Zoom In Button */}
+          <button 
+            className="mapboxgl-ctrl-zoom-in" 
+            aria-label="Zoom In"
+            style={{
+              width: screenSize.isMobile ? "28px" : "30px",
+              height: screenSize.isMobile ? "28px" : "30px",
+              border: "none",
+              borderRight: "1px solid rgba(0,0,0,0.1)",
+              background: "white",
+              cursor: "pointer",
+              padding: "5px",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center"
+            }}
+            onClick={() => {
+              setViewport(prev => ({
+                ...prev,
+                zoom: prev.zoom + 1,
+                transitionDuration: 200
+              }));
+            }}
+          >
+            <span style={{ fontSize: "18px", fontWeight: "bold" }}>+</span>
+          </button>
+          
+          {/* Custom Zoom Out Button */}
+          <button 
+            className="mapboxgl-ctrl-zoom-out" 
+            aria-label="Zoom Out"
+            style={{
+              width: screenSize.isMobile ? "28px" : "30px",
+              height: screenSize.isMobile ? "28px" : "30px",
+              border: "none",
+              borderRight: "1px solid rgba(0,0,0,0.1)",
+              background: "white",
+              cursor: "pointer",
+              padding: "5px",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center"
+            }}
+            onClick={() => {
+              setViewport(prev => ({
+                ...prev,
+                zoom: prev.zoom - 1,
+                transitionDuration: 200
+              }));
+            }}
+          >
+            <span style={{ fontSize: "18px", fontWeight: "bold" }}>−</span>
+          </button>
+          
+          {/* Custom Compass Button */}
+          <button 
+            className="mapboxgl-ctrl-compass" 
+            aria-label="Reset Bearing to North"
+            style={{
+              width: screenSize.isMobile ? "28px" : "30px",
+              height: screenSize.isMobile ? "28px" : "30px",
+              border: "none",
+              background: "white",
+              cursor: "pointer",
+              padding: "5px",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center"
+            }}
+            onClick={() => {
+              setViewport(prev => ({
+                ...prev,
+                bearing: 0,
+                pitch: 0,
+                transitionDuration: 500
+              }));
+            }}
+          >
+            <svg 
+              viewBox="0 0 20 20" 
+              style={{ width: "20px", height: "20px" }}
+            >
+              <polygon points="6,9 10,1 14,9" style={{ fill: "black" }}></polygon>
+              <polygon points="6,11 10,19 14,11" style={{ fill: "gray" }}></polygon>
+            </svg>
+          </button>
         </div>
 
         {/* Mobile Controls Toggle Button */}
@@ -382,19 +505,16 @@ const MapBoxComponent = () => {
           </div>
         )}
 
-        {/* Timeline Slider - Responsive */}
+        {/* Timeline Slider - Repositioned when side panel is open */}
         {isStoriesOn && filteredStories && (screenSize.isMobile ? showControls : true) && (
           <div
             className="timeline-slider-wrapper"
             style={{ 
-              position: "absolute", 
-              bottom: screenSize.isMobile ? 60 : 100, 
-              left: 0, 
-              right: 0, 
-              margin: "0 auto", 
-              width: screenSize.isMobile ? "95%" : "50%",
+              position: "absolute",
               zIndex: 5,
-              paddingBottom: "10px"
+              paddingBottom: "10px",
+              transition: "all 0.3s ease-in-out",
+              ...timelinePosition
             }}
           >
             <TimelineSlider 
