@@ -4,14 +4,24 @@ import { FlyToInterpolator } from "react-map-gl";
 import "mapbox-gl/dist/mapbox-gl.css";
 import "../styles/mapBox.css";
 import SidePanel from "./SidePanel";
+import TimelineSlider from "./TimelineSlider"; // Import the TimelineSlider component
 
 const MapBoxComponent = () => {
+  const mapContainerRef = useRef(null);
+  
+  // State to track screen size
+  const [screenSize, setScreenSize] = useState({
+    width: typeof window !== 'undefined' ? window.innerWidth : 0,
+    height: typeof window !== 'undefined' ? window.innerHeight : 0,
+    isMobile: typeof window !== 'undefined' ? window.innerWidth < 768 : false
+  });
+
   const [viewport, setViewport] = useState({
     latitude: 60,
     longitude: -100,
     zoom: 1.6,
     width: "100%",
-    height: "800px",
+    height: "100vh",
     transitionDuration: 500,
     transitionInterpolator: new FlyToInterpolator(),
   });
@@ -27,25 +37,44 @@ const MapBoxComponent = () => {
   const [mapStyle, setMapStyle] = useState(
     "mapbox://styles/kodalis2/cm7kvvsfl00x601qo0597eedp"
   );
-  const [selectedYear, setSelectedYear] = useState(1900);
-  const timelineRef = useRef(null);
+  const [yearRange, setYearRange] = useState({
+    startYear: 1000,
+    endYear: new Date().getFullYear()
+  });
   const [filteredStories, setFilteredStories] = useState(null);
   const [selectedTribe, setSelectedTribe] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
+  const [showControls, setShowControls] = useState(true);
 
-  // Define year sequence from 1000 to 2025
+  // Define year constants
   const startYear = 1000;
   const currentYear = new Date().getFullYear();
-  const years = [];
+  
+  // Handle window resize
+  useEffect(() => {
+    const handleResize = () => {
+      const width = window.innerWidth;
+      const height = window.innerHeight;
+      setScreenSize({
+        width,
+        height,
+        isMobile: width < 768
+      });
+      
+      // Adjust viewport based on screen size
+      setViewport(prev => ({
+        ...prev,
+        width: "100%",
+        height: "100vh",
+        zoom: width < 768 ? 0.8 : 1.6, // Adjust zoom level for mobile
+      }));
+    };
 
-  for (let year = startYear; year <= currentYear; year += 100) {
-    years.push(year);
-  }
-
-  // Ensure currentYear is included if not already
-  if (years[years.length - 1] !== currentYear) {
-    years.push(currentYear);
-  }
+    window.addEventListener('resize', handleResize);
+    handleResize(); // Initial call
+    
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
 
   // Fetch tribes and stories data from API
   useEffect(() => {
@@ -57,8 +86,7 @@ const MapBoxComponent = () => {
         const data = await tribesResponse.json();
 
         const tribesJson = data["tribes"];
-        console.log("Tribes data:", tribesJson);
-
+        
         // Transform tribes data to match expected format
         const transformedTribesData = {
           type: "FeatureCollection",
@@ -75,12 +103,9 @@ const MapBoxComponent = () => {
           }))
         };
         setTribesData(transformedTribesData);
-        console.log("Transformed tribes data:", transformedTribesData);
         
         // Fetch stories data
         const storiesJson = data["stories"];
-        console.log("stories data:", storiesData);
-
 
         // Transform stories data to match expected format
         const transformedStoriesData = {
@@ -98,7 +123,6 @@ const MapBoxComponent = () => {
             geometry: story.geometry
           }))
         };
-        console.log("Transformed stories data:", transformedStoriesData);
         setStoriesData(transformedStoriesData);
         setFilteredStories(transformedStoriesData);
       } catch (error) {
@@ -111,25 +135,19 @@ const MapBoxComponent = () => {
     fetchData();
   }, []);
 
-  // Filter stories when selectedYear changes
+  // Filter stories when year range changes
   useEffect(() => {
     if (!storiesData) return;
     
-    if (selectedYear !== null) {
-      const nextInterval = years.find((year) => year > selectedYear);
-      const filtered = {
-        ...storiesData,
-        features: storiesData.features.filter((story) => {
-          const storyYear = story.properties.year;
-          return (
-            storyYear >= selectedYear &&
-            (nextInterval ? storyYear < nextInterval : true)
-          );
-        }),
-      };
-      setFilteredStories(filtered);
-    }
-  }, [selectedYear, storiesData]);
+    const filtered = {
+      ...storiesData,
+      features: storiesData.features.filter((story) => {
+        const storyYear = story.properties.year;
+        return storyYear >= yearRange.startYear && storyYear <= yearRange.endYear;
+      }),
+    };
+    setFilteredStories(filtered);
+  }, [yearRange, storiesData]);
 
   // Update map style based on 3D toggle
   useEffect(() => {
@@ -142,6 +160,7 @@ const MapBoxComponent = () => {
 
   const handleToggle = () => setIs3dOn(!is3dOn);
   const handleStoriesToggle = () => setIsStoriesOn(!isStoriesOn);
+  const toggleControls = () => setShowControls(!showControls);
 
   const handleHover = useCallback((event) => {
     const features = event.features;
@@ -149,6 +168,70 @@ const MapBoxComponent = () => {
       features && features.length > 0 ? features[0].id : null
     );
   }, []);
+
+  const handleClick = (event) => {
+    const features = event.features;
+    if (features && features.length > 0) {
+      const clickedFeature = features[0];
+      const tribeId = clickedFeature.id;
+      fetchTribeStoriesData(tribeId);
+    }
+  };
+
+  const fetchTribeStoriesData = async (id) => {
+    try {
+      // Fetch tribes data
+      const tribesResponse = await fetch('api/mapData/tribes/' + id);
+      const data = await tribesResponse.json();
+      setSelectedTribe(data);
+    } catch (error) {
+      console.error("Error fetching data:", error);
+    } 
+  };
+
+  // Handle year range change from timeline slider
+  const handleYearRangeChange = (newRange) => {
+    setYearRange(newRange);
+  };
+
+  // Calculate timeline position based on whether side panel is open
+  const getTimelineStyles = () => {
+    if (selectedTribe) {
+      // When side panel is open
+      if (screenSize.isMobile) {
+        // For mobile: move timeline to bottom-right with more space from bottom
+        return {
+          position: "fixed", // Changed from absolute to fixed
+          bottom: 100,      // Increased from 60 to 100 for better visibility
+          right: 10,
+          left: 'auto',
+          width: "60%",
+          zIndex: 50       // Increased z-index
+        };
+      } else {
+        // For desktop: move timeline to right side with more space from bottom
+        return {
+          position: "fixed", // Changed from absolute to fixed
+          bottom: 40,       // Increased from 10 to 40
+          right: 350,       // Adjusted based on side panel width
+          left: 'auto',
+          width: "40%",
+          zIndex: 50        // Increased z-index
+        };
+      }
+    } else {
+      // Default position when side panel is closed
+      return {
+        position: "fixed",  // Changed from absolute to fixed
+        bottom: 80,         // Increased from 20 to 80
+        left: "50%",
+        transform: "translateX(-50%)",
+        width: screenSize.isMobile ? "95%" : "60%",
+        maxWidth: "800px",
+        zIndex: 50          // Increased z-index
+      };
+    }
+  };
 
   const fillLayer = {
     id: "tribe-fill",
@@ -189,7 +272,7 @@ const MapBoxComponent = () => {
     layout: {
       "text-field": ["coalesce", ["get", "Name"], "Unnamed"],
       "text-font": ["Open Sans Bold", "Arial Unicode MS Bold"],
-      "text-size": 12,
+      "text-size": screenSize.isMobile ? 10 : 12, // Smaller text on mobile
       "text-offset": [0, 0.8],
       "text-anchor": "top",
       "symbol-placement": "point",
@@ -201,24 +284,14 @@ const MapBoxComponent = () => {
     },
   };
 
-  // Handle scrolling left/right without triggering map interactions
-  const scrollTimeline = (direction, event) => {
-    if (timelineRef.current) {
-      event.preventDefault(); // Prevent default browser behavior
-      event.stopPropagation(); // Prevent map click events
-      const scrollAmount = timelineRef.current.offsetWidth / 2; // Scroll half the container width
-      timelineRef.current.scrollLeft += direction * scrollAmount;
-    }
-  };
-
   // Define Layer for Stories (will only be shown when isStoriesOn is true)
   const storiesLayer = {
     id: "stories-layer",
     type: "circle",
     paint: {
-      "circle-radius": 6,
-      "circle-color": "#1E90FF", // Blue color for stories
-      "circle-stroke-width": 2,
+      "circle-radius": screenSize.isMobile ? 4 : 6, // Smaller circles on mobile
+      "circle-color": "#B366FF", // Purple color for stories
+      "circle-stroke-width": screenSize.isMobile ? 1 : 2, // Thinner stroke on mobile
       "circle-stroke-color": "#ffffff",
     },
   };
@@ -227,34 +300,15 @@ const MapBoxComponent = () => {
     return <div className="loading">Loading map data...</div>;
   }
 
-  const handleClick = (event) => {
-    console.log("Clicked on map:", event);
-    const features = event.features;
-    console.log("Clicked on features:", features);
-    if (features && features.length > 0) {
-      const clickedFeature = features[0];
-      const tribeId = clickedFeature.id;
-      console.log("Clicked on tribe:", tribeId);
-      fetchTribeStoriesData(tribeId);
-
-    }
-
-  }
-
-  const fetchTribeStoriesData = async (id) => {
-    try {
-      // Fetch tribes data
-      const tribesResponse = await fetch('api/mapData/tribes/' + id);
-      const data = await tribesResponse.json();
-      console.log("Tribe data:", data);
-      setSelectedTribe(data);
-    } catch (error) {
-      console.error("Error fetching data:", error);
-    } 
-  };
+  // Get timeline position styles
+  const timelineStyles = getTimelineStyles();
 
   return (
-    <div style={{ width: "100%", height: "100vh", position: "relative" }}>
+    <div 
+      ref={mapContainerRef} 
+      className="map-container" 
+      style={{ width: "100%", height: "100vh", position: "relative" }}
+    >
       <MapGL
         {...viewport}
         mapboxApiAccessToken={process.env.REACT_APP_MAPBOX_TOKEN}
@@ -292,87 +346,181 @@ const MapBoxComponent = () => {
           </Source>
         )}
 
-        {/* Navigation Control */}
-        <div style={{ position: "absolute", bottom: 100, right: 50 }}>
-          <NavigationControl showZoom showCompass />
-        </div>
-
-        {/* 3D and Stories Toggle */}
-        <div style={{ position: "absolute", top: 10, right: 10 }}>
-          <div className="toggle-container">
-            <span className="status-text">{"3D"}</span>
-            <label className="switch">
-              <input type="checkbox" checked={is3dOn} onChange={handleToggle} />
-              <span className="slider"></span>
-            </label>
-            <span className="status-text">{"Stories"}</span>
-            <label className="switch">
-              <input
-                type="checkbox"
-                checked={isStoriesOn}
-                onChange={handleStoriesToggle}
-              />
-              <span className="slider"></span>
-            </label>
-          </div>
-        </div>
-
-        {/* Timeline */}
-        <div
-          className="timeline-container"
-          style={{ position: "absolute", bottom: 80 }}
+        {/* Navigation Controls */}
+        <div 
+          style={{ 
+            position: "absolute", 
+            top: screenSize.isMobile ? 60 : 90, 
+            right: screenSize.isMobile ? 10 : 50,
+            zIndex: 5,
+            display: "flex",
+            flexDirection: "row",
+            backgroundColor: "white",
+            borderRadius: "4px",
+            padding: "0",
+            boxShadow: "0 0 0 2px rgba(0,0,0,0.1)",
+          }}
         >
-          <button
-            className="timeline-arrow left"
-            onClick={(e) => {
-              scrollTimeline(-1, e);
-              e.stopPropagation();
+          {/* Custom Zoom In Button */}
+          <button 
+            className="mapboxgl-ctrl-zoom-in" 
+            aria-label="Zoom In"
+            style={{
+              width: screenSize.isMobile ? "28px" : "30px",
+              height: screenSize.isMobile ? "28px" : "30px",
+              border: "none",
+              borderRight: "1px solid rgba(0,0,0,0.1)",
+              background: "white",
+              cursor: "pointer",
+              padding: "5px",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center"
             }}
-            onDoubleClick={(e) => {
-              e.preventDefault();
-              e.stopPropagation();
+            onClick={() => {
+              setViewport(prev => ({
+                ...prev,
+                zoom: prev.zoom + 1,
+                transitionDuration: 200
+              }));
             }}
           >
-            &lt;
+            <span style={{ fontSize: "18px", fontWeight: "bold" }}>+</span>
           </button>
-
-          <div className="timeline-years" ref={timelineRef}>
-            {years.map((year) => (
-              <span
-                key={year}
-                className={`timeline-year ${
-                  selectedYear === year ? "active" : ""
-                }`}
-                onClick={() => setSelectedYear(year)}
-              >
-                {year}
-              </span>
-            ))}
-          </div>
-
-          <button
-            className="timeline-arrow right"
-            onClick={(e) => {
-              scrollTimeline(1, e);
-              e.stopPropagation();
+          
+          {/* Custom Zoom Out Button */}
+          <button 
+            className="mapboxgl-ctrl-zoom-out" 
+            aria-label="Zoom Out"
+            style={{
+              width: screenSize.isMobile ? "28px" : "30px",
+              height: screenSize.isMobile ? "28px" : "30px",
+              border: "none",
+              borderRight: "1px solid rgba(0,0,0,0.1)",
+              background: "white",
+              cursor: "pointer",
+              padding: "5px",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center"
             }}
-            onDoubleClick={(e) => {
-              e.preventDefault();
-              e.stopPropagation();
+            onClick={() => {
+              setViewport(prev => ({
+                ...prev,
+                zoom: prev.zoom - 1,
+                transitionDuration: 200
+              }));
             }}
           >
-            &gt;
+            <span style={{ fontSize: "18px", fontWeight: "bold" }}>−</span>
+          </button>
+          
+          {/* Custom Compass Button */}
+          <button 
+            className="mapboxgl-ctrl-compass" 
+            aria-label="Reset Bearing to North"
+            style={{
+              width: screenSize.isMobile ? "28px" : "30px",
+              height: screenSize.isMobile ? "28px" : "30px",
+              border: "none",
+              background: "white",
+              cursor: "pointer",
+              padding: "5px",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center"
+            }}
+            onClick={() => {
+              setViewport(prev => ({
+                ...prev,
+                bearing: 0,
+                pitch: 0,
+                transitionDuration: 500
+              }));
+            }}
+          >
+            <svg 
+              viewBox="0 0 20 20" 
+              style={{ width: "20px", height: "20px" }}
+            >
+              <polygon points="6,9 10,1 14,9" style={{ fill: "black" }}></polygon>
+              <polygon points="6,11 10,19 14,11" style={{ fill: "gray" }}></polygon>
+            </svg>
           </button>
         </div>
 
-        {/* Side Panel for tribes and stories */}
+        {/* Mobile Controls Toggle Button */}
+        {screenSize.isMobile && (
+          <button
+            className="controls-toggle-btn"
+            onClick={toggleControls}
+            style={{
+              position: "absolute",
+              top: 10,
+              right: 10,
+              zIndex: 10,
+              background: "rgba(255, 255, 255, 0.8)",
+              border: "none",
+              borderRadius: "4px",
+              padding: "8px",
+              boxShadow: "0 2px 4px rgba(0, 0, 0, 0.2)"
+            }}
+          >
+            {showControls ? "Hide Controls" : "Show Controls"}
+          </button>
+        )}
+
+        {/* 3D and Stories Toggle - Responsive */}
+        {(screenSize.isMobile ? showControls : true) && (
+          <div 
+            style={{ 
+              position: "absolute", 
+              top: 10, 
+              right: 10,
+              zIndex: 5
+            }}
+          >
+            <div className="toggle-container">
+              <span>3D</span>
+              <label className="switch">
+                <input type="checkbox" checked={is3dOn} onChange={handleToggle} />
+                <span className="slider round"></span>
+              </label>
+              <span>Stories</span>
+              <label className="switch">
+                <input
+                  type="checkbox"
+                  checked={isStoriesOn}
+                  onChange={handleStoriesToggle}
+                />
+                <span className="slider round"></span>
+              </label>
+            </div>
+          </div>
+        )}
+       
+        {/* Side Panel for tribes and stories - Responsive */}
         {selectedTribe && (
           <SidePanel
             tribe={selectedTribe}
             onClose={() => setSelectedTribe(null)}
+            isMobile={screenSize.isMobile}
           />
         )}
       </MapGL>
+
+      {/* Timeline Slider Component - UPDATED */}
+      {isStoriesOn && filteredStories && (screenSize.isMobile ? showControls : true) && (
+        <div className="timeline-wrapper" style={timelineStyles}>
+          <TimelineSlider
+            startYear={startYear}
+            endYear={currentYear}
+            yearRange={yearRange}
+            onRangeChange={handleYearRangeChange}
+            isMobile={screenSize.isMobile}
+          />
+        </div>
+      )}
     </div>
   );
 };
