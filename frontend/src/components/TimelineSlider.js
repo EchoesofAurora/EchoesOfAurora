@@ -25,7 +25,7 @@ const TimelineSlider = ({ years, onRangeChange, initialStartYear, initialEndYear
 
   // Format the year label
   const formatYear = (year) => {
-    return year === maxYear ? `${year} (Present)` : year;
+    return year === maxYear ? `${year}` : year;
   };
   
   // Handle clicks on the timeline track (but not on thumbs or markers)
