@@ -1,10 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { FaTrash, FaArrowLeft } from "react-icons/fa";
-import Sidebar from "../components/Sidebar";
-import Header from "../components/AdminHeader";
 import { motion } from "framer-motion";
 import '../styles/SubmissionDetail.css';
+import '../styles/DashboardLayout.css';
+import DashboardLayout from "../components/DashboardLayout";
 
 const HeroSubmissionDetail = () => {
   const { id } = useParams();
@@ -71,65 +71,65 @@ const HeroSubmissionDetail = () => {
   }
 
   return (
-    <div className="overlap">
-      <Sidebar />
-      <main className="rightFrame-5">
-        <div className="sd-submission-detail-main">
-          <button className="sd-back-btn" onClick={() => navigate('/Admin/UserSubmissions')}>
-            <FaArrowLeft /> Back to Submissions
-          </button>
+    <div className="sd-submission-detail-main">
+      <button className="sd-back-btn" onClick={() => navigate('/Admin/UserSubmissions')}>
+        <FaArrowLeft /> Back to Submissions
+      </button>
 
-          <h1 className="sd-submission-subject">{submission.topic}</h1>
+      <h1 className="sd-submission-subject">{submission.topic}</h1>
 
-          <motion.div className="sd-submission-header">
-            <div className="sd-sender-info">
-              <div className="sd-sender-name">{submission.name}</div>
-              <div className="sd-sender-email">{submission.email}</div>
-            </div>
-            <div className="sd-submission-date">
-              {new Date(submission.created_at).toLocaleDateString('en-US', {
-                month: 'short',
-                day: 'numeric',
-                year: 'numeric',
-              })}
-            </div>
-          </motion.div>
-
-          <motion.div
-            className="sd-submission-content"
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.25, delay: 0.25 }}
-          >
-            <p>{submission.message}</p>
-          </motion.div>
-
-          <motion.div className="sd-submission-actions">
-            <motion.button
-              className="sd-action-btn sd-trash-btn"
-              onClick={handleDeleteClick}
-              disabled={isDeleting}
-              whileHover={{ scale: 1.05 }}
-              whileTap={{ scale: 0.95 }}
-            >
-              <FaTrash /> <span>{isDeleting ? 'Deleting...' : 'Trash'}</span>
-            </motion.button>
-          </motion.div>
+      <motion.div className="sd-submission-header">
+        <div className="sd-sender-info">
+          <div className="sd-sender-name">{submission.name}</div>
+          <div className="sd-sender-email">{submission.email}</div>
         </div>
-      </main>
+        <div className="sd-submission-date">
+          {new Date(submission.created_at).toLocaleDateString('en-US', {
+            month: 'short',
+            day: 'numeric',
+            year: 'numeric',
+          })}
+        </div>
+      </motion.div>
 
-      {/* Delete Confirmation Popup */}
+      <motion.div
+        className="sd-submission-content"
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.25, delay: 0.25 }}
+      >
+        <p>{submission.message}</p>
+      </motion.div>
+
+      <motion.div className="sd-submission-actions">
+        <motion.button
+          className="sd-action-btn sd-trash-btn"
+          onClick={handleDeleteClick}
+          disabled={isDeleting}
+          whileHover={{ scale: 1.05 }}
+          whileTap={{ scale: 0.95 }}
+        >
+          <FaTrash /> <span>{isDeleting ? 'Deleting...' : 'Trash'}</span>
+        </motion.button>
+      </motion.div>
+
+      {/* Delete Confirmation Modal */}
       {showDeleteModal && (
-        <div className="delete-popup-overlay">
-          <div className="delete-popup">
-            <p>
-              Are you sure you want to delete this submission?
-            </p>
-            <div className="delete-popup-buttons">
-              <button className="cancel-button" onClick={cancelDelete}>
+        <div className="modal-overlay">
+          <div className="modal-content">
+            <h3>Confirm Deletion</h3>
+            <p>Are you sure you want to delete this submission?</p>
+            <div className="modal-buttons">
+              <button 
+                className="action-btn edit-btn"
+                onClick={cancelDelete}
+              >
                 Cancel
               </button>
-              <button className="confirm-button" onClick={confirmDelete}>
+              <button 
+                className="action-btn delete-btn"
+                onClick={confirmDelete}
+              >
                 {isDeleting ? 'Deleting...' : 'Delete'}
               </button>
             </div>
@@ -142,12 +142,11 @@ const HeroSubmissionDetail = () => {
 
 const SubmissionDetail = () => {
   return (
-    <div className="ManageStories">
-      <div className="div">
-        <Header />
+    <DashboardLayout activeTab="submissions">
+      <div className="manage-stories-container">
         <HeroSubmissionDetail />
       </div>
-    </div>
+    </DashboardLayout>
   );
 };
 
