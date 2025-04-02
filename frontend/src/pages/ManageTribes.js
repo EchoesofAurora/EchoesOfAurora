@@ -251,7 +251,7 @@ const ManageTribes = () => {
                   <th>Tribe Name</th>
                   <th>Timeline</th>
                   <th>Status</th>
-                  <th>Actions</th>
+                  <th style={{textAlign: 'center'}}>Actions</th>
                 </tr>
               </thead>
               <tbody>
@@ -273,8 +273,8 @@ const ManageTribes = () => {
                           {tribe.published ? "Published" : "Editing"}
                         </span>
                       </td>
-                      <td onClick={(e) => e.stopPropagation()}>
-                        <div className="action-buttons">
+                      <td onClick={(e) => e.stopPropagation()} style={{textAlign: 'center'}}>
+                        <div className="action-buttons" style={{justifyContent: 'center'}}>
                           {tribe.published ? (
                             <button
                               className="action-btn unpublish-btn"

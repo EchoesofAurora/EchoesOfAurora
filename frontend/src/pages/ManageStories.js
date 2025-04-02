@@ -12,7 +12,6 @@ const ManageStories = () => {
   const [searchResults, setSearchResults] = useState([]);
   const [tribes, setTribes] = useState({});
   const [loading, setLoading] = useState(true);
-  const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [showErrorModal, setShowErrorModal] = useState(false);
   const [selectedStory, setSelectedStory] = useState(null);
   const [error, setError] = useState(null);
@@ -71,23 +70,93 @@ const ManageStories = () => {
   const handleDeleteClick = (story, e) => {
     e.stopPropagation(); // Prevent row click navigation
     setSelectedStory(story);
-    setShowDeleteModal(true);
+    const confirmDelete = window.confirm(`Are you sure you want to delete "${story.story_name}"?`);
+    
+    if (confirmDelete) {
+      deleteStory(story);
+    }
   };
 
-  const confirmDelete = async () => {
+  const deleteStory = async (story) => {
     try {
-      const response = await fetch(`/api/admin/stories/${selectedStory.story_id}`, {
+      const response = await fetch(`/api/admin/stories/${story.story_id}`, {
         method: "DELETE",
       });
+      
       if (!response.ok) throw new Error("Failed to delete story");
-      const updatedStories = stories.filter((story) => story.story_id !== selectedStory.story_id);
+      
+      const updatedStories = stories.filter((s) => s.story_id !== story.story_id);
       setStories(updatedStories);
       setSearchResults(updatedStories);
-      setShowDeleteModal(false);
+      setError(`"${story.story_name}" has been deleted successfully.`);
+      setShowErrorModal(true);
     } catch (err) {
       console.error("Error deleting story:", err);
       setError(`Failed to delete story: ${err.message}`);
       setShowErrorModal(true);
+    }
+  };
+
+  const handleStatusChange = async (story, newPublishStatus, e) => {
+    e.stopPropagation(); // Prevent row click navigation
+    setStatusUpdating(true);
+    
+    try {
+      // First, get the full story data
+      const getResponse = await fetch(`/api/admin/stories/${story.story_id}`);
+      if (!getResponse.ok) {
+        throw new Error(`Failed to fetch story data: ${getResponse.statusText}`);
+      }
+      const fullStory = await getResponse.json();
+      
+      // Update only the published field
+      const storyData = {
+        story_name: fullStory.story_name,
+        tribe_id: fullStory.tribe_id,
+        story_year: fullStory.story_year,
+        story_text: fullStory.story_text,
+        story_references: fullStory.story_references,
+        published: newPublishStatus
+      };
+      
+      // Use the existing PUT endpoint
+      const response = await fetch(`/api/admin/stories/${story.story_id}`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(storyData),
+      });
+      
+      if (!response.ok) {
+        throw new Error(`Failed to update story status: ${response.statusText}`);
+      }
+      
+      // Update state locally
+      const updatedStories = stories.map(s => {
+        if (s.story_id === story.story_id) {
+          return { ...s, published: newPublishStatus };
+        }
+        return s;
+      });
+      
+      setStories(updatedStories);
+      setSearchResults(
+        searchResults.map(s => {
+          if (s.story_id === story.story_id) {
+            return { ...s, published: newPublishStatus };
+          }
+          return s;
+        })
+      );
+      
+      // Show success message
+      setError(`"${story.story_name}" has been ${newPublishStatus ? "published" : "unpublished"} successfully.`);
+      setShowErrorModal(true);
+    } catch (err) {
+      console.error("Error updating story status:", err);
+      setError(`Failed to update story status: ${err.message}`);
+      setShowErrorModal(true);
+    } finally {
+      setStatusUpdating(false);
     }
   };
 
@@ -193,70 +262,6 @@ const ManageStories = () => {
     navigate(`/EditStory/${story.story_id}`);
   };
 
-  const handleStatusChange = async (story, newPublishStatus, e) => {
-    e.stopPropagation(); // Prevent row click navigation
-    
-    setStatusUpdating(true);
-    try {
-      // First, get the full story data
-      const getResponse = await fetch(`/api/admin/stories/${story.story_id}`);
-      if (!getResponse.ok) {
-        throw new Error(`Failed to fetch story data: ${getResponse.statusText}`);
-      }
-      const fullStory = await getResponse.json();
-      
-      // Update only the published field
-      const storyData = {
-        story_name: fullStory.story_name,
-        tribe_id: fullStory.tribe_id,
-        story_year: fullStory.story_year,
-        story_text: fullStory.story_text,
-        story_references: fullStory.story_references,
-        published: newPublishStatus
-      };
-      
-      // Use the existing PUT endpoint
-      const response = await fetch(`/api/admin/stories/${story.story_id}`, {
-        method: "PUT",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(storyData),
-      });
-      
-      if (!response.ok) {
-        throw new Error(`Failed to update story status: ${response.statusText}`);
-      }
-      
-      // Update state locally
-      const updatedStories = stories.map(s => {
-        if (s.story_id === story.story_id) {
-          return { ...s, published: newPublishStatus };
-        }
-        return s;
-      });
-      
-      setStories(updatedStories);
-      setSearchResults(
-        searchResults.map(s => {
-          if (s.story_id === story.story_id) {
-            return { ...s, published: newPublishStatus };
-          }
-          return s;
-        })
-      );
-      
-      // Show success message
-      setError(`"${story.story_name}" has been ${newPublishStatus ? "published" : "unpublished"} successfully.`);
-      setShowErrorModal(true);
-      
-    } catch (err) {
-      console.error("Error updating story status:", err);
-      setError(`Failed to update story status: ${err.message}`);
-      setShowErrorModal(true);
-    } finally {
-      setStatusUpdating(false);
-    }
-  };
-
   return (
     <DashboardLayout activeTab="stories">
       <div className="manage-stories-container">
@@ -285,7 +290,7 @@ const ManageStories = () => {
                   <th>Tribe</th>
                   <th>Timeline</th>
                   <th>Status</th>
-                  <th>Actions</th>
+                  <th style={{textAlign: 'center'}}>Actions</th>
                 </tr>
               </thead>
               <tbody>
@@ -308,12 +313,13 @@ const ManageStories = () => {
                           {story.published ? "Published" : "Editing"}
                         </span>
                       </td>
-                      <td>
-                        <div className="action-buttons">
+                      <td onClick={(e) => e.stopPropagation()} style={{textAlign: 'center'}}>
+                        <div className="action-buttons" style={{justifyContent: 'center'}}>
                           {story.published ? (
                             <button
                               className="action-btn unpublish-btn"
                               onClick={(e) => handleStatusChange(story, false, e)}
+                              disabled={statusUpdating}
                             >
                               Unpublish
                             </button>
@@ -321,6 +327,7 @@ const ManageStories = () => {
                             <button
                               className="action-btn publish-btn"
                               onClick={(e) => handleStatusChange(story, true, e)}
+                              disabled={statusUpdating}
                             >
                               Publish
                             </button>
@@ -328,6 +335,7 @@ const ManageStories = () => {
                           <button
                             className="action-btn delete-btn"
                             onClick={(e) => handleDeleteClick(story, e)}
+                            disabled={statusUpdating}
                           >
                             Delete
                           </button>
@@ -357,40 +365,30 @@ const ManageStories = () => {
         )}
       </div>
 
-      {/* Delete Confirmation Modal */}
-      {showDeleteModal && (
-        <div className="modal-overlay">
-          <div className="modal-content">
-            <h3>Confirm Deletion</h3>
-            <p>Are you sure you want to delete "{selectedStory?.story_name}"?</p>
-            <div className="modal-buttons">
-              <button 
-                className="action-btn edit-btn"
-                onClick={() => setShowDeleteModal(false)}
-              >
-                Cancel
-              </button>
-              <button 
-                className="action-btn delete-btn"
-                onClick={confirmDelete}
-              >
-                Delete
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
-
-      {/* Status/Error Modal */}
-      <Modal show={showErrorModal} onHide={() => setShowErrorModal(false)} centered>
+      {/* Error/Status Modal */}
+      <Modal 
+        show={showErrorModal} 
+        onHide={() => {
+          setShowErrorModal(false);
+          setError(null);
+        }} 
+        centered
+      >
         <Modal.Header closeButton>
-          <Modal.Title>{error && error.includes("Failed") ? "Error" : "Status Update"}</Modal.Title>
+          <Modal.Title>
+            {error && error.includes("Failed") ? "Error" : "Status Update"}
+          </Modal.Title>
         </Modal.Header>
-        <Modal.Body>{error}</Modal.Body>
+        <Modal.Body>
+          {error}
+        </Modal.Body>
         <Modal.Footer>
           <button 
             className="action-btn edit-btn"
-            onClick={() => setShowErrorModal(false)}
+            onClick={() => {
+              setShowErrorModal(false);
+              setError(null);
+            }}
           >
             Close
           </button>
