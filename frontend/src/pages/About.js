@@ -18,8 +18,9 @@ import c4 from '../images/rectangle-37.png'
 const About = () => {
     const stories = [
       {
+        title: "Welcome to Echoes of Aurora",
         description:
-          "“Welcome to the Indigenous Stories and Space Weather Platform, where ancient wisdom meets scientific discovery. Our journey began with a fascinating revelation: long before modern technology could track space weather, Indigenous peoples across North America were documenting the dancing lights in the sky through their rich oral traditions and stories.”",
+          "Welcome to Echoes of Aurora, where ancient wisdom meets scientific discovery. Our journey began with a fascinating revelation: long before modern technology could track space weather, Indigenous peoples across North America were documenting the dancing lights in the sky through their rich oral traditions and stories.",
         image: s1, 
       },
       {
@@ -55,12 +56,6 @@ const About = () => {
         description:
           "Discover a rich collection of stories passed down by indigenous tribes, illuminating their cultural connections to the aurora borealis. Each story offers unique insights into how indigenous communities interpreted these celestial phenomena.",
         image: e2, 
-      },
-      {
-        title: "Historical Space Weather Data",
-        description:
-          "Gain access to meticulously curated space weather data, capturing historical auroral events and solar weather phenomena. This dataset provides valuable context for understanding past interactions between the Earth and space.",
-        image: e3, 
       },
       
     ];
@@ -98,59 +93,63 @@ const About = () => {
           <Header/>
         <div className="About-hero-section">
           <h1 className="user-hero-title">About Our Platform</h1>
-          <h1 className="user-hero-subtext">
-            "Bridging Indigenous Knowledge and Scientific Exploration to Educate and Inspire."
-          </h1>
-          <button className="About-explore-button">See More</button>
+          <p className="user-hero-subtext">
+            Bridging Indigenous Knowledge and Scientific Exploration to Educate and Inspire
+          </p>
         </div>
   
-        <div className="title-In-lines">
-          <img className="About-line" alt="Divider Line" src={line1} />
-          <h2 className="text-wrapper-6">Our Story</h2>
-          <img className="About-line" alt="Divider Line" src={line1} />
+        <div className="user-section-background long-section-background user-section-shadow">
+          <div className="title-In-lines">
+            <img className="About-line" alt="Divider Line" src={line1} />
+            <h2 className="text-wrapper-6">Our Story</h2>
+            <img className="About-line" alt="Divider Line" src={line1} />
+          </div>
+    
+          <div className="stories-container"> {stories.map((story, index) => ( <div className={`story-card-func ${index % 2 === 0 ? "image-left" : "image-right"}`} key={index}>
+          <img src={story.image} alt={story.title} className="story-img" />
+          <div className="about-section-story-content">
+            <h2 className="about-section-story-title">{story.title}</h2>
+            <p className="about-section-story-description">{story.description}</p>
+          </div>
+              </div>
+            ))}
+          </div>
         </div>
   
-        <div className="stories-container"> {stories.map((story, index) => ( <div className={`story-card-func ${index % 2 === 0 ? "image-left" : "image-right"}`} key={index}>
-        <img src={story.image} alt={story.title} className="story-img" />
-        <div className="about-section-story-content">
-          <h2 className="about-section-story-title">{story.title}</h2>
-          <p className="about-section-story-description">{story.description}</p>
-        </div>
-            </div>
-          ))}
-        </div>
-  
-  
-        <div className="title-In-lines">
-          <img className="About-line" alt="Divider Line" src={line1} />
-          <h2 className="text-wrapper-6">What we Offer</h2>
-          <img className="About-line" alt="Divider Line" src={line1} />
-        </div>
+        <div className="user-section-background long-section-background user-section-shadow">
+          <div className="title-In-lines">
+            <img className="About-line" alt="Divider Line" src={line1} />
+            <h2 className="text-wrapper-6">What we Offer</h2>
+            <img className="About-line" alt="Divider Line" src={line1} />
+          </div>
 
-        <div className="stories-container"> {features.map((feature, index) => ( <div className={`features-card-func ${index % 2 === 0 ? "image-left" : "image-right"}`} key={index}>
-        <img src={feature.image} alt={feature.title} className="features-img" />
-        <div className="features-content">
-          <h2 className="features-title">{feature.title}</h2>
-          <p className="features-description">{feature.description}</p>
-        </div>
-            </div>
-          ))}
-        </div>
-  
-        <div className="title-In-lines">
-          <img className="About-line" alt="Divider Line" src={line1} />
-          <h2 className="text-wrapper-6">Our Commitment</h2>
-          <img className="About-line" alt="Divider Line" src={line1} />
+          <div className="stories-container"> {features.map((feature, index) => ( <div className={`features-card-func ${index % 2 === 0 ? "image-left" : "image-right"}`} key={index}>
+          <img src={feature.image} alt={feature.title} className="features-img" />
+          <div className="features-content">
+            <h2 className="features-title">{feature.title}</h2>
+            <p className="features-description">{feature.description}</p>
+          </div>
+              </div>
+            ))}
+          </div>
         </div>
   
-        <div className="stories-container"> {commitments.map((commitment, index) => ( <div className={`commitment-card-func ${index % 2 === 0 ? "image-left" : "image-right"}`} key={index}>
-        <img src={commitment.image} alt={commitment.title} className="commitment-img" />
-        <div className="commitment-content">
-          <h2 className="commitment-title">{commitment.title}</h2>
-          <p className="commitment-description">{commitment.description}</p>
-        </div>
-            </div>
-          ))}
+        <div className="user-section-background long-section-background user-section-shadow">
+          <div className="title-In-lines">
+            <img className="About-line" alt="Divider Line" src={line1} />
+            <h2 className="text-wrapper-6">Our Commitment</h2>
+            <img className="About-line" alt="Divider Line" src={line1} />
+          </div>
+    
+          <div className="stories-container"> {commitments.map((commitment, index) => ( <div className={`commitment-card-func ${index % 2 === 0 ? "image-left" : "image-right"}`} key={index}>
+          <img src={commitment.image} alt={commitment.title} className="commitment-img" />
+          <div className="commitment-content">
+            <h2 className="commitment-title">{commitment.title}</h2>
+            <p className="commitment-description">{commitment.description}</p>
+          </div>
+              </div>
+            ))}
+          </div>
         </div>
   
   

@@ -1,0 +1,46 @@
+.reference-links-container {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+  
+  .reference-link-field {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  
+  .reference-link-input {
+    flex-grow: 1;
+    border: 1px solid rgba(0, 0, 0, 0.23);
+    border-radius: 4px;
+    padding: 10px;
+    font-size: 16px;
+    color: #313638;
+  }
+  
+  .reference-link-button {
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    border: none;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 18px;
+    cursor: pointer;
+    color: white;
+  }
+  
+  .reference-link-button.add {
+    background-color: #7b6d96;
+  }
+  
+  .reference-link-button.remove {
+    background-color: #e74c3c;
+  }
+  
+  .reference-link-button:hover {
+    opacity: 0.9;
+  }

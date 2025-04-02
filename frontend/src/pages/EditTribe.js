@@ -10,6 +10,8 @@ import "../styles/ManageStories.css";
 import "../styles/DashboardLayout.css";
 import DashboardLayout from "../components/DashboardLayout";
 import ImageUpload from "../components/ImageUpload";
+import ReferenceLinks from "../components/ReferenceLinks";
+
 
 // Map Drawing Component
 const MapWithDrawing = ({ isDrawingEnabled, onShapeUpdate, drawnShape, tempMarkers, setTempMarkers }) => {
@@ -633,7 +635,7 @@ const HeroEditTribe = () => {
           )}
         </div>
        
-       {/* upload images */}
+        {/* Upload images */}
         <section className="edit-tribe-form-group">
           <div className="images-container">
             <label className="edit-tribe-label">Current Images</label>
@@ -680,21 +682,20 @@ const HeroEditTribe = () => {
         </div>
             
         <div className="edit-tribe-form-group">
-          <label htmlFor="referenceLinks" className="edit-tribe-label">
-            Reference *
-          </label>
-          <input
-            type="text"
-            id="referenceLinks"
-            name="tribe_references"
-            className={`edit-tribe-input ${formErrors.tribe_references ? 'error-field' : ''}`}
-            value={tribeData.tribe_references}
-            onChange={handleInputChange}
-            style={formErrors.tribe_references ? { borderColor: 'red' } : {}}
+          <label className="edit-tribe-label">References *</label>
+          <ReferenceLinks 
+            initialLinks={tribeData.tribe_references} 
+            onChange={(links) => {
+              setTribeData({...tribeData, tribe_references: links});
+              if (formErrors.tribe_references && links.trim()) {
+                setFormErrors({ ...formErrors, tribe_references: false });
+              }
+            }} 
           />
+          <p className="edit-tribe-upload-instruction">Add one or more reference links</p>
           {formErrors.tribe_references && (
             <div className="error-message" style={{ color: 'red', fontSize: '0.85em' }}>
-              Reference is required
+              At least one reference is required
             </div>
           )}
         </div>
