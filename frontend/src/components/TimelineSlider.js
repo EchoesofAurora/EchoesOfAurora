@@ -1,158 +1,104 @@
-import React, { useState, useEffect, useRef } from 'react';
-import { Range } from 'react-range';
+import React, { useMemo } from 'react';
+import Slider from 'rc-slider';
+import 'rc-slider/assets/index.css';
 import '../styles/timelineSlider.css';
 
-const TimelineSlider = ({ years, onRangeChange, initialStartYear, initialEndYear }) => {
-  // Convert years array to values needed for the range slider
-  const minYear = Math.min(...years);
-  const maxYear = Math.max(...years);
-  
-  // State for the current range values (start and end years)
-  const [values, setValues] = useState([
-    initialStartYear || minYear,
-    initialEndYear || maxYear
-  ]);
-  
-  // Reference to the track element for click handling
-  const sliderAreaRef = useRef(null);
-  
-  // Update the parent component when values change
-  useEffect(() => {
-    if (values.length === 2) {
-      onRangeChange(Math.round(values[0]), Math.round(values[1]));
+const TimelineSlider = ({ 
+  startYear, 
+  endYear, 
+  yearRange, 
+  onRangeChange, 
+  isMobile = false,
+  // storiesData prop no longer needed
+}) => {
+  // Create marks for the slider at century intervals
+  const marks = {};
+  for (let year = Math.ceil(startYear / 100) * 100; year <= endYear; year += 100) {
+    if (year >= startYear) {
+      marks[year] = {
+        style: { 
+          fontSize: isMobile ? '9px' : '10px',
+          color: '#555'
+        },
+        label: year
+      };
     }
-  }, [values, onRangeChange]);
-
-  // Format the year label
-  const formatYear = (year) => {
-    return year === maxYear ? `${year}` : year;
+  }
+  
+  // Always include start and end years as marks
+  marks[startYear] = {
+    style: { 
+      fontWeight: 'bold',
+      fontSize: isMobile ? '9px' : '10px',
+      color: '#333'
+    },
+    label: startYear
   };
   
-  // Handle clicks on the timeline track (but not on thumbs or markers)
-  const handleTrackClick = (e) => {
-    // Don't handle the click if it's on a thumb
-    if (e.target.closest('.timeline-thumb')) {
-      return;
-    }
-    
-    // Don't handle the click if it's on a marker (they have their own handler)
-    if (e.target.closest('.timeline-marker')) {
-      return;
-    }
-    
-    if (sliderAreaRef.current) {
-      // Get the click position relative to the slider area
-      const rect = sliderAreaRef.current.getBoundingClientRect();
-      const clickPosition = (e.clientX - rect.left) / rect.width;
-      
-      if (clickPosition >= 0 && clickPosition <= 1) {
-        // Calculate the year based on click position
-        const clickedYear = Math.round(minYear + clickPosition * (maxYear - minYear));
-        
-        // Determine which thumb to move (closest to click)
-        const distToStart = Math.abs(clickedYear - values[0]);
-        const distToEnd = Math.abs(clickedYear - values[1]);
-        
-        if (distToStart < distToEnd) {
-          // Move start thumb if clickedYear is less than end value
-          if (clickedYear < values[1]) {
-            setValues([clickedYear, values[1]]);
-          }
-        } else {
-          // Move end thumb if clickedYear is greater than start value
-          if (clickedYear > values[0]) {
-            setValues([values[0], clickedYear]);
-          }
-        }
-      }
+  marks[endYear] = {
+    style: { 
+      fontWeight: 'bold',
+      fontSize: isMobile ? '9px' : '10px',
+      color: '#333'
+    },
+    label: endYear
+  };
+  
+  // Handle slider change
+  const handleChange = (value) => {
+    onRangeChange({
+      startYear: value[0],
+      endYear: value[1]
+    });
+  };
+  
+  // Handle arrow button clicks
+  const handleShiftTimeline = (direction) => {
+    const step = 50;
+    if (direction === 'left') {
+      const newStart = Math.max(startYear, yearRange.startYear - step);
+      const newEnd = Math.min(endYear, newStart + (yearRange.endYear - yearRange.startYear));
+      onRangeChange({
+        startYear: newStart,
+        endYear: newEnd
+      });
+    } else {
+      const newEnd = Math.min(endYear, yearRange.endYear + step);
+      const newStart = Math.max(startYear, newEnd - (yearRange.endYear - yearRange.startYear));
+      onRangeChange({
+        startYear: newStart,
+        endYear: newEnd
+      });
     }
   };
-
+  
+  // Log current state for debugging
+  console.log('Rendering TimelineSlider with:', { yearRange, startYear, endYear });
+  
   return (
-    <div className="timeline-slider-container">
-      {/* The range display at the top has been removed */}
+    <div className="timeline-slider-container" id="timeline-slider-container">
+      <div className="timeline-year-labels">
+        <div className="timeline-year-label start">
+          {yearRange.startYear}
+        </div>
+        <div className="timeline-year-label end">
+          {yearRange.endYear}
+        </div>
+      </div>
       
-      <div 
-        className="timeline-slider-area"
-        onClick={handleTrackClick}
-        ref={sliderAreaRef}
-      >
-        <Range
+      <div className="slider-container">
+        <Slider
+          range
+          min={startYear}
+          max={endYear}
+          defaultValue={[yearRange.startYear, yearRange.endYear]}
+          value={[yearRange.startYear, yearRange.endYear]}
+          onChange={handleChange}
+          pushable={50}
           step={1}
-          min={minYear}
-          max={maxYear}
-          values={values}
-          onChange={(newValues) => setValues(newValues)}
-          renderTrack={({ props, children }) => (
-            <div
-              {...props}
-              className="timeline-track"
-            >
-              {children}
-              
-              {/* Selected range indicator */}
-              <div 
-                className="timeline-selected-range"
-                style={{
-                  left: `${((values[0] - minYear) / (maxYear - minYear)) * 100}%`,
-                  width: `${((values[1] - values[0]) / (maxYear - minYear)) * 100}%`
-                }}
-              />
-            </div>
-          )}
-          renderThumb={({ props, isDragged, index }) => (
-            <div
-              {...props}
-              className={`timeline-thumb ${isDragged ? 'active' : ''} ${index === 0 ? 'start' : 'end'}`}
-            >
-              <div className="timeline-thumb-label">
-                {formatYear(Math.round(values[index]))}
-              </div>
-            </div>
-          )}
+          included={true}
+          marks={marks}
         />
-        
-        {/* Year markers */}
-        <div className="timeline-markers">
-          {years.map((year) => (
-            <div 
-              key={year} 
-              className="timeline-marker"
-              style={{ 
-                left: `${((year - minYear) / (maxYear - minYear)) * 100}%` 
-              }}
-              onClick={(e) => {
-                e.stopPropagation(); // Prevent the track click handler from firing
-                // Find which thumb is closer to click
-                const distToStart = Math.abs(year - values[0]);
-                const distToEnd = Math.abs(year - values[1]);
-                
-                if (distToStart < distToEnd) {
-                  setValues([year, values[1]]);
-                } else {
-                  setValues([values[0], year]);
-                }
-              }}
-            >
-              <span className="timeline-marker-label">{year}</span>
-            </div>
-          ))}
-        </div>
-        
-        {/* Current year ticks - show all decades */}
-        <div className="timeline-year-ticks">
-          {Array.from({ length: (maxYear - minYear) / 10 + 1 }, (_, i) => minYear + i * 10)
-            .filter(year => !years.includes(year))
-            .map((year) => (
-              <div 
-                key={year} 
-                className="timeline-year-tick"
-                style={{ 
-                  left: `${((year - minYear) / (maxYear - minYear)) * 100}%` 
-                }}
-              />
-            ))}
-        </div>
       </div>
     </div>
   );

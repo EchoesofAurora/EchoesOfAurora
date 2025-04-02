@@ -3,8 +3,9 @@ import MapGL, { Source, Layer, NavigationControl } from "react-map-gl";
 import { FlyToInterpolator } from "react-map-gl";
 import "mapbox-gl/dist/mapbox-gl.css";
 import "../styles/mapBox.css";
+import "rc-slider/assets/index.css"; // Required for rc-slider
 import SidePanel from "./SidePanel";
-import TimelineSlider from "./TimelineSlider";
+import TimelineSlider from "./TimelineSlider"; // Import the TimelineSlider with story availability
 
 const MapBoxComponent = () => {
   const mapContainerRef = useRef(null);
@@ -21,7 +22,7 @@ const MapBoxComponent = () => {
     longitude: -100,
     zoom: 1.6,
     width: "100%",
-    height: "100vh", // Changed to viewport height
+    height: "100vh",
     transitionDuration: 500,
     transitionInterpolator: new FlyToInterpolator(),
   });
@@ -37,29 +38,22 @@ const MapBoxComponent = () => {
   const [mapStyle, setMapStyle] = useState(
     "mapbox://styles/kodalis2/cm7kvvsfl00x601qo0597eedp"
   );
+  
+  // Define year constants
+  const startYear = 1000;
+  const currentYear = new Date().getFullYear();
+  
+  // Initialize with predefined values
   const [yearRange, setYearRange] = useState({
     startYear: 1900,
-    endYear: new Date().getFullYear()
+    endYear: currentYear
   });
+  
   const [filteredStories, setFilteredStories] = useState(null);
   const [selectedTribe, setSelectedTribe] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
   const [showControls, setShowControls] = useState(true);
-
-  // Define year sequence from 1000 to 2025
-  const startYear = 1000;
-  const currentYear = new Date().getFullYear();
-  const years = [];
-
-  for (let year = startYear; year <= currentYear; year += 100) {
-    years.push(year);
-  }
-
-  // Ensure currentYear is included if not already
-  if (years[years.length - 1] !== currentYear) {
-    years.push(currentYear);
-  }
-
+  
   // Handle window resize
   useEffect(() => {
     const handleResize = () => {
@@ -179,11 +173,68 @@ const MapBoxComponent = () => {
     );
   }, []);
 
-  const handleYearRangeChange = (startYear, endYear) => {
-    setYearRange({
-      startYear: startYear,
-      endYear: endYear
-    });
+  const handleClick = (event) => {
+    const features = event.features;
+    if (features && features.length > 0) {
+      const clickedFeature = features[0];
+      const tribeId = clickedFeature.id;
+      fetchTribeStoriesData(tribeId);
+    }
+  };
+
+  const fetchTribeStoriesData = async (id) => {
+    try {
+      // Fetch tribes data
+      const tribesResponse = await fetch('api/mapData/tribes/' + id);
+      const data = await tribesResponse.json();
+      setSelectedTribe(data);
+    } catch (error) {
+      console.error("Error fetching data:", error);
+    } 
+  };
+
+  // Handle year range change from timeline slider
+  const handleYearRangeChange = (newRange) => {
+    setYearRange(newRange);
+  };
+
+  // Calculate timeline position based on whether side panel is open
+  const getTimelineStyles = () => {
+    if (selectedTribe) {
+      // When side panel is open
+      if (screenSize.isMobile) {
+        // For mobile: move timeline to bottom-right with more space from bottom
+        return {
+          position: "fixed", // Changed from absolute to fixed
+          bottom: 100,      // Increased from 60 to 100 for better visibility
+          right: 10,
+          left: 'auto',
+          width: "60%",
+          zIndex: 50       // Increased z-index
+        };
+      } else {
+        // For desktop: move timeline to right side with more space from bottom
+        return {
+          position: "fixed", // Changed from absolute to fixed
+          bottom: 40,       // Increased from 10 to 40
+          right: 350,       // Adjusted based on side panel width
+          left: 'auto',
+          width: "40%",
+          zIndex: 50        // Increased z-index
+        };
+      }
+    } else {
+      // Default position when side panel is closed
+      return {
+        position: "fixed",  // Changed from absolute to fixed
+        bottom: 20,         // Increased from 20 to 80
+        left: "50%",
+        transform: "translateX(-50%)",
+        width: screenSize.isMobile ? "95%" : "60%",
+        maxWidth: "800px",
+        zIndex: 50          // Increased z-index
+      };
+    }
   };
 
   const fillLayer = {
@@ -243,7 +294,7 @@ const MapBoxComponent = () => {
     type: "circle",
     paint: {
       "circle-radius": screenSize.isMobile ? 4 : 6, // Smaller circles on mobile
-      "circle-color": "#B366FF", // Blue color for stories
+      "circle-color": "#B366FF", // Purple color for stories
       "circle-stroke-width": screenSize.isMobile ? 1 : 2, // Thinner stroke on mobile
       "circle-stroke-color": "#ffffff",
     },
@@ -252,62 +303,6 @@ const MapBoxComponent = () => {
   if (isLoading) {
     return <div className="loading">Loading map data...</div>;
   }
-
-  const handleClick = (event) => {
-    const features = event.features;
-    if (features && features.length > 0) {
-      const clickedFeature = features[0];
-      const tribeId = clickedFeature.id;
-      fetchTribeStoriesData(tribeId);
-    }
-  };
-
-  const fetchTribeStoriesData = async (id) => {
-    try {
-      // Fetch tribes data
-      const tribesResponse = await fetch('api/mapData/tribes/' + id);
-      const data = await tribesResponse.json();
-      setSelectedTribe(data);
-    } catch (error) {
-      console.error("Error fetching data:", error);
-    } 
-  };
-
-  // Calculate timeline position based on whether side panel is open
-  const getTimelinePosition = () => {
-    if (selectedTribe) {
-      // When side panel is open
-      if (screenSize.isMobile) {
-        // For mobile: move timeline to bottom-right
-        return {
-          bottom: 60,
-          right: 10,
-          left: 'auto',
-          width: "60%"
-        };
-      } else {
-        // For desktop: move timeline to right side
-        return {
-          bottom: 10,
-          right: 350, // Adjust based on your side panel width
-          left: 'auto',
-          width: "40%"
-        };
-      }
-    } else {
-      // Default position when side panel is closed
-      return {
-        bottom: screenSize.isMobile ? 60 : 50,
-        left: 0,
-        right: 0,
-        margin: "0 auto",
-        width: screenSize.isMobile ? "95%" : "50%"
-      };
-    }
-  };
-
-  // Get timeline position
-  const timelinePosition = getTimelinePosition();
 
   return (
     <div 
@@ -352,7 +347,7 @@ const MapBoxComponent = () => {
           </Source>
         )}
 
-        {/* Custom Horizontal Navigation Controls */}
+        {/* Navigation Controls */}
         <div 
           style={{ 
             position: "absolute", 
@@ -481,50 +476,27 @@ const MapBoxComponent = () => {
           <div 
             style={{ 
               position: "absolute", 
-              top: screenSize.isMobile ? 50 : 10, 
-              right: screenSize.isMobile ? 10 : 10,
+              top: 10, 
+              right: screenSize.isMobile ? 120 : 10, // Adjust position for mobile
               zIndex: 5
             }}
           >
-            <div className={`toggle-container ${screenSize.isMobile ? 'toggle-container-mobile' : ''}`}>
-              <span className="status-text">{"3D"}</span>
+            <div className="toggle-container">
+              <span>3D</span>
               <label className="switch">
                 <input type="checkbox" checked={is3dOn} onChange={handleToggle} />
-                <span className="slider"></span>
+                <span className="slider round"></span>
               </label>
-              <span className="status-text">{"Stories"}</span>
+              <span>Stories</span>
               <label className="switch">
                 <input
                   type="checkbox"
                   checked={isStoriesOn}
                   onChange={handleStoriesToggle}
                 />
-                <span className="slider"></span>
+                <span className="slider round"></span>
               </label>
             </div>
-          </div>
-        )}
-
-        {/* Timeline Slider - Repositioned when side panel is open */}
-        {isStoriesOn && filteredStories && (screenSize.isMobile ? showControls : true) && (
-          <div
-            className="timeline-slider-wrapper"
-            style={{ 
-              position: "absolute",
-              zIndex: 5,
-              paddingBottom: "10px",
-              transition: "all 0.3s ease-in-out",
-
-              ...timelinePosition
-            }}
-          >
-            {/* <TimelineSlider 
-              years={years}
-              onRangeChange={handleYearRangeChange}
-              initialStartYear={yearRange.startYear}
-              initialEndYear={yearRange.endYear}
-              isMobile={screenSize.isMobile}
-            /> */}
           </div>
         )}
        
@@ -537,6 +509,20 @@ const MapBoxComponent = () => {
           />
         )}
       </MapGL>
+
+            {/* Timeline Slider Component */}
+            {isStoriesOn && filteredStories && (screenSize.isMobile ? showControls : true) && (
+              <div style={getTimelineStyles()} className="mapbox-timeline-container">
+                <TimelineSlider
+                  startYear={startYear}
+                  endYear={currentYear}
+                  yearRange={yearRange}
+                  onRangeChange={handleYearRangeChange}
+                  isMobile={screenSize.isMobile}
+                  storiesData={storiesData}
+                />
+              </div>
+            )}
     </div>
   );
 };
