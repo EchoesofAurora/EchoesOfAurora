@@ -10,6 +10,7 @@ const adminStoriesRoutes = require('./routes/adminStories');
 const imageUploadRoutes = require('./routes/imageUploadRoutes');
 const submissionsRoutes = require('./routes/submissions');
 const mapDataRoutes = require('./routes/mapData'); // Ensure this matches the file name
+const adminStatsRoutes = require('./routes/adminStats');
 
 // Initialize the Express App
 const app = express();
@@ -30,6 +31,7 @@ app.use('/api/admin/stories', adminStoriesRoutes);
 app.use('/api/images', imageUploadRoutes);
 app.use('/api/submissions', submissionsRoutes);
 app.use('/api/mapData', mapDataRoutes); // Ensure case matches
+app.use('/api/adminStats', adminStatsRoutes);
 
 // Default Route
 app.get('/', (req, res) => {

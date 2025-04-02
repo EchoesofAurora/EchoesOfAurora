@@ -5,28 +5,61 @@ import "../styles/DashboardLayout.css";
 const DashboardLayout = ({ children, activeTab = "dashboard" }) => {
   const navigate = useNavigate();
   const [currentDate, setCurrentDate] = useState("");
+  const [statsData, setStatsData] = useState({
+    tribes: "0",
+    stories: "0",
+    // locations: "85",
+    messages: "0",
+    unreadMessages: "0"
+  });
+
+  // Fetch stats data from API
+  useEffect(() => {
+    const fetchStatsData = async () => {
+      try {
+        const response = await fetch('http://localhost:5001/api/adminStats'); // Adjust the API endpoint as needed
+        const data = await response.json();
+        
+        // Update the stats with API data, keeping default values for any missing stats
+        setStatsData(prevStats => ({
+          ...prevStats,
+          tribes: data.tribes || prevStats.tribes,
+          stories: data.stories || prevStats.stories,
+          // locations: data.locations || prevStats.locations,
+          messages: data.messages || prevStats.messages,
+          unreadMessages: data.unread_messages || prevStats.unreadMessages
+
+          // Add other fields if your API returns them
+        }));
+      } catch (error) {
+        console.error('Error fetching stats data:', error);
+      }
+    };
+
+    fetchStatsData();
+  }, []);
 
   // Statistics data with icons
   const stats = [
     { 
-      value: "500", label: "Tribes", trend: "↑12%", trendDirection: "up",
+      value: statsData.tribes, label: "Tribes", trend: "↑12%", trendDirection: "up",
       icon: <TribeIcon />
     },
     { 
-      value: "1.4K", label: "Stories", trend: "↑5%", trendDirection: "up",
+      value: statsData.stories, label: "Stories", trend: "↑5%", trendDirection: "up",
       icon: <StoryIcon />
     },
+    // { 
+    //   value: statsData.locations, label: "Locations", trend: "→", trendDirection: "neutral",
+    //   icon: <LocationIcon />
+    // },
     { 
-      value: "85", label: "Locations", trend: "→", trendDirection: "neutral",
-      icon: <LocationIcon />
-    },
-    { 
-      value: "60", label: "Messages", trend: "↓2%", trendDirection: "down",
+      value: statsData.messages, label: "Messages", trend: "↓2%", trendDirection: "down",
       icon: <MessageIcon />
     },
     { 
-      value: "40", label: "Active Users", trend: "↑8%", trendDirection: "up",
-      icon: <UserIcon />
+      value: statsData.unreadMessages, label: "Unread Messages", trend: "↑8%", trendDirection: "up",
+      icon: <UnreadMessageIcon />
     }
   ];
 
@@ -62,9 +95,9 @@ const DashboardLayout = ({ children, activeTab = "dashboard" }) => {
               <div className="stat-content">
                 <div className="stat-value">{stat.value}</div>
                 <div className="stat-label">{stat.label}</div>
-                <div className={`stat-trend ${stat.trendDirection}`}>
+                {/* <div className={`stat-trend ${stat.trendDirection}`}>
                   {stat.trend} <span>this week</span>
-                </div>
+                </div> */}
               </div>
             </div>
           ))}
@@ -146,6 +179,13 @@ const UserIcon = () => (
     <circle cx="9" cy="7" r="4"></circle>
     <path d="M23 21v-2a4 4 0 0 0-3-3.87"></path>
     <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
+  </svg>
+);
+
+const UnreadMessageIcon = () => (
+  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
+    <circle cx="18" cy="6" r="3" fill="currentColor" stroke="none"></circle>
   </svg>
 );
 
