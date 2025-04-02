@@ -128,18 +128,6 @@ input:checked + .slider:before {
   background-color: #f0f0f0 !important;
 }
 
-/* Timeline Slider Container */
-.timeline-slider-container {
-  width: 100%;
-  padding: 15px 20px;
-  background: rgba(255, 255, 255, 0.95);
-  border-radius: 8px;
-  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.12);
-  border: 1px solid rgba(190, 180, 220, 0.5);
-  transition: all 0.3s ease-in-out;
-  position: relative;
-}
-
 /* Timeline Title */
 .timeline-title {
   text-align: center;
@@ -171,12 +159,12 @@ input:checked + .slider:before {
 
 /* RC Slider Customizations for Timeline */
 .rc-slider-rail {
-  background-color: #e0e0e0 !important;
+  background-color: #e0e0e0 !important; /* Restore background override */
   height: 6px !important;
 }
 
 .rc-slider-track {
-  background-color: #9c27b0 !important;
+  background-color: rgba(156, 39, 176, 0.4) !important; /* Restore background override */
   height: 6px !important;
 }
 
@@ -200,8 +188,9 @@ input:checked + .slider:before {
 }
 
 .rc-slider-mark-text {
-  color: #333 !important;
-  font-size: 10px !important;
+  /* display: none; */ /* Hide marks below */
+  color: #333 !important; 
+  font-size: 10px !important; 
 }
 
 .rc-slider-mark-text-active {
@@ -209,10 +198,14 @@ input:checked + .slider:before {
 }
 
 .rc-slider-dot {
+  /* display: none; */ /* Hide dots */
   border: 1px solid #d1d5db !important;
   background-color: #f3f4f6 !important;
-  width: 4px !important;
-  height: 4px !important;
+  width: 1px !important; /* Make dots thinner like original design */
+  height: 8px !important; /* Make dots taller */
+  margin-left: -1px !important; /* Adjust horizontal position */
+  bottom: -2px !important; /* Adjust vertical position */
+  z-index: 3; /* Ensure dots are layered correctly */
 }
 
 .rc-slider-dot-active {
@@ -222,16 +215,15 @@ input:checked + .slider:before {
 
 /* Side Panel styles */
 .side-panel {
-  position: absolute;
-  top: 60px;
-  left: 10px;
+  position: fixed;
+  top: 0.5px;
   width: 320px;
   max-width: 90vw;
   background: rgba(255, 255, 255, 0.95);
   border-radius: 8px;
   box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
   padding: 15px;
-  max-height: 80vh;
+  max-height: calc(100vh - 80px - 20px);
   overflow-y: auto;
   z-index: 10;
   border-top: 4px solid #9c27b0;

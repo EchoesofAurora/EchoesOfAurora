@@ -3,8 +3,9 @@ import MapGL, { Source, Layer, NavigationControl } from "react-map-gl";
 import { FlyToInterpolator } from "react-map-gl";
 import "mapbox-gl/dist/mapbox-gl.css";
 import "../styles/mapBox.css";
+import "rc-slider/assets/index.css"; // Required for rc-slider
 import SidePanel from "./SidePanel";
-import TimelineSlider from "./TimelineSlider"; // Import the TimelineSlider component
+import TimelineSlider from "./TimelineSlider"; // Import the TimelineSlider with story availability
 
 const MapBoxComponent = () => {
   const mapContainerRef = useRef(null);
@@ -37,18 +38,21 @@ const MapBoxComponent = () => {
   const [mapStyle, setMapStyle] = useState(
     "mapbox://styles/kodalis2/cm7kvvsfl00x601qo0597eedp"
   );
+  
+  // Define year constants
+  const startYear = 1000;
+  const currentYear = new Date().getFullYear();
+  
+  // Initialize with predefined values
   const [yearRange, setYearRange] = useState({
-    startYear: 1000,
-    endYear: new Date().getFullYear()
+    startYear: 1900,
+    endYear: currentYear
   });
+  
   const [filteredStories, setFilteredStories] = useState(null);
   const [selectedTribe, setSelectedTribe] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
   const [showControls, setShowControls] = useState(true);
-
-  // Define year constants
-  const startYear = 1000;
-  const currentYear = new Date().getFullYear();
   
   // Handle window resize
   useEffect(() => {
@@ -223,7 +227,7 @@ const MapBoxComponent = () => {
       // Default position when side panel is closed
       return {
         position: "fixed",  // Changed from absolute to fixed
-        bottom: 80,         // Increased from 20 to 80
+        bottom: 20,         // Increased from 20 to 80
         left: "50%",
         transform: "translateX(-50%)",
         width: screenSize.isMobile ? "95%" : "60%",
@@ -299,9 +303,6 @@ const MapBoxComponent = () => {
   if (isLoading) {
     return <div className="loading">Loading map data...</div>;
   }
-
-  // Get timeline position styles
-  const timelineStyles = getTimelineStyles();
 
   return (
     <div 
@@ -476,7 +477,7 @@ const MapBoxComponent = () => {
             style={{ 
               position: "absolute", 
               top: 10, 
-              right: 10,
+              right: screenSize.isMobile ? 120 : 10, // Adjust position for mobile
               zIndex: 5
             }}
           >
@@ -509,18 +510,19 @@ const MapBoxComponent = () => {
         )}
       </MapGL>
 
-      {/* Timeline Slider Component - UPDATED */}
-      {isStoriesOn && filteredStories && (screenSize.isMobile ? showControls : true) && (
-        <div className="timeline-wrapper" style={timelineStyles}>
-          <TimelineSlider
-            startYear={startYear}
-            endYear={currentYear}
-            yearRange={yearRange}
-            onRangeChange={handleYearRangeChange}
-            isMobile={screenSize.isMobile}
-          />
-        </div>
-      )}
+            {/* Timeline Slider Component */}
+            {isStoriesOn && filteredStories && (screenSize.isMobile ? showControls : true) && (
+              <div style={getTimelineStyles()} className="mapbox-timeline-container">
+                <TimelineSlider
+                  startYear={startYear}
+                  endYear={currentYear}
+                  yearRange={yearRange}
+                  onRangeChange={handleYearRangeChange}
+                  isMobile={screenSize.isMobile}
+                  storiesData={storiesData}
+                />
+              </div>
+            )}
     </div>
   );
 };

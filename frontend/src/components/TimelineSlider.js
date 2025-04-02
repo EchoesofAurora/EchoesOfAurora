@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useMemo } from 'react';
 import Slider from 'rc-slider';
 import 'rc-slider/assets/index.css';
 import '../styles/timelineSlider.css';
@@ -8,55 +8,42 @@ const TimelineSlider = ({
   endYear, 
   yearRange, 
   onRangeChange, 
-  isMobile = false 
+  isMobile = false,
+  // storiesData prop no longer needed
 }) => {
-  // Create year markers for the timeline
-  const years = [];
-  for (let year = startYear; year <= endYear; year += 100) {
-    years.push(year);
-  }
-  // Ensure endYear is included if not already
-  if (years[years.length - 1] !== endYear) {
-    years.push(endYear);
-  }
-
-  // Create marks for the slider
-  const midYear1 = Math.round(startYear + (endYear - startYear) * 0.33);
-  const midYear2 = Math.round(startYear + (endYear - startYear) * 0.66);
-  
-  const marks = {
-    [startYear]: {
-      style: { 
-        fontWeight: 'bold',
-        fontSize: '10px',
-        color: '#333'
-      },
-      label: startYear
-    },
-    [midYear1]: {
-      style: { 
-        fontSize: '10px',
-        color: '#555'
-      },
-      label: midYear1
-    },
-    [midYear2]: {
-      style: { 
-        fontSize: '10px',
-        color: '#555'
-      },
-      label: midYear2
-    },
-    [endYear]: {
-      style: { 
-        fontWeight: 'bold',
-        fontSize: '10px',
-        color: '#333'
-      },
-      label: endYear
+  // Create marks for the slider at century intervals
+  const marks = {};
+  for (let year = Math.ceil(startYear / 100) * 100; year <= endYear; year += 100) {
+    if (year >= startYear) {
+      marks[year] = {
+        style: { 
+          fontSize: isMobile ? '9px' : '10px',
+          color: '#555'
+        },
+        label: year
+      };
     }
+  }
+  
+  // Always include start and end years as marks
+  marks[startYear] = {
+    style: { 
+      fontWeight: 'bold',
+      fontSize: isMobile ? '9px' : '10px',
+      color: '#333'
+    },
+    label: startYear
   };
-
+  
+  marks[endYear] = {
+    style: { 
+      fontWeight: 'bold',
+      fontSize: isMobile ? '9px' : '10px',
+      color: '#333'
+    },
+    label: endYear
+  };
+  
   // Handle slider change
   const handleChange = (value) => {
     onRangeChange({
@@ -64,9 +51,32 @@ const TimelineSlider = ({
       endYear: value[1]
     });
   };
-
+  
+  // Handle arrow button clicks
+  const handleShiftTimeline = (direction) => {
+    const step = 50;
+    if (direction === 'left') {
+      const newStart = Math.max(startYear, yearRange.startYear - step);
+      const newEnd = Math.min(endYear, newStart + (yearRange.endYear - yearRange.startYear));
+      onRangeChange({
+        startYear: newStart,
+        endYear: newEnd
+      });
+    } else {
+      const newEnd = Math.min(endYear, yearRange.endYear + step);
+      const newStart = Math.max(startYear, newEnd - (yearRange.endYear - yearRange.startYear));
+      onRangeChange({
+        startYear: newStart,
+        endYear: newEnd
+      });
+    }
+  };
+  
+  // Log current state for debugging
+  console.log('Rendering TimelineSlider with:', { yearRange, startYear, endYear });
+  
   return (
-    <div className="timeline-slider-container">
+    <div className="timeline-slider-container" id="timeline-slider-container">
       <div className="timeline-year-labels">
         <div className="timeline-year-label start">
           {yearRange.startYear}
@@ -76,22 +86,19 @@ const TimelineSlider = ({
         </div>
       </div>
       
-      <Slider
-        range
-        min={startYear}
-        max={endYear}
-        defaultValue={[yearRange.startYear, yearRange.endYear]}
-        value={[yearRange.startYear, yearRange.endYear]}
-        onChange={handleChange}
-        marks={marks}
-      />
-      
-      <div className="timeline-year-markers">
-        {years.map((year) => (
-          <span key={year} className="timeline-year-marker">
-            {year}
-          </span>
-        ))}
+      <div className="slider-container">
+        <Slider
+          range
+          min={startYear}
+          max={endYear}
+          defaultValue={[yearRange.startYear, yearRange.endYear]}
+          value={[yearRange.startYear, yearRange.endYear]}
+          onChange={handleChange}
+          pushable={50}
+          step={1}
+          included={true}
+          marks={marks}
+        />
       </div>
     </div>
   );
