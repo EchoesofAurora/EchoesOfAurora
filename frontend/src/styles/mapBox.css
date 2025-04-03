@@ -341,3 +341,80 @@ input:checked + .slider:before {
     font-size: 12px;
   }
 }
+
+/* Add these styles to your mapBox.css file */
+
+/* Interaction controls container */
+.interaction-control {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 5px;
+  font-family: Arial, sans-serif;
+  width: 100%;
+}
+
+/* Smaller switch for interaction controls */
+.small-switch {
+  width: 30px;
+  height: 16px;
+}
+
+.small-switch .slider:before {
+  height: 12px;
+  width: 12px;
+  left: 2px;
+  bottom: 2px;
+}
+
+.small-switch input:checked + .slider:before {
+  transform: translateX(14px);
+}
+
+/* Tooltip for keyboard controls */
+.keyboard-tooltip {
+  position: absolute;
+  bottom: 100%;
+  left: 50%;
+  transform: translateX(-50%);
+  background-color: rgba(0, 0, 0, 0.8);
+  color: white;
+  padding: 8px;
+  border-radius: 4px;
+  font-size: 12px;
+  width: 200px;
+  z-index: 100;
+  opacity: 0;
+  transition: opacity 0.3s;
+  pointer-events: none;
+}
+
+.interaction-control:hover .keyboard-tooltip {
+  opacity: 1;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .interaction-control {
+    font-size: 11px;
+    margin-bottom: 3px;
+  }
+  
+  .interaction-control span {
+    max-width: 90px;
+  }
+  
+  .small-switch {
+    width: 28px;
+    height: 14px;
+  }
+  
+  .small-switch .slider:before {
+    height: 10px;
+    width: 10px;
+  }
+  
+  .small-switch input:checked + .slider:before {
+    transform: translateX(14px);
+  }
+}

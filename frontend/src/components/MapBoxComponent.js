@@ -1,5 +1,5 @@
 import React, { useState, useCallback, useEffect, useRef } from "react";
-import MapGL, { Source, Layer, NavigationControl } from "react-map-gl";
+import MapGL, { Source, Layer } from "react-map-gl";
 import { FlyToInterpolator } from "react-map-gl";
 import "mapbox-gl/dist/mapbox-gl.css";
 import "../styles/mapBox.css";
@@ -9,22 +9,35 @@ import TimelineSlider from "./TimelineSlider"; // Import the TimelineSlider with
 
 const MapBoxComponent = () => {
   const mapContainerRef = useRef(null);
+  const mapRef = useRef(null);
   
-  // State to track screen size
+  // State to track screen size 
   const [screenSize, setScreenSize] = useState({
     width: typeof window !== 'undefined' ? window.innerWidth : 0,
     height: typeof window !== 'undefined' ? window.innerHeight : 0,
     isMobile: typeof window !== 'undefined' ? window.innerWidth < 768 : false
   });
 
+  // State for interaction controls with enhanced scroll zoom options
+  const [interactionState, setInteractionState] = useState({
+    scrollZoom: {
+      speed: 0.01, // Using your preferred high value for faster zooming
+      smooth: false, // Disable smooth zooming to eliminate delay between scroll actions
+      eventFire: 'wheel' // Respond immediately to wheel events
+    },
+    dragPan: true,
+    keyboard: true,
+    doubleClickZoom: true
+  });
+
+  // Update viewport with additional settings to improve zoom responsiveness
   const [viewport, setViewport] = useState({
     latitude: 60,
     longitude: -100,
     zoom: 1.6,
     width: "100%",
     height: "100vh",
-
-    transitionDuration: 500,
+    transitionDuration: 0, // Disable transition animation for immediate response
     transitionInterpolator: new FlyToInterpolator(),
   });
 
@@ -80,6 +93,19 @@ const MapBoxComponent = () => {
     
     return () => window.removeEventListener('resize', handleResize);
   }, []);
+
+  // Store reference to the map instance when loaded
+  const onLoad = useCallback(event => {
+    if (event && event.target) {
+      mapRef.current = event.target;
+    }
+  }, []);
+
+  // Toggle interaction controls
+  const toggleScrollZoom = () => setInteractionState(prev => ({ ...prev, scrollZoom: !prev.scrollZoom }));
+  const toggleDragPan = () => setInteractionState(prev => ({ ...prev, dragPan: !prev.dragPan }));
+  const toggleKeyboard = () => setInteractionState(prev => ({ ...prev, keyboard: !prev.keyboard }));
+  const toggleDoubleClickZoom = () => setInteractionState(prev => ({ ...prev, doubleClickZoom: !prev.doubleClickZoom }));
 
   // Fetch tribes and stories data from API
   useEffect(() => {
@@ -176,11 +202,13 @@ const MapBoxComponent = () => {
 
   const handleClick = (event) => {
     const features = event.features;
+    // Only process tribe clicks, not general map clicks
     if (features && features.length > 0) {
       const clickedFeature = features[0];
       const tribeId = clickedFeature.id;
       fetchTribeStoriesData(tribeId);
     }
+    // Important: Do not reset or interfere with scroll zoom state
   };
 
   const fetchTribeStoriesData = async (id) => {
@@ -315,17 +343,24 @@ const MapBoxComponent = () => {
         {...viewport}
         mapboxApiAccessToken={process.env.REACT_APP_MAPBOX_TOKEN}
         mapStyle={mapStyle}
-        doubleClickZoom={true}
+        onLoad={onLoad}
         onViewportChange={(newViewport) =>
           setViewport({
             ...newViewport,
-            transitionDuration: 500,
-            transitionInterpolator: new FlyToInterpolator(),
+            transitionDuration: 0, // Keep transition duration at 0 for immediate response
           })
         }
         onClick={handleClick}
         onHover={handleHover}
         interactiveLayerIds={["tribe-fill"]}
+        // Set interaction controls based on state with enhanced scroll zoom
+        scrollZoom={interactionState.scrollZoom}
+        dragPan={interactionState.dragPan}
+        keyboard={interactionState.keyboard}
+        doubleClickZoom={interactionState.doubleClickZoom}
+        // Add these options to maintain smooth interaction flow
+        clickZoom={false} // Disable automatic zoom on click
+        touchAction="pan-y" // Allow vertical touch scrolling while maintaining map interactions
       >
         {/* Tribes Source and Layers */}
         {tribesData && (
@@ -451,6 +486,8 @@ const MapBoxComponent = () => {
           </button>
         </div>
 
+        {/* Interaction controls are enabled but the UI panel is removed */}
+
         {/* Mobile Controls Toggle Button */}
         {screenSize.isMobile && (
           <button
@@ -511,19 +548,19 @@ const MapBoxComponent = () => {
         )}
       </MapGL>
 
-            {/* Timeline Slider Component */}
-            {isStoriesOn && filteredStories && (screenSize.isMobile ? showControls : true) && (
-              <div style={getTimelineStyles()} className="mapbox-timeline-container">
-                <TimelineSlider
-                  startYear={startYear}
-                  endYear={currentYear}
-                  yearRange={yearRange}
-                  onRangeChange={handleYearRangeChange}
-                  isMobile={screenSize.isMobile}
-                  storiesData={storiesData}
-                />
-              </div>
-            )}
+      {/* Timeline Slider Component */}
+      {isStoriesOn && filteredStories && (screenSize.isMobile ? showControls : true) && (
+        <div style={getTimelineStyles()} className="mapbox-timeline-container">
+          <TimelineSlider
+            startYear={startYear}
+            endYear={currentYear}
+            yearRange={yearRange}
+            onRangeChange={handleYearRangeChange}
+            isMobile={screenSize.isMobile}
+            storiesData={storiesData}
+          />
+        </div>
+      )}
     </div>
   );
 };
