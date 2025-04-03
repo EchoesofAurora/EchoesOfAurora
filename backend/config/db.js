@@ -2,14 +2,30 @@ require('dotenv').config(); // Load environment variables
 const { Client } = require('pg'); // PostgreSQL client
 
 // Database connection configuration
-const client = new Client({
-    host: process.env.DB_HOST, // Use environment variable
-    user: process.env.DB_USER, // Use environment variable
-    password: process.env.DB_PASSWORD, // Use environment variable
-    database: process.env.DB_NAME, // Use environment variable
-    port: process.env.DB_PORT, // Use environment variable
-});
-//sdfasdfasd
+let connectionConfig;
+
+// Check if Heroku's DATABASE_URL is available
+if (process.env.DATABASE_URL) {
+    // Use Heroku's DATABASE_URL
+    connectionConfig = {
+        connectionString: process.env.DATABASE_URL,
+        ssl: {
+            rejectUnauthorized: false // Required for Heroku PostgreSQL
+        }
+    };
+} else {
+    // Use local environment variables for development
+    connectionConfig = {
+        host: process.env.DB_HOST,
+        user: process.env.DB_USER,
+        password: process.env.DB_PASSWORD,
+        database: process.env.DB_NAME,
+        port: process.env.DB_PORT,
+    };
+}
+
+const client = new Client(connectionConfig);
+
 // Connect to the database
 client.connect((err) => {
     if (err) {
