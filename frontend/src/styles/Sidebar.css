@@ -1,89 +1,181 @@
-.img {
-  height: 1027px;
-  left: 110%;
-  position: absolute;
-  top: 0;
-  width: 1px;
-}
-.overlap-group {
-  height: 1028px;
-  left: 0;
-  position: absolute;
-  top: 0;
-  width: 100%;
-}
-
-.frame {
-  align-items: flex-start;
+/* Side Panel Container */
+.side-panel {
+  width: 450px;
+  height: 100%;
+  background: #b08ae6;
+  color: white;
+  overflow: hidden;
+  box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.2);
+  font-family: Arial, sans-serif;
+  position: relative;
   display: flex;
   flex-direction: column;
-  gap: 4px;
-  padding-left: 10px;
-  position: absolute;
-  top: 15px;
-  width: 20%;
 }
 
-.frame-2 {
-  align-items: center;
-  align-self: stretch;
+/* Tabs Navigation */
+.tabs {
   display: flex;
-  gap: 4px;
-}
-
-.rectangle {
-  
-  background-color: #000000;
-  height: 52px;
+  justify-content: flex-start;
+  background: #7846ac;
+  padding: 10px;
   position: relative;
-  width: 5px;
 }
 
-.frame-3 {
-  align-items: center;
-  background-color: #ffffff;
-  border: 0.5px solid;
-  border-color: #a196c5;
-  border-radius: 0px 10px 10px 0px;
-  display: flex;
-  gap: 10px;
-  /* height: 52px; */
-  padding: 16px;
-  position: relative;
-  width: 100%;
-}
-
-.img-2 {
-  height: 24px;
-  margin-bottom: -2.00px;
-  margin-top: -2.00px;
-  position: relative;
-  width: 24px;
-}
-
-.text-wrapper {
-  color: #000000;
-  font-family: "Poppins-Medium", Helvetica;
+.tab {
+  flex: 1;
+  text-align: center;
+  padding: 10px;
   font-size: 16px;
-  font-weight: 500;
-  letter-spacing: -0.05px;
-  line-height: normal;
-  margin-bottom: -1.50px;
-  margin-top: -2.50px;
+  font-weight: bold;
+  color: white;
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  transition: background 0.3s ease;
+  border-radius: 8px;
+  margin: 0 4px;
+}
+
+.tab.active {
+  background: #b08ae6;
+}
+
+/* Content Section */
+.content {
+  padding: 20px;
+  flex: 1;
+  height: calc(100% - 0px); 
   position: relative;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Story/Tribe Content Styling */
+.story-container{
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 10px;
+  padding: 15px;
+  margin-bottom: 15px;
+  height: calc(100% - 0px); /* Adjust to leave space for pagination */
+  overflow-y: auto;
+}
+
+.tribe-container {
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 10px;
+  padding: 15px;
+  margin-bottom: 15px;
+  height: calc(100% - 70px); /* Adjust to leave space for pagination */
+  overflow-y: auto;
+}
+
+/* Tab Icons */
+.tab-icon {
   width: 100%;
+  height: 250px; /* Increased height */
+  object-fit: cover;
+  border-radius: 8px;
+  margin-bottom: 15px;
 }
 
-
-/* Add styles for the active tab */
-.frame-3.active-tab {
-  background-color: #fbf7ef;
+.tribe-title {
+  font-size: 22px;
+  font-weight: bold;
+  margin-bottom: 15px;
+  text-align: center;
+  display: block;
+  letter-spacing: 0.5px;
+  cursor: "pointer";
+  text-decoration: underline;
 }
 
-.text-wrapper.active-text {
-  color: #a196c5;
-}
-.rectangle.active-rectangle {
-  background-color: #a196c5; 
+.tribe-text {
+  margin-bottom: 12px;
+  line-height: 1.5;
+  font-size: 15px;
 }
 
+.section-label {
+  font-weight: bold;
+  margin-top: 15px;
+  margin-bottom: 5px;
+  font-size: 16px;
+}
+
+/* Pagination Controls */
+.pagination {
+  display: flex;
+  justify-content: center;
+  padding: 10px;
+  background: rgba(120, 70, 172, 0.3);
+  border-radius: 8px;
+  position: sticky;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  margin-top: auto;
+  z-index: 10;
+}
+
+.page-btn {
+  background: rgba(255, 255, 255, 0.3);
+  color: white;
+  border: none;
+  padding: 8px 14px;
+  margin: 0 4px;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.page-btn:hover {
+  background: rgba(255, 255, 255, 0.5);
+}
+
+.page-btn.active-page {
+  background: white;
+  color: #5b3c85;
+  font-weight: bold;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+/* Style the close button */
+.close-btn {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  background: none;
+  border: none;
+  font-size: 24px;
+  color: white;
+  cursor: pointer;
+  padding: 0;
+  line-height: 1;
+  z-index: 5;
+  width: 30px;
+  height: 30px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  transition: background 0.3s ease;
+}
+
+.close-btn:hover {
+  background: rgba(255, 255, 255, 0.2);
+}
+
+/* Empty state styling */
+.empty-state {
+  text-align: center;
+  padding: 30px;
+  color: rgba(255, 255, 255, 0.8);
+  font-style: italic;
+}
+
+/* References section */
+.references-section {
+  margin-top: 20px;
+  padding-top: 10px;
+  border-top: 1px solid rgba(255, 255, 255, 0.3);
+}

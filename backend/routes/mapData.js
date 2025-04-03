@@ -53,7 +53,7 @@ router.get('/tribes/:tribeId', async (req, res) => {
     try {
         // Fetch tribe details
         const tribeResult = await pool.query(
-            `SELECT tribe_id, tribe_name, tribe_text, tribe_references
+            `SELECT tribe_id, tribe_name, tribe_text, tribe_references,start_year, end_year
              FROM tribes
              WHERE tribe_id = $1 AND published = true`,
             [tribeId]
@@ -82,7 +82,7 @@ router.get('/tribes/:tribeId', async (req, res) => {
 
         // Fetch all stories for the tribe
         const storyResult = await pool.query(
-            `SELECT story_id, story_name, story_text, story_references, tribe_id
+            `SELECT story_id, story_name, story_text, story_references, tribe_id, story_year
              FROM stories
              WHERE tribe_id = $1 AND published = true`,
             [tribeId]
@@ -111,6 +111,7 @@ router.get('/tribes/:tribeId', async (req, res) => {
                 story_name: story.story_name,
                 story_text: story.story_text,
                 story_references: story.story_references,
+                story_year: story.story_year,
                 tribe_id: story.tribe_id,
                 image: image
             };
@@ -122,13 +123,13 @@ router.get('/tribes/:tribeId', async (req, res) => {
             tribe_text: tribe.tribe_text,
             tribe_references: tribe.tribe_references,
             image: tribeImage,
+            start_year: tribe.start_year,
+            end_year: tribe.end_year,
             stories: storiesWithImages
         };
 
-        console.log(`Detailed tribe data for tribe_id ${tribeId}:`, response);
         res.json(response);
     } catch (err) {
-        console.error('Query error:', err.message, 'at:', new Date().toISOString());
         res.status(500).json({ error: err.message });
     }
 });

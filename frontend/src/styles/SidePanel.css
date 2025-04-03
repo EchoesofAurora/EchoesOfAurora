@@ -1,22 +1,24 @@
 /* Side Panel Container */
 .side-panel {
-  width: 350px;
+  width: 450px;
   height: 100%;
   background: #b08ae6;
   color: white;
-  /* border-radius: 12px; */
   overflow: hidden;
   box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.2);
   font-family: Arial, sans-serif;
   position: relative;
+  display: flex;
+  flex-direction: column;
 }
 
 /* Tabs Navigation */
 .tabs {
   display: flex;
-  justify-content: space-between;
+  justify-content: flex-start;
   background: #7846ac;
   padding: 10px;
+  position: relative;
 }
 
 .tab {
@@ -30,73 +32,150 @@
   background: transparent;
   cursor: pointer;
   transition: background 0.3s ease;
+  border-radius: 8px;
+  margin: 0 4px;
 }
 
 .tab.active {
   background: #b08ae6;
-  border-radius: 8px;
 }
 
 /* Content Section */
 .content {
+  padding: 20px;
+  flex: 1;
+  height: calc(100% - 0px); 
+  position: relative;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Story/Tribe Content Styling */
+.story-container{
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 10px;
   padding: 15px;
-  height: 100%;
+  margin-bottom: 15px;
+  height: calc(100% - 0px); /* Adjust to leave space for pagination */
   overflow-y: auto;
+}
+
+.tribe-container {
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 10px;
+  padding: 15px;
+  margin-bottom: 15px;
+  height: calc(100% - 70px); /* Adjust to leave space for pagination */
+  overflow-y: auto;
+}
+
+/* Tab Icons */
+.tab-icon {
+  width: 100%;
+  height: 250px; /* Increased height */
+  object-fit: cover;
+  border-radius: 8px;
+  margin-bottom: 15px;
+}
+
+.tribe-title {
+  font-size: 22px;
+  font-weight: bold;
+  margin-bottom: 15px;
+  text-align: center;
+  display: block;
+  letter-spacing: 0.5px;
+  cursor: "pointer";
+  text-decoration: underline;
+}
+
+.tribe-text {
+  margin-bottom: 12px;
+  line-height: 1.5;
+  font-size: 15px;
+}
+
+.section-label {
+  font-weight: bold;
+  margin-top: 15px;
+  margin-bottom: 5px;
+  font-size: 16px;
 }
 
 /* Pagination Controls */
 .pagination {
   display: flex;
   justify-content: center;
-  margin-top: 10px;
+  padding: 10px;
+  background: rgba(120, 70, 172, 0.3);
+  border-radius: 8px;
+  position: sticky;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  margin-top: auto;
+  z-index: 10;
 }
 
 .page-btn {
   background: rgba(255, 255, 255, 0.3);
   color: white;
   border: none;
-  padding: 6px 12px;
+  padding: 8px 14px;
   margin: 0 4px;
   border-radius: 6px;
   cursor: pointer;
-  transition: background 0.3s ease;
+  transition: all 0.2s ease;
+}
+
+.page-btn:hover {
+  background: rgba(255, 255, 255, 0.5);
 }
 
 .page-btn.active-page {
   background: white;
   color: #5b3c85;
   font-weight: bold;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
 }
 
-/* Tab Icons */
-.tab-icon {
-  width: 100%;
-  height: 40%;
-  margin-right: 8px;
-  margin-bottom: 10px;
-  vertical-align: middle;
-}
- .tribe-title {
-  font-size: 24px;
-  font-weight: bold;
-  margin-bottom: 10px;
-  text-align: center;
-  display: block;
-}
 /* Style the close button */
 .close-btn {
   position: absolute;
-  top: 2px;
+  top: 10px;
   right: 10px;
   background: none;
   border: none;
-  font-size: 30px; /* Adjust size as needed */
-  color: #333; /* Adjust color as needed */
+  font-size: 24px;
+  color: white;
   cursor: pointer;
   padding: 0;
   line-height: 1;
+  z-index: 5;
+  width: 30px;
+  height: 30px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  transition: background 0.3s ease;
 }
-/* Optional: Hover effect */
+
 .close-btn:hover {
-  color: #aa93cb; /* Red on hover, adjust as needed */
+  background: rgba(255, 255, 255, 0.2);
+}
+
+/* Empty state styling */
+.empty-state {
+  text-align: center;
+  padding: 30px;
+  color: rgba(255, 255, 255, 0.8);
+  font-style: italic;
+}
+
+/* References section */
+.references-section {
+  margin-top: 20px;
+  padding-top: 10px;
+  border-top: 1px solid rgba(255, 255, 255, 0.3);
 }

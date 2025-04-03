@@ -119,3 +119,17 @@
   .adding-story-publish-button:hover {
     opacity: 0.9;
   }
+  .adding-story-back-button{
+  background-color: #9d499a;
+  color: white;
+  border: none;
+  padding: 12px 24px;
+  border-radius: 5px;
+  cursor: pointer;
+  font-size: 16px;
+  font-weight: bold;
+  }
+  /* Hover Effect */
+.adding-story-back-button:hover {
+  background-color: #b0b0b0;
+}

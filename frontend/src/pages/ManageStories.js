@@ -1,32 +1,32 @@
 import React, { useState, useEffect } from "react";
-import "../styles/ManageStories.css";
-import "../styles/pagination.css";
-import storyBackground3 from "../images/stories/story-background1.png";
-import storyBackground1 from "../images/stories/story-background2.png";
-import storyBackground2 from "../images/stories/story-background3.png";
-import Sidebar from "../components/Sidebar";
-import Header from "../components/AdminHeader";
-import { Modal, Button } from "react-bootstrap";
 import { useNavigate } from "react-router-dom";
-import AdminStorySearchBar from "../components/AdminStorySearchBar"; // Import the story-specific search bar
+import { Modal } from "react-bootstrap";
+import DashboardLayout from "../components/DashboardLayout";
+import AdminStorySearchBar from "../components/AdminStorySearchBar";
 import Pagination from "../components/Pagination";
+import "../styles/DashboardLayout.css";
+import "../styles/ManageStories.css";
 
-const HeroManageStories = () => {
+const ManageStories = () => {
   const [stories, setStories] = useState([]);
   const [searchResults, setSearchResults] = useState([]);
   const [tribes, setTribes] = useState({});
   const [loading, setLoading] = useState(true);
-  const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [showErrorModal, setShowErrorModal] = useState(false);
   const [selectedStory, setSelectedStory] = useState(null);
   const [error, setError] = useState(null);
-  // Pagination states
   const [currentPage, setCurrentPage] = useState(1);
-  const [storiesPerPage] = useState(7); // Show 7 stories per page
+  const [storiesPerPage] = useState(10);
+  const [statusUpdating, setStatusUpdating] = useState(false);
   
   const navigate = useNavigate();
 
-  const backgrounds = [storyBackground1, storyBackground2, storyBackground3];
+  // Background colors for alternating rows - matching ManageTribes
+  const rowBackgroundColors = [
+    "#f9f0ff", // Lavender whisper  
+    "#f0f9ff", // Baby blue  
+    "#f0fff4"  // Mint cream  
+  ];
 
   useEffect(() => {
     const fetchTribes = async () => {
@@ -45,7 +45,6 @@ const HeroManageStories = () => {
         setShowErrorModal(true);
       }
     };
-    fetchTribes();
 
     const fetchStories = async () => {
       setLoading(true);
@@ -53,9 +52,8 @@ const HeroManageStories = () => {
         const response = await fetch("/api/admin/stories");
         if (!response.ok) throw new Error("Failed to fetch stories");
         const data = await response.json();
-        console.log("Fetched stories:", data);
         setStories(data);
-        setSearchResults(data); // Initialize search results with all stories
+        setSearchResults(data);
       } catch (err) {
         console.error("Error fetching stories:", err);
         setError("Failed to load stories. Please try again later.");
@@ -64,37 +62,104 @@ const HeroManageStories = () => {
         setLoading(false);
       }
     };
+
+    fetchTribes();
     fetchStories();
   }, []);
 
-  const handleDeleteClick = (story) => {
+  const handleDeleteClick = (story, e) => {
+    e.stopPropagation(); // Prevent row click navigation
     setSelectedStory(story);
-    setShowDeleteModal(true);
+    const confirmDelete = window.confirm(`Are you sure you want to delete "${story.story_name}"?`);
+    
+    if (confirmDelete) {
+      deleteStory(story);
+    }
   };
 
-  const confirmDelete = async () => {
+  const deleteStory = async (story) => {
     try {
-      const response = await fetch(`/api/admin/stories/${selectedStory.story_id}`, {
+      const response = await fetch(`/api/admin/stories/${story.story_id}`, {
         method: "DELETE",
       });
-      if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.error || "Failed to delete story");
-      }
-      const updatedStories = stories.filter((story) => story.story_id !== selectedStory.story_id);
+      
+      if (!response.ok) throw new Error("Failed to delete story");
+      
+      const updatedStories = stories.filter((s) => s.story_id !== story.story_id);
       setStories(updatedStories);
       setSearchResults(updatedStories);
-      setShowDeleteModal(false);
-      setSelectedStory(null);
+      setError(`"${story.story_name}" has been deleted successfully.`);
+      setShowErrorModal(true);
     } catch (err) {
       console.error("Error deleting story:", err);
       setError(`Failed to delete story: ${err.message}`);
       setShowErrorModal(true);
-      setShowDeleteModal(false);
     }
   };
 
-  // Search handler function
+  const handleStatusChange = async (story, newPublishStatus, e) => {
+    e.stopPropagation(); // Prevent row click navigation
+    setStatusUpdating(true);
+    
+    try {
+      // First, get the full story data
+      const getResponse = await fetch(`/api/admin/stories/${story.story_id}`);
+      if (!getResponse.ok) {
+        throw new Error(`Failed to fetch story data: ${getResponse.statusText}`);
+      }
+      const fullStory = await getResponse.json();
+      
+      // Update only the published field
+      const storyData = {
+        story_name: fullStory.story_name,
+        tribe_id: fullStory.tribe_id,
+        story_year: fullStory.story_year,
+        story_text: fullStory.story_text,
+        story_references: fullStory.story_references,
+        published: newPublishStatus
+      };
+      
+      // Use the existing PUT endpoint
+      const response = await fetch(`/api/admin/stories/${story.story_id}`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(storyData),
+      });
+      
+      if (!response.ok) {
+        throw new Error(`Failed to update story status: ${response.statusText}`);
+      }
+      
+      // Update state locally
+      const updatedStories = stories.map(s => {
+        if (s.story_id === story.story_id) {
+          return { ...s, published: newPublishStatus };
+        }
+        return s;
+      });
+      
+      setStories(updatedStories);
+      setSearchResults(
+        searchResults.map(s => {
+          if (s.story_id === story.story_id) {
+            return { ...s, published: newPublishStatus };
+          }
+          return s;
+        })
+      );
+      
+      // Show success message
+      setError(`"${story.story_name}" has been ${newPublishStatus ? "published" : "unpublished"} successfully.`);
+      setShowErrorModal(true);
+    } catch (err) {
+      console.error("Error updating story status:", err);
+      setError(`Failed to update story status: ${err.message}`);
+      setShowErrorModal(true);
+    } finally {
+      setStatusUpdating(false);
+    }
+  };
+
   const handleSearch = (searchTerm) => {
     if (!searchTerm) {
       setSearchResults(stories);
@@ -104,10 +169,9 @@ const HeroManageStories = () => {
       story.story_name.toLowerCase().includes(searchTerm.toLowerCase())
     );
     setSearchResults(filteredStories);
-    setCurrentPage(1); // Reset to first page when searching
+    setCurrentPage(1);
   };
 
-  // Sort handler function
   const handleSort = (sortOption) => {
     let sortedStories = [...searchResults];
     switch (sortOption) {
@@ -141,14 +205,12 @@ const HeroManageStories = () => {
         break;
     }
     setSearchResults(sortedStories);
-    setCurrentPage(1); // Reset to first page when sorting
+    setCurrentPage(1);
   };
 
-  // Filter handler function
   const handleFilter = (tribeName, timeRange, statusFilter = 'all') => {
     let filteredStories = [...stories];
-
-    // Filter by tribe name
+    
     if (tribeName) {
       const matchingTribes = Object.entries(tribes).filter(([_, name]) => 
         name.toLowerCase().includes(tribeName.toLowerCase())
@@ -162,19 +224,22 @@ const HeroManageStories = () => {
       }
     }
 
-    // Filter by year range
     if (timeRange && timeRange.length === 2) {
       const minYear = parseInt(timeRange[0]);
       const maxYear = parseInt(timeRange[1]);
       
-      if (!isNaN(minYear) && !isNaN(maxYear)) {
+      if (!isNaN(minYear)) {
         filteredStories = filteredStories.filter(story => 
-          story.story_year >= minYear && story.story_year <= maxYear
+          story.story_year >= minYear
+        );
+      }
+      if (!isNaN(maxYear)) {
+        filteredStories = filteredStories.filter(story => 
+          story.story_year <= maxYear
         );
       }
     }
 
-    // Filter by status
     if (statusFilter !== 'all') {
       const isPublished = statusFilter === 'published';
       filteredStories = filteredStories.filter(story => 
@@ -183,127 +248,161 @@ const HeroManageStories = () => {
     }
 
     setSearchResults(filteredStories);
-    setCurrentPage(1); // Reset to first page when filtering
+    setCurrentPage(1);
   };
 
   // Get current stories for pagination
   const indexOfLastStory = currentPage * storiesPerPage;
   const indexOfFirstStory = indexOfLastStory - storiesPerPage;
   const currentStories = searchResults.slice(indexOfFirstStory, indexOfLastStory);
-  
-  // Change page
   const paginate = (pageNumber) => setCurrentPage(pageNumber);
 
+  // Handle row click to navigate to edit page
+  const handleRowClick = (story) => {
+    navigate(`/EditStory/${story.story_id}`);
+  };
+
   return (
-    <div className="overlap">
-      <Sidebar />
-      <main className="rightFrame-5">
-        <div className="manage-header">
-          <button className="back-btn" onClick={() => navigate("/Admin/Dashboard")}>Back</button>
-          <button className="new-story-btn" onClick={() => navigate("/ManageStories/AddingStory")}>+ New Story</button>
+    <DashboardLayout activeTab="stories">
+      <div className="manage-stories-container">
+        <div className="search-filter-container">
+          <AdminStorySearchBar 
+            onSearch={handleSearch} 
+            onSort={handleSort} 
+            onFilter={handleFilter} 
+          />
+          <button 
+            className="new-story-btn"
+            onClick={() => navigate("/ManageStories/AddingStory")}
+          >
+            + New Story
+          </button>
         </div>
 
-        {loading && <div className="loading">Loading stories...</div>}
-        {error && showErrorModal && (
-          <Modal show={showErrorModal} onHide={() => setShowErrorModal(false)} centered>
-            <Modal.Header closeButton>
-              <Modal.Title>Error</Modal.Title>
-            </Modal.Header>
-            <Modal.Body>{error}</Modal.Body>
-            <Modal.Footer>
-              <Button variant="secondary" onClick={() => setShowErrorModal(false)}>
-                Close
-              </Button>
-            </Modal.Footer>
-          </Modal>
-        )}
-        
-        {/* Using the story-specific search bar */}
-        <AdminStorySearchBar 
-          onSearch={handleSearch} 
-          onSort={handleSort} 
-          onFilter={handleFilter} 
-        />
-
-        <div className="stories-table">
-          <div className="table-header">
-            <span>Story Name</span>
-            <span>Tribe</span>
-            <span>Timeline</span>
-            <span>Status</span>
-            <span>Actions</span>
-          </div>
-
-          <div className="table-body">
-            {currentStories.length > 0 ? (
-              currentStories.map((story, index) => (
-                <div
-                  key={story.story_id}
-                  className="table-row"
-                  style={{ backgroundImage: `url(${backgrounds[index % backgrounds.length]})` }}
-                >
-                  <span>{story.story_name}</span>
-                  <span>{tribes[story.tribe_id] || "Unknown"}</span>
-                  <span>{story.story_year || "N/A"}</span>
-                  <span className={`status ${story.published ? "published" : "editing"}`}>
-                    {story.published ? "Published" : "Editing"}
-                  </span>
-                  <div className="actions">
-                    <button
-                      className="edit-btn"
-                      onClick={() => navigate(`/EditStory/${story.story_id}`)}
+        {loading ? (
+          <div className="loading">Loading stories...</div>
+        ) : (
+          <>
+            <table className="stories-table">
+              <thead>
+                <tr>
+                  <th>Story Name</th>
+                  <th>Tribe</th>
+                  <th>Timeline</th>
+                  <th>Status</th>
+                  <th style={{textAlign: 'center'}}>Actions</th>
+                </tr>
+              </thead>
+              <tbody>
+                {currentStories.length > 0 ? (
+                  currentStories.map((story, index) => (
+                    <tr 
+                      key={story.story_id}
+                      style={{ 
+                        backgroundColor: rowBackgroundColors[index % rowBackgroundColors.length],
+                        cursor: 'pointer'
+                      }}
+                      onClick={() => handleRowClick(story)}
+                      className="story-row"
                     >
-                      Edit
-                    </button>
-                    <button 
-                      className="delete-btn"
-                      onClick={() => handleDeleteClick(story)}
-                    >
-                      Delete
-                    </button>
-                  </div>
-                </div>
-              ))
-            ) : (
-              <div className="table-row empty-row">
-                <span>No stories available.</span>
-              </div>
-            )}
-          </div>
-        </div>
+                      <td>{story.story_name}</td>
+                      <td>{tribes[story.tribe_id] || "Unknown"}</td>
+                      <td>{story.story_year || "N/A"}</td>
+                      <td>
+                        <span className={`status-badge ${story.published ? "published" : "editing"}`}>
+                          {story.published ? "Published" : "Editing"}
+                        </span>
+                      </td>
+                      <td onClick={(e) => e.stopPropagation()} style={{textAlign: 'center'}}>
+                        <div className="action-buttons" style={{justifyContent: 'center'}}>
+                          {story.published ? (
+                            <button
+                              className="action-btn unpublish-btn"
+                              onClick={(e) => handleStatusChange(story, false, e)}
+                              disabled={statusUpdating}
+                            >
+                              Unpublish
+                            </button>
+                          ) : (
+                            <button
+                              className="action-btn publish-btn"
+                              onClick={(e) => handleStatusChange(story, true, e)}
+                              disabled={statusUpdating}
+                            >
+                              Publish
+                            </button>
+                          )}
+                          <button
+                            className="action-btn delete-btn"
+                            onClick={(e) => handleDeleteClick(story, e)}
+                            disabled={statusUpdating}
+                          >
+                            Delete
+                          </button>
+                        </div>
+                      </td>
+                    </tr>
+                  ))
+                ) : (
+                  <tr>
+                    <td colSpan="5" style={{ textAlign: 'center', padding: '2rem' }}>
+                      No stories found
+                    </td>
+                  </tr>
+                )}
+              </tbody>
+            </table>
 
-        {/* Pagination component */}
-        <Pagination
-          storiesPerPage={storiesPerPage}
-          totalStories={searchResults.length}
-          paginate={paginate}
-          currentPage={currentPage}
-        />
-
-        {showDeleteModal && (
-          <div className="delete-modal">
-            <div className="delete-modal-content">
-              <p>Are you sure you want to delete <strong>{selectedStory?.story_name}</strong>?</p>
-              <div className="modal-buttons">
-                <button className="cancel-btn" onClick={() => setShowDeleteModal(false)}>Cancel</button>
-                <button className="delete-btn" onClick={confirmDelete}>Delete</button>
-              </div>
+            <div className="pagination-container">
+              <Pagination
+                storiesPerPage={storiesPerPage}
+                totalStories={searchResults.length}
+                paginate={paginate}
+                currentPage={currentPage}
+              />
             </div>
-          </div>
+          </>
         )}
-      </main>
-    </div>
-  );
-};
-
-const ManageStories = () => {
-  return (
-    <div className="ManageStories">
-      <div className="div">
-        <Header />
-        <HeroManageStories />
       </div>
-    </div>
+
+      {/* Error/Status Modal */}
+      <Modal 
+        show={showErrorModal} 
+        onHide={() => {
+          setShowErrorModal(false);
+          setError(null);
+        }} 
+        centered
+      >
+        <Modal.Header closeButton>
+          <Modal.Title>
+            {error && error.includes("Failed") ? "Error" : "Status Update"}
+          </Modal.Title>
+        </Modal.Header>
+        <Modal.Body>
+          {error}
+        </Modal.Body>
+        <Modal.Footer>
+          <button 
+            className="action-btn edit-btn"
+            onClick={() => {
+              setShowErrorModal(false);
+              setError(null);
+            }}
+          >
+            Close
+          </button>
+        </Modal.Footer>
+      </Modal>
+      
+      {/* Loading overlay for status updates */}
+      {statusUpdating && (
+        <div className="status-updating-overlay">
+          <div className="status-updating-spinner"></div>
+          <p>Updating story status...</p>
+        </div>
+      )}
+    </DashboardLayout>
   );
 };
 

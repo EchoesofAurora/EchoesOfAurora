@@ -1,11 +1,12 @@
 import React, { useEffect, useState } from "react";
-import { useParams, Link } from "react-router-dom";
+import { useParams, Link, useNavigate } from "react-router-dom";
 import Header from "../components/Header";
 import Footer from "../components/Footer";
 import "../styles/tribeLandingPage.css";
 
 const TribeLandingPage = () => {
   const { tribeId } = useParams();
+  const navigate = useNavigate();
   const [tribe, setTribe] = useState(null);
   const [tribeImages, setTribeImages] = useState([]);
   const [activeImage, setActiveImage] = useState(null);
@@ -156,10 +157,29 @@ const TribeLandingPage = () => {
           <h2>Tribe Details</h2>
           <div className="tribe-landing-text">{tribe.tribe_text}</div>
 
-          {/* Historical Timeline Section */}
-          <h2>Historical Timeline</h2>
-          <div className="tribe-landing-text">
-            This tribe has historical significance spanning from <strong>{tribe.start_year || 'unknown'}</strong> to <strong>{tribe.end_year || 'present'}</strong>.
+          <a href="#" className="back-button" onClick={(e) => {
+            e.preventDefault();
+            navigate(-1);
+          }}>
+            ← Back
+          </a>
+          
+          {/* Tribe Title */}
+          <h1>{tribe.tribe_name}</h1>
+ 
+          {/* Hero Image with Placeholder */}
+          <div className="hero-image-container">
+            {tribe.heroImage ? (
+              <img
+                src={tribe.heroImage}
+                alt={`${tribe.tribe_name} Hero`}
+                className="hero-image"
+              />
+            ) : (
+              <div className="hero-placeholder">
+                <p>Hero Image Placeholder</p>
+              </div>
+            )}
           </div>
 
           {/* References Section */}
@@ -218,5 +238,5 @@ const TribeLandingPage = () => {
     </div>
   );
 };
-
+ 
 export default TribeLandingPage;
