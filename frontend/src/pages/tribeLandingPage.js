@@ -156,10 +156,25 @@ const TribeLandingPage = () => {
           <h2>Tribe Details</h2>
           <div className="tribe-landing-text">{tribe.tribe_text}</div>
 
-          {/* Historical Timeline Section */}
-          <h2>Historical Timeline</h2>
-          <div className="tribe-landing-text">
-            This tribe has historical significance spanning from <strong>{tribe.start_year || 'unknown'}</strong> to <strong>{tribe.end_year || 'present'}</strong>.
+      <a href="/" className="back-button" onClick={() => navigate(-1)}>
+        ← Back
+      </a>
+ 
+      </Link>
+      {/* Tribe Title */}
+      <h1>{tribe.tribe_name}</h1>
+ 
+      {/* Hero Image with Placeholder */}
+      <div className="hero-image-container">
+        {tribe.heroImage ? (
+          <img
+            src={tribe.heroImage}
+            alt={`${tribe.tribe_name} Hero`}
+            className="hero-image"
+          />
+        ) : (
+          <div className="hero-placeholder">
+            <p>Hero Image Placeholder</p>
           </div>
 
           {/* References Section */}
@@ -215,8 +230,8 @@ const TribeLandingPage = () => {
       )}
       
       <Footer />
-    </div>
+     </div>
   );
-};
-
+}
+ 
 export default TribeLandingPage;
