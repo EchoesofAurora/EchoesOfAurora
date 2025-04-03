@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import "../styles/profileEdit.css";
-import Sidebar from "../components/Sidebar";
-import Header from "../components/AdminHeader";
+import "../styles/DashboardLayout.css";
+import DashboardLayout from "../components/DashboardLayout";
 import ProfileUpdatedPopUp from "../components/profileUpdatedPopUp"; // Updated to match component name
 import lynn1 from "../images/lynn.png";
 import envelope from "../images/envelope.png";
@@ -28,87 +28,83 @@ const MyProfile = () => {
   };
 
   return (
-    <div className="overlap">
-      <Sidebar />
-      <main className="profile-right-frame">
-        <div className="manage-header">
+    <div className="profile-content">
+      <div className="manage-header">
         <h1>Edit My Profile</h1>
-          <button
-            className="add-user-button"
-            onClick={() => (window.location.href = "/Admin/AddUser")}
-          >
-            Add New User
-          </button>
-        </div>
-        <div className="left-profile-fields">
-          
-          <div className="profile-card-container">
-            <img className="profile-image" src={lynn1} alt="Lynn Hazelman" />
-            <div className="profile-info">
-              <button
-                className="profile-edit-button"
-                onClick={() => (window.location.href = "/Admin/changePassword")}
-              >
-                <div className="profile-button-content">
-                  <span className="profile-button-text">Change Password</span>
-                </div>
-              </button>
-            </div>
-          </div>
-
-          <div className="profile-container">
-            <div className="input-container">
-              <label className="label">Full Name</label>
-              <div className="input-wrapper">
-                <img src={person} alt="person" className="icon" />
-                <input type="text" placeholder="Enter your full name" className="input" />
+        <button
+          className="add-user-button"
+          onClick={() => (window.location.href = "/Admin/AddUser")}
+        >
+          Add New User
+        </button>
+      </div>
+      <div className="left-profile-fields">
+        
+        <div className="profile-card-container">
+          <img className="profile-image" src={lynn1} alt="Lynn Hazelman" />
+          <div className="profile-info">
+            <button
+              className="profile-edit-button"
+              onClick={() => (window.location.href = "/Admin/changePassword")}
+            >
+              <div className="profile-button-content">
+                <span className="profile-button-text">Change Password</span>
               </div>
-            </div>
-
-            <div className="input-container">
-              <label className="label">Email</label>
-              <div className="input-wrapper">
-                <img src={envelope} alt="mail" className="icon" />
-                <input
-                  type="email"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  className="input"
-                />
-              </div>
-              <button className="profile-edit-button" onClick={() => handleOpenPopup("Email")}>
-                Update Email
-              </button>
-            </div>
+            </button>
           </div>
         </div>
 
-        {showPopup && <ProfileUpdatedPopUp field={fieldToUpdate} newValue={newValue} onClose={handleClosePopup} />}
+        <div className="profile-container">
+          <div className="input-container">
+            <label className="label">Full Name</label>
+            <div className="input-wrapper">
+              <img src={person} alt="person" className="icon" />
+              <input type="text" placeholder="Enter your full name" className="input" />
+            </div>
+          </div>
 
-        <div className="text-note">
-          <span>
-            <strong>Instructions to update Admin Email:</strong>
-            <ul>
-              <li>A verification PIN will be sent to the old email.</li>
-              <li>Enter the PIN to confirm your identity.</li>
-              <li>After verification, update your details.</li>
-            </ul>
-            Ensure access to the old email. Contact support if needed.
-          </span>
+          <div className="input-container">
+            <label className="label">Email</label>
+            <div className="input-wrapper">
+              <img src={envelope} alt="mail" className="icon" />
+              <input
+                type="email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                className="input"
+              />
+            </div>
+            <button className="profile-edit-button" onClick={() => handleOpenPopup("Email")}>
+              Update Email
+            </button>
+          </div>
         </div>
-      </main>
+      </div>
+
+      {showPopup && <ProfileUpdatedPopUp field={fieldToUpdate} newValue={newValue} onClose={handleClosePopup} />}
+
+      <div className="text-note">
+        <span>
+          <strong>Instructions to update Admin Email:</strong>
+          <ul>
+            <li>A verification PIN will be sent to the old email.</li>
+            <li>Enter the PIN to confirm your identity.</li>
+            <li>After verification, update your details.</li>
+          </ul>
+          Ensure access to the old email. Contact support if needed.
+        </span>
+      </div>
     </div>
   );
 };
 
 const EditProfile = () => {
   return (
-    <div className="EditProfile-container">
-      <div className="div">
-        <Header />
+    <DashboardLayout activeTab="settings">
+      <div className="manage-stories-container">
         <MyProfile />
       </div>
-    </div>
+    </DashboardLayout>
   );
 };
 

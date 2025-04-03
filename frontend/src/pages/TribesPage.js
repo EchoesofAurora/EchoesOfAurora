@@ -7,6 +7,9 @@ import Header from '../components/Header';
 import Footer from '../components/Footer';
 import SearchBar from "../components/TribeSearchBar";
 import Pagination from "../components/Pagination"; // Import the Pagination component
+
+// Import a default image as fallback
+import defaultTribeImage from "../images/tribes/1.png";
  
 function TribesSection() {
   const [tribes, setTribes] = useState([]);
@@ -18,7 +21,7 @@ function TribesSection() {
   const navigate = useNavigate();
  
   useEffect(() => {
-    const fetchTribes = async () => {
+    const fetchTribesWithImages = async () => {
       try {
         const response = await fetch("/api/tribes");
         if (!response.ok) {
@@ -26,7 +29,7 @@ function TribesSection() {
         }
         const data = await response.json();
         setTribes(data);
-        setSearchResults(data); // Initialize search results with all tribes
+        setSearchResults(data.sort((a, b) => a.tribe_name.localeCompare(b.tribe_name))); // Initialize with sorted results
       } catch (error) {
         setError(error.message);
       } finally {
@@ -34,11 +37,25 @@ function TribesSection() {
       }
     };
  
-    fetchTribes();
+    fetchTribesWithImages();
   }, []);
- 
-  const getImageUrl = (tribeId) => {
-    return require(`../images/tribes/${tribeId}.png`);
+
+  // Get the tribe image or return a default image
+  const getTribeImage = (tribe) => {
+    // First check if there's image data in the database
+    if (tribe.image_data) {
+      return `data:${tribe.media_type};base64,${tribe.image_data}`;
+    }
+
+    // Otherwise use a consistent image based on tribe ID
+    try {
+      // This will throw an error if the image doesn't exist
+      return require(`../images/tribes/${tribe.tribe_id}.png`);
+    } catch (e) {
+      // If tribe-specific image not found, use the generic default
+      console.error(`Error loading specific image for tribe ${tribe.tribe_id}:`, e);
+      return defaultTribeImage;
+    }
   };
  
   const handleLearnMore = (tribe) => {
@@ -120,9 +137,16 @@ function TribesSection() {
               {currentTribes.map((tribe, index) => (
                 <div className="tribe-card" key={index}>
                   <img
-                    src={getImageUrl(1)}
+                    src={getTribeImage(tribe)}
                     alt={tribe.tribe_name}
                     className="tribe-image"
+                    onError={(e) => {
+                      console.log(
+                        `Error loading image for tribe ${tribe.tribe_id}, using default`
+                      );
+                      e.target.onerror = null; // Prevent infinite loops
+                      e.target.src = defaultTribeImage;
+                    }}
                   />
                   <div className="tribe-info">
                     <h3>{tribe.tribe_name.charAt(0).toUpperCase() + tribe.tribe_name.slice(1)}</h3>
@@ -136,7 +160,9 @@ function TribesSection() {
                       >
                         Learn more
                       </button>
-                      <h2 className="tribe-year">Year: {tribe.start_year}</h2>
+                      <h2 className="tribe-year">
+                        Year: {tribe.start_year}{tribe.end_year ? ` - ${tribe.end_year}` : ''}
+                      </h2>
                     </div>
                   </div>
                 </div>

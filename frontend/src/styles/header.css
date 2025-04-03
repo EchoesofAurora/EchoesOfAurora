@@ -109,4 +109,24 @@
   }
 }
 
+
+.user-header-nav-bar a {
+  text-decoration: none;
+  color: rgb(254, 239, 255);
+  font-size: 1.2rem;
+  font-weight: 700;
+  transition: color 0.3s, border-bottom 0.3s;
+  padding-bottom: 3px;
+}
+
+.user-header-nav-bar a:hover {
+  color: #9d4edd;
+}
+
+.user-header-nav-bar a.active {
+  font-weight: 900;
+  color: #f4a261;
+  border-bottom: 3px solid #f4a261;
+}
+
   

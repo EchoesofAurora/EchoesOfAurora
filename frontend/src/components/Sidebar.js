@@ -24,8 +24,8 @@ const Sidebar = () => {
   // Check if the current path is related to settings
   const isSettingsActive = [
     "/Admin/EditProfile",
-    "/Admin/AddNewUser",
-    "/Admin/ChangePassword",
+    "/Admin/AddUser",
+    "/Admin/changePassword",
   ].includes(location.pathname);
 
   // Check if the current path is related to "Manage Stories"

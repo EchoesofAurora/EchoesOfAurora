@@ -1,8 +1,8 @@
 import React, { useState } from "react";
 import { FaSearch } from "react-icons/fa"; 
-import "../styles/AdminSearchBar.css"; 
+import "../styles/AdminStorySearchBar.css"; 
 
-const AdminSearchBar = ({ onSearch, onSort, onFilter }) => {
+const AdminStorySearchBar = ({ onSearch, onSort, onFilter }) => {
   const [searchQuery, setSearchQuery] = useState("");
   const [sortOption, setSortOption] = useState("");
   const [filterTribe, setFilterTribe] = useState("");
@@ -31,30 +31,21 @@ const AdminSearchBar = ({ onSearch, onSort, onFilter }) => {
     onFilter(filterTribe, newRange, statusFilter);
   };
 
-  const handleStatusToggle = () => {
-    const newStatus = statusFilter === 'all' ? 'published' : 
-                      statusFilter === 'published' ? 'editing' : 
-                      'all';
+  const handleStatusChange = (e) => {
+    const newStatus = e.target.value;
     setStatusFilter(newStatus);
     onFilter(filterTribe, timeRange, newStatus);
   };
 
-  const getStatusLabel = () => {
-    switch(statusFilter) {
-      case 'published': return 'Published Stories';
-      case 'editing': return 'Editing Stories';
-      default: return 'All Stories';
-    }
-  };
-
   return (
     <div className="admin-filter-sort-bar">
+      {/* First row: Search and Sort */}
       <div className="admin-search-and-sort-container">
         <div className="admin-search-bar-container">
           <input
             className="admin-search-bar"
             type="text"
-            placeholder="Search..."
+            placeholder="Search stories..."
             value={searchQuery}
             onChange={handleSearch}
           />
@@ -74,48 +65,57 @@ const AdminSearchBar = ({ onSearch, onSort, onFilter }) => {
         </select>
       </div>
 
-      <div className="admin-search-and-sort-container">
-        <input
-          className="admin-filter-input"
-          type="text"
-          placeholder="Filter by tribe"
-          value={filterTribe}
-          onChange={handleFilterTribe}
-        />
-
-        <div className="admin-time-range">
-          <label className="admin-year-range-label">From:</label>
+      {/* Second row: Filter by Tribe, Year Range, and Status */}
+      <div className="admin-filters-container">
+        <div className="admin-tribe-filter">
           <input
-            type="number"
-            min="0"
-            max={new Date().getFullYear()}
-            value={timeRange[0]}
-            onChange={(e) => handleTimeRangeChange(e, 0)}
-          />
-          <label className="admin-year-range-label">To:</label>
-          <input
-            type="number"
-            min="0"
-            max={new Date().getFullYear()}
-            value={timeRange[1]}
-            onChange={(e) => handleTimeRangeChange(e, 1)}
+            className="admin-filter-input"
+            type="text"
+            placeholder="Filter by tribe"
+            value={filterTribe}
+            onChange={handleFilterTribe}
           />
         </div>
-      </div>
 
-      <div className="admin-status-filter-container">
-        <div className="admin-status-toggle-wrapper">
-          <span className="admin-status-label">{getStatusLabel()}</span>
-          <div 
-            className={`admin-status-toggle ${statusFilter}`} 
-            onClick={handleStatusToggle}
-          >
-            <div className="admin-status-toggle-slider"></div>
+        <div className="admin-time-range">
+          <div className="admin-date-field">
+            <span className="admin-date-label">From:</span>
+            <input
+              type="number"
+              min="0"
+              max={new Date().getFullYear()}
+              value={timeRange[0]}
+              onChange={(e) => handleTimeRangeChange(e, 0)}
+              className="admin-date-input"
+            />
           </div>
+          <div className="admin-date-field">
+            <span className="admin-date-label">To:</span>
+            <input
+              type="number"
+              min="0"
+              max={new Date().getFullYear()}
+              value={timeRange[1]}
+              onChange={(e) => handleTimeRangeChange(e, 1)}
+              className="admin-date-input"
+            />
+          </div>
+        </div>
+
+        <div className="admin-status-filter">
+          <select 
+            className="admin-status-dropdown" 
+            value={statusFilter} 
+            onChange={handleStatusChange}
+          >
+            <option value="all">All Stories</option>
+            <option value="published">Published Stories</option>
+            <option value="editing">Editing Stories</option>
+          </select>
         </div>
       </div>
     </div>
   );
 };
 
-export default AdminSearchBar;
+export default AdminStorySearchBar;

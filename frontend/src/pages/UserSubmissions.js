@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import "../styles/UserSubmissions.css";
-import Sidebar from "../components/Sidebar";
-import Header from "../components/AdminHeader";
+import "../styles/DashboardLayout.css";
+import DashboardLayout from "../components/DashboardLayout";
 import { FaStar, FaRegStar, FaTrash, FaEnvelopeOpenText, FaInbox } from "react-icons/fa";
 
 const HeroUserSubmissions = () => {
@@ -98,68 +98,72 @@ const HeroUserSubmissions = () => {
   };
 
   return (
-    <div className="overlap">
-      <Sidebar />
-      <main className="rightFrame-5">
-        <div className="user-submissions-main">
-          <button className="us-back-btn" onClick={() => navigate("/Admin/Dashboard")}>Back</button>
-          
-          <h3>User Submissions</h3>
+    <div className="user-submissions-main">
+      <h3>User Submissions</h3>
 
-          {/* Horizontal Filter Bar */}
-          <div className="horizontal-filters">
-            <button className={selectedFilter === "Inbox" ? "active" : ""} onClick={() => setSelectedFilter("Inbox")}>
-              <FaInbox /> Inbox
-            </button>
-            <button className={selectedFilter === "Starred" ? "active" : ""} onClick={() => setSelectedFilter("Starred")}>
-              <FaStar /> Starred
-            </button>
-            <button className={selectedFilter === "Unread" ? "active" : ""} onClick={() => setSelectedFilter("Unread")}>
-              <FaEnvelopeOpenText /> Unread
-            </button>
-          </div>
+      {/* Horizontal Filter Bar */}
+      <div className="horizontal-filters">
+        <button className={selectedFilter === "Inbox" ? "active" : ""} onClick={() => setSelectedFilter("Inbox")}>
+          <FaInbox /> Inbox
+        </button>
+        <button className={selectedFilter === "Starred" ? "active" : ""} onClick={() => setSelectedFilter("Starred")}>
+          <FaStar /> Starred
+        </button>
+        <button className={selectedFilter === "Unread" ? "active" : ""} onClick={() => setSelectedFilter("Unread")}>
+          <FaEnvelopeOpenText /> Unread
+        </button>
+      </div>
 
-          {/* User Submissions List */}
-          <div className="user-submissions-content">
-            {submissions.map((submission) => (
-              <div
-                key={submission.id}
-                className={`submission-item ${!submission.is_read ? "unread" : ""}`}
-                onClick={() => handleSubmissionClick(submission.id)}
-              >
-                <div className="submission-star" onClick={(e) => { e.stopPropagation(); toggleStar(submission.id); }}>
-                  {submission.stared ? <FaStar className="starred" /> : <FaRegStar className="unstarred" />}
-                </div>
-                <div className="submission-sender">{submission.name}</div>
-                <div className="submission-subject">{submission.topic}</div>
-                <div className="submission-date">
-                  {new Date(submission.created_at).toLocaleDateString('en-US', {
-                    month: 'short',
-                    day: 'numeric',
-                    year: 'numeric',
-                  })}
-                </div>
-                <div className="submission-trash" onClick={(e) => { e.stopPropagation(); handleDeleteClick(submission.id); }}>
-                  <FaTrash />
-                </div>
+      {/* User Submissions List */}
+      <div className="user-submissions-content">
+        {submissions.length > 0 ? (
+          submissions.map((submission) => (
+            <div
+              key={submission.id}
+              className={`submission-item ${!submission.is_read ? "unread" : ""}`}
+              onClick={() => handleSubmissionClick(submission.id)}
+            >
+              <div className="submission-star" onClick={(e) => { e.stopPropagation(); toggleStar(submission.id); }}>
+                {submission.stared ? <FaStar className="starred" /> : <FaRegStar className="unstarred" />}
               </div>
-            ))}
-          </div>
-        </div>
-      </main>
+              <div className="submission-sender">{submission.name}</div>
+              <div className="submission-subject">{submission.topic}</div>
+              <div className="submission-date">
+                {new Date(submission.created_at).toLocaleDateString('en-US', {
+                  month: 'short',
+                  day: 'numeric',
+                  year: 'numeric',
+                })}
+              </div>
+              <div className="submission-trash" onClick={(e) => { e.stopPropagation(); handleDeleteClick(submission.id); }}>
+                <FaTrash />
+              </div>
+            </div>
+          ))
+        ) : (
+          <div className="no-submissions">No submissions found</div>
+        )}
+      </div>
 
       {/* Delete Confirmation Popup */}
       {showDeleteModal && (
-        <div className="delete-popup-overlay">
-          <div className="delete-popup">
-            <p>
-              Are you sure you want to delete this submission?
-            </p>
-            <div className="delete-popup-buttons">
-              <button className="cancel-button" onClick={cancelDelete}>
+        <div className="modal-overlay">
+          <div className="modal-content">
+            <h3>Confirm Deletion</h3>
+            <p>Are you sure you want to delete this submission?</p>
+            <div className="modal-buttons">
+              <button 
+                className="action-btn edit-btn"
+                onClick={cancelDelete}
+              >
                 Cancel
               </button>
-              <button className="confirm-button" onClick={confirmDelete}>Delete</button>
+              <button 
+                className="action-btn delete-btn"
+                onClick={confirmDelete}
+              >
+                Delete
+              </button>
             </div>
           </div>
         </div>
@@ -170,12 +174,11 @@ const HeroUserSubmissions = () => {
 
 const UserSubmissions = () => {
   return (
-    <div className="ManageStories">
-      <div className="div">
-        <Header />
+    <DashboardLayout activeTab="submissions">
+      <div className="manage-stories-container">
         <HeroUserSubmissions />
       </div>
-    </div>
+    </DashboardLayout>
   );
 };
 
