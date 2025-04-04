@@ -4,38 +4,12 @@ import "react-datepicker/dist/react-datepicker.css";
 import "../styles/AddingTribe.css";
 import "../styles/ManageTribes.css";
 import "../styles/DashboardLayout.css";
-import { MapContainer, TileLayer, Polygon, Polyline, Circle, useMapEvents } from "react-leaflet";
-import "leaflet/dist/leaflet.css";
 import { Modal, Button } from "react-bootstrap";
 import { useNavigate } from "react-router-dom"; 
 import ImageUpload from "../components/ImageUpload"; 
 import DashboardLayout from "../components/DashboardLayout";
 import ReferenceLinks from "../components/ReferenceLinks";
-
-const MapWithDrawing = ({ isDrawingEnabled, onShapeUpdate, drawnShape, tempMarkers, setTempMarkers }) => {
-  useMapEvents({
-    click: (e) => {
-      if (!isDrawingEnabled) return;
-      const { lat, lng } = e.latlng;
-      setTempMarkers([...tempMarkers, [lat, lng]]);
-      onShapeUpdate([...drawnShape, [lat, lng]]);
-    },
-  });
-
-  return (
-    <>
-      {isDrawingEnabled && drawnShape.length > 1 && (
-        <Polyline positions={drawnShape} color="blue" />
-      )}
-      {!isDrawingEnabled && drawnShape.length > 2 && (
-        <Polygon positions={[...drawnShape, drawnShape[0]]} color="blue" fillColor="blue" fillOpacity={0.4} />
-      )}
-      {tempMarkers.map((pos, idx) => (
-        <Circle key={idx} center={pos} radius={5000} color="blue" fillColor="blue" fillOpacity={0.6} />
-      ))}
-    </>
-  );
-};
+import MapboxAdmin from "../components/MapboxAdmin";
 
 const HeroAddingTribe = () => {
   // Form field refs for scrolling
@@ -265,9 +239,14 @@ const HeroAddingTribe = () => {
     if (!isDrawingEnabled) {
       setDrawnShape([]);
       setTempMarkers([]);
-      geojson.geometry.coordinates = ""; // Clear coordinates when drawing starts
+      setGeojson({
+        ...geojson,
+        geometry: {
+          ...geojson.geometry,
+          coordinates: ""
+        }
+      });
     } else {
-      // Close the shape if there are at least 3 points
       setDrawnShape((prevShape) => (prevShape.length > 2 ? [...prevShape, prevShape[0]] : prevShape));
     }
     setIsDrawingEnabled(!isDrawingEnabled);
@@ -275,13 +254,16 @@ const HeroAddingTribe = () => {
 
   // Synchronize drawnShape with geojson.geometry.coordinates
   const updateGeojsonCoordinates = (coordinates) => {
-    setGeojson((prev) => ({
-      ...prev,
-      geometry: {
-        ...prev.geometry,
-        coordinates: JSON.stringify([coordinates.map(([lat, lng]) => [lng, lat])]), // Note: GeoJSON uses [longitude, latitude] format
-      },
-    }));
+    if (coordinates && coordinates.length >= 3) {
+      setGeojson((prev) => ({
+        ...prev,
+        geometry: {
+          ...prev.geometry,
+          type: "Polygon",
+          coordinates: JSON.stringify([coordinates.map(([lat, lng]) => [lng, lat])]), // Note: GeoJSON uses [longitude, latitude] format
+        },
+      }));
+    }
   };
 
   // Check if any errors exist
@@ -415,11 +397,11 @@ const HeroAddingTribe = () => {
               Reset Map
             </button>
           </div>
-          <MapContainer center={[40.736, -74.172]} zoom={5} scrollWheelZoom={true} className={`adding-tribe-map ${errors.drawnShape ? 'map-error' : ''}`} style={errors.drawnShape ? { border: '2px solid red' } : {}}>
-            <TileLayer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" />
-            <MapWithDrawing
-              key={JSON.stringify(drawnShape)}
-              isDrawingEnabled={isDrawingEnabled}
+          <div 
+            className={`adding-tribe-map ${errors.drawnShape ? 'map-error' : ''}`} 
+            style={errors.drawnShape ? { border: '2px solid red' } : {}}
+          >
+            <MapboxAdmin
               onShapeUpdate={(newShape) => {
                 setDrawnShape(newShape);
                 updateGeojsonCoordinates(newShape);
@@ -427,11 +409,10 @@ const HeroAddingTribe = () => {
                   setErrors({...errors, drawnShape: ""});
                 }
               }}
-              drawnShape={drawnShape}
-              tempMarkers={tempMarkers}
-              setTempMarkers={setTempMarkers}
+              initialCoordinates={drawnShape}
+              tribeColor={tribeColor}
             />
-          </MapContainer>
+          </div>
           {errors.drawnShape && <div className="error-message" style={{ color: 'red', fontSize: '0.8rem', marginTop: '5px' }}>{errors.drawnShape}</div>}
         </div>
 

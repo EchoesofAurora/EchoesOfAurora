@@ -2,8 +2,6 @@ import React, { useEffect, useState, useRef } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
-import { MapContainer, TileLayer, Polygon, Polyline, Circle, useMapEvents } from "react-leaflet";
-import "leaflet/dist/leaflet.css";
 import { Modal, Button } from "react-bootstrap";
 import "../styles/EditTribe.css";
 import "../styles/ManageStories.css";
@@ -11,48 +9,7 @@ import "../styles/DashboardLayout.css";
 import DashboardLayout from "../components/DashboardLayout";
 import ImageUpload from "../components/ImageUpload";
 import ReferenceLinks from "../components/ReferenceLinks";
-
-
-// Map Drawing Component
-const MapWithDrawing = ({ isDrawingEnabled, onShapeUpdate, drawnShape, tempMarkers, setTempMarkers }) => {
-  useMapEvents({
-    click: (e) => {
-      if (!isDrawingEnabled) return;
-      const { lat, lng } = e.latlng;
-      setTempMarkers([...tempMarkers, [lat, lng]]);
-      onShapeUpdate([...drawnShape, [lat, lng]]);
-    },
-  });
-
-  useEffect(() => {
-  }, [drawnShape]);
-
-  return (
-    <>
-      {isDrawingEnabled && drawnShape.length > 1 && (
-        <Polyline positions={drawnShape} color="blue" />
-      )}
-      {!isDrawingEnabled && drawnShape.length > 2 && (
-        <Polygon
-          positions={[...drawnShape, drawnShape[0]]}
-          color="blue"
-          fillColor="blue"
-          fillOpacity={0.4}
-        />
-      )}
-      {tempMarkers.map((pos, idx) => (
-        <Circle
-          key={idx}
-          center={pos}
-          radius={5000}
-          color="blue"
-          fillColor="blue"
-          fillOpacity={0.6}
-        />
-      ))}
-    </>
-  );
-};
+import MapboxAdmin from "../components/MapboxAdmin";
 
 // Helper function to process coordinates
 const processCoordinates = (geojsonData, logPrefix = "") => {
@@ -70,7 +27,7 @@ const processCoordinates = (geojsonData, logPrefix = "") => {
         const firstRing = coordinates[0];
 
         if (Array.isArray(firstRing)) {
-          processedCoordinates = firstRing.map(([lat, lng]) => [lat, lng]);
+          processedCoordinates = firstRing.map(([lng, lat]) => [lat, lng]); // Convert from [lng, lat] to [lat, lng]
         } else {
           console.warn(`${logPrefix}geojson_data.coordinates[0] is not an array of coordinates:`, firstRing);
         }
@@ -254,12 +211,16 @@ const HeroEditTribe = () => {
     }
 
     if (field === "coordinates" && e.target.value) {
-      const parsedCoords = JSON.parse(e.target.value) || [];
-      if (Array.isArray(parsedCoords) && parsedCoords.length > 0) {
-        const firstRing = parsedCoords[0];
-        if (Array.isArray(firstRing)) {
-          setDrawnShape(firstRing.map(([lat, lng]) => [lat, lng]));
+      try {
+        const parsedCoords = JSON.parse(e.target.value) || [];
+        if (Array.isArray(parsedCoords) && parsedCoords.length > 0) {
+          const firstRing = parsedCoords[0];
+          if (Array.isArray(firstRing)) {
+            setDrawnShape(firstRing.map(([lng, lat]) => [lat, lng]));
+          }
         }
+      } catch (error) {
+        console.error("Failed to parse coordinates:", error);
       }
     }
   };
@@ -289,7 +250,13 @@ const HeroEditTribe = () => {
     if (!isDrawingEnabled) {
       setDrawnShape([]);
       setTempMarkers([]);
-      tribeData.geojson_data.coordinates = "";
+      setTribeData(prev => ({
+        ...prev,
+        geojson_data: {
+          ...prev.geojson_data,
+          coordinates: ""
+        }
+      }));
     } else {
       setDrawnShape((prevShape) => (prevShape.length > 2 ? [...prevShape, prevShape[0]] : prevShape));
       
@@ -302,13 +269,16 @@ const HeroEditTribe = () => {
   };
 
   const updateGeojsonCoordinates = (coordinates) => {
-    setTribeData((prev) => ({
-      ...prev,
-      geojson_data: {
-        ...prev.geojson_data,
-        coordinates: JSON.stringify([coordinates.map(([lat, lng]) => [lat, lng])]),
-      },
-    }));
+    if (coordinates && coordinates.length >= 3) {
+      setTribeData((prev) => ({
+        ...prev,
+        geojson_data: {
+          ...prev.geojson_data,
+          type: "Polygon",
+          coordinates: JSON.stringify([coordinates.map(([lat, lng]) => [lng, lat])]),
+        },
+      }));
+    }
   };
 
   const handleClose = () => setShowModal(false);
@@ -444,10 +414,6 @@ const HeroEditTribe = () => {
       }));
       setDrawnShape(processedCoordinates);
 
-      if (mapRef.current && typeof mapRef.current.invalidateSize === "function") {
-        mapRef.current.invalidateSize();
-      }
-
       setModalMessage(successMessage);
       setShowModal(true);
     } catch (err) {
@@ -580,24 +546,21 @@ const HeroEditTribe = () => {
             <button
               type="button"
               className="map-control-btn"
-              onClick={toggleDrawing}
+              onClick={() => {
+                setDrawnShape([]);
+                setTempMarkers([]);
+                setFormErrors({...formErrors, map_coordinates: true});
+              }}
               disabled={drawnShape.length === 0}
             >
               Reset Map
             </button>
           </div>
-          <MapContainer
-            center={[40.736, -74.172]}
-            zoom={5}
-            scrollWheelZoom={true}
+          <div 
             className={`edit-tribe-map ${formErrors.map_coordinates ? 'error-field' : ''}`}
-            ref={mapRef}
             style={formErrors.map_coordinates ? { border: '2px solid red' } : {}}
           >
-            <TileLayer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" />
-            <MapWithDrawing
-              key={JSON.stringify(drawnShape)}
-              isDrawingEnabled={isDrawingEnabled}
+            <MapboxAdmin
               onShapeUpdate={(newShape) => {
                 setDrawnShape(newShape);
                 updateGeojsonCoordinates(newShape);
@@ -605,17 +568,15 @@ const HeroEditTribe = () => {
                   setFormErrors({ ...formErrors, map_coordinates: false });
                 }
               }}
-              drawnShape={drawnShape}
-              tempMarkers={tempMarkers}
-              setTempMarkers={setTempMarkers}
+              initialCoordinates={drawnShape}
+              tribeColor={tribeData.map_color}
             />
-          </MapContainer>
+          </div>
           {formErrors.map_coordinates && (
             <div className="error-message" style={{ color: 'red', fontSize: '0.85em' }}>
               Please draw a valid area on the map (at least 3 points)
             </div>
           )}
-          <p>Drawn Shape Coordinates: {JSON.stringify(drawnShape)}</p>
         </div>
 
         <div className="edit-tribe-form-group">
