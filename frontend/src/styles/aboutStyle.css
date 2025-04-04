@@ -18,6 +18,7 @@
 }
 
 .About-hero-section::before {
+
   content: '';
   position: absolute;
   top: 0;
@@ -43,7 +44,7 @@
     justify-content: center;
     color: #000;
     gap: 30px;
-    margin: 50px auto;
+    padding-top: 50px;
     font-style: italic;
     font-size: larger;
   }
@@ -133,7 +134,7 @@
   }
 
   .features-img {
-    width: 40%;
+    width: 30%;
     margin: 0 5%;
     height: auto;
     object-fit: cover; /* Ensure the image is properly cropped */
@@ -143,9 +144,9 @@
     width: 40%;
     margin: 0 5%;
     min-height: 400px;
-    /*height: 100px; /* Fixed height */
-    object-fit: cover; /* Ensure the image is properly cropped */
-    /* border-radius: 20px; Rounded corners for images */
+    height: 100px; /*Fixed height*/
+    object-fit: cover; /*Ensure the image is properly cropped*/
+    border-radius: 20px; /*Rounded corners for images */
     border: 5px solid black;
     border-top-left-radius: 100px;
     border-bottom-right-radius: 100px;

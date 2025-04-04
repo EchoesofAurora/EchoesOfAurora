@@ -12,8 +12,8 @@ function ContactPage() {
         <div className="contact-page long-section-background user-section-background long-section-background">
             <Header />
             <div className="hero hero-section contact-hero">
-                <h1 className='hero-title'>Contact us</h1>
-                <p>Have questions, feedback, or stories to share?</p>
+                <h1 className='user-hero-title'>Contact us</h1>
+                <p className='user-hero-subtext'>Have questions, feedback, or stories to share?</p>
             </div>
             <div className="contactus-page-body-section">
                 {/* ... existing contact details ... */}
@@ -116,7 +116,9 @@ const ContactForm = () => {
                     <label htmlFor="message">Your message</label>
                     <textarea id="message" name="message" placeholder="Type your message here..." required></textarea>
                 </div>
-                <button type="submit">Send Message</button>
+                <div className='contact-page-btn-div' >
+                <button class='button' type="submit">Send Message</button>
+                </div>
             </form>
         </div>
     );

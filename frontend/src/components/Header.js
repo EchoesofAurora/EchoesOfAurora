@@ -18,7 +18,9 @@ const Header = () => {
     <header className="user-header">
       <div className="user-header-container">
         <div className="user-header-logo">
-          <img src={logo} alt="Aurora Logo" className="user-header-logo-img" />
+          <Link to="/">
+            <img src={logo} alt="Aurora Logo" className="user-header-logo-img" />
+          </Link>
         </div>
         <div className="user-header-hamburger" onClick={toggleMenu}>
           <div></div>

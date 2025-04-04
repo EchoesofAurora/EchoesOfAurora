@@ -1,23 +1,36 @@
   
   /* Hero section styles */
-   .contact-hero {   
-    background-image: url('../images/contactus/img32.jpg');
+  .contact-hero {   
+    background-image: url('../images/contactus/img31.jpg');
     opacity: 80%;
     background-size: cover;
     background-position: center;
+    text-align: center; 
+    position: relative; 
+    padding: 50px 20px;
+    color: white;
+    height: 45vh;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    z-index: 1;
   }
   
-  .contact-hero h1 {
-    font-size: 4rem;
-    margin-bottom: 20px;
-    font-family: 'Texturina', serif;
-  }
   
+  .contact-hero * {
+    position: relative;
+    z-index: 2;
+  }
+
+  
+  
+
   /* Contact section styles */
   .contactus-page-contact-section {
-    display: flex;
+    /* display: flex; */
     padding: 50px 10%;
-    gap: 50px;
+    /* gap: 50px; */
   }
   
   .contactus-page-contact-info {
@@ -80,6 +93,14 @@
     color: #333;
     /* transition: border-color 0.3s, background-color 0.3s; */
   }
+  .contact-page-btn-div{
+    display: flex;
+    align-content: space-around;
+    flex-wrap: wrap;
+    flex-direction: column;
+
+  }
+ 
   
   .form-group {
     margin-bottom: 20px;
@@ -156,3 +177,8 @@
     font-size: 16px;
     cursor: pointer;
   }
+
+
+
+
+  
