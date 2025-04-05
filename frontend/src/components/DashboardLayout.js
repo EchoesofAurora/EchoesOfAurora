@@ -1,14 +1,13 @@
 import React, { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import "../styles/DashboardLayout.css";
 
 const DashboardLayout = ({ children, activeTab = "dashboard" }) => {
   const navigate = useNavigate();
-  const [currentDate, setCurrentDate] = useState("");
+  const location = useLocation();
   const [statsData, setStatsData] = useState({
     tribes: "0",
     stories: "0",
-    // locations: "85",
     messages: "0",
     unreadMessages: "0"
   });
@@ -25,11 +24,8 @@ const DashboardLayout = ({ children, activeTab = "dashboard" }) => {
           ...prevStats,
           tribes: data.tribes || prevStats.tribes,
           stories: data.stories || prevStats.stories,
-          // locations: data.locations || prevStats.locations,
           messages: data.messages || prevStats.messages,
           unreadMessages: data.unread_messages || prevStats.unreadMessages
-
-          // Add other fields if your API returns them
         }));
       } catch (error) {
         console.error('Error fetching stats data:', error);
@@ -39,26 +35,59 @@ const DashboardLayout = ({ children, activeTab = "dashboard" }) => {
     fetchStatsData();
   }, []);
 
+  // Handle stat card clicks - redirect to appropriate pages
+  const handleStatCardClick = (statType) => {
+    switch(statType) {
+      case "tribes":
+        navigate("/Admin/ManageTribes");
+        break;
+      case "stories":
+        navigate("/Admin/ManageStories");
+        break;
+      case "messages":
+        navigate("/Admin/UserSubmissions", {state: { activeFilter: "Inbox" } });
+        break;
+      case "unread-messages":
+        // Navigate to UserSubmissions page with a state parameter indicating the unread tab
+        navigate("/Admin/UserSubmissions", { state: { activeFilter: "Unread" } });
+        break;
+      default:
+        break;
+    }
+  };
+
   // Statistics data with icons
   const stats = [
     { 
-      value: statsData.tribes, label: "Tribes", trend: "↑12%", trendDirection: "up",
+      value: statsData.tribes, 
+      label: "Tribes", 
+      type: "tribes",
+      trend: "↑12%", 
+      trendDirection: "up",
       icon: <TribeIcon />
     },
     { 
-      value: statsData.stories, label: "Stories", trend: "↑5%", trendDirection: "up",
+      value: statsData.stories, 
+      label: "Stories", 
+      type: "stories",
+      trend: "↑5%", 
+      trendDirection: "up",
       icon: <StoryIcon />
     },
-    // { 
-    //   value: statsData.locations, label: "Locations", trend: "→", trendDirection: "neutral",
-    //   icon: <LocationIcon />
-    // },
     { 
-      value: statsData.messages, label: "Messages", trend: "↓2%", trendDirection: "down",
+      value: statsData.messages, 
+      label: "Messages", 
+      type: "messages",
+      trend: "↓2%", 
+      trendDirection: "down",
       icon: <MessageIcon />
     },
     { 
-      value: statsData.unreadMessages, label: "Unread Messages", trend: "↑8%", trendDirection: "up",
+      value: statsData.unreadMessages, 
+      label: "Unread Messages", 
+      type: "unread-messages",
+      trend: "↑8%", 
+      trendDirection: "up",
       icon: <UnreadMessageIcon />
     }
   ];
@@ -71,14 +100,14 @@ const DashboardLayout = ({ children, activeTab = "dashboard" }) => {
     { id: "settings", label: "Settings", link: "/Admin/EditProfile" },
   ];
 
-  useEffect(() => {
-    setCurrentDate(new Date().toLocaleDateString("en-US", {
-      weekday: "long", month: "long", day: "numeric", year: "numeric"
-    }));
-  }, []);
-
   const handleTabClick = (tabLink) => {
     navigate(tabLink);
+  };
+
+  const handleSignOut = () => {
+    // Perform sign out actions here
+    // For example, clear local storage, cookies, etc.
+    navigate("/Admin/SignIn");
   };
 
   return (
@@ -88,16 +117,18 @@ const DashboardLayout = ({ children, activeTab = "dashboard" }) => {
         <h3 className="stats-title">Key Metrics</h3>
         <div className="stats-grid">
           {stats.map((stat, index) => (
-            <div className="stat-card" key={index} onClick={() => navigate(`/${stat.label.toLowerCase().replace(' ', '-')}`)}>
+            <div 
+              className="stat-card" 
+              key={index} 
+              onClick={() => handleStatCardClick(stat.type)}
+              style={{ cursor: 'pointer' }}
+            >
               <div className={`stat-icon ${stat.label.toLowerCase().replace(' ', '-')}`}>
                 {stat.icon}
               </div>
               <div className="stat-content">
                 <div className="stat-value">{stat.value}</div>
                 <div className="stat-label">{stat.label}</div>
-                {/* <div className={`stat-trend ${stat.trendDirection}`}>
-                  {stat.trend} <span>this week</span>
-                </div> */}
               </div>
             </div>
           ))}
@@ -110,7 +141,13 @@ const DashboardLayout = ({ children, activeTab = "dashboard" }) => {
         <div className="dashboard-header">
           <div className="welcome-container">
             <h1 className="welcome-heading">Welcome back, Admin</h1>
-            <div className="welcome-meta">{currentDate}</div>
+            <button 
+              className="signout-button" 
+              onClick={handleSignOut}
+            >
+              <SignOutIcon />
+              Sign Out
+            </button>
           </div>
           
           {/* Professional Tabs with indicator */}
@@ -125,10 +162,6 @@ const DashboardLayout = ({ children, activeTab = "dashboard" }) => {
                   {tab.label}
                 </button>
               ))}
-              <div className="tab-indicator" style={{
-                left: tabs.findIndex(tab => tab.id === activeTab) * 120,
-                width: 100
-              }} />
             </div>
           </div>
         </div>
@@ -160,32 +193,24 @@ const StoryIcon = () => (
   </svg>
 );
 
-const LocationIcon = () => (
-  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor">
-    <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path>
-    <circle cx="12" cy="10" r="3"></circle>
-  </svg>
-);
-
 const MessageIcon = () => (
   <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor">
     <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
   </svg>
 );
 
-const UserIcon = () => (
-  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor">
-    <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
-    <circle cx="9" cy="7" r="4"></circle>
-    <path d="M23 21v-2a4 4 0 0 0-3-3.87"></path>
-    <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
+const UnreadMessageIcon = () => (
+  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+    <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
+    <circle cx="18" cy="6" r="3" fill="currentColor" stroke="none"></circle>
   </svg>
 );
 
-const UnreadMessageIcon = () => (
-  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-    <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
-    <circle cx="18" cy="6" r="3" fill="currentColor" stroke="none"></circle>
+const SignOutIcon = () => (
+  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+    <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path>
+    <polyline points="16 17 21 12 16 7"></polyline>
+    <line x1="21" y1="12" x2="9" y2="12"></line>
   </svg>
 );
 

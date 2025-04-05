@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import "../styles/profileEdit.css";
 import "../styles/DashboardLayout.css";
 import DashboardLayout from "../components/DashboardLayout";
-import ProfileUpdatedPopUp from "../components/profileUpdatedPopUp"; // Updated to match component name
+import ProfileUpdatedPopUp from "../components/profileUpdatedPopUp";
 import lynn1 from "../images/lynn.png";
 import envelope from "../images/envelope.png";
 import person from "../images/personFrame.png";

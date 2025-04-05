@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import "../styles/UserSubmissions.css";
 import "../styles/DashboardLayout.css";
 import DashboardLayout from "../components/DashboardLayout";
@@ -9,6 +9,7 @@ const HeroUserSubmissions = () => {
   const [submissions, setSubmissions] = useState([]);
   const [selectedFilter, setSelectedFilter] = useState("Inbox");
   const navigate = useNavigate();
+  const location = useLocation();
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [submissionToDelete, setSubmissionToDelete] = useState(null);
 
@@ -25,6 +26,12 @@ const HeroUserSubmissions = () => {
       console.error('Error fetching submissions:', error);
     }
   };
+
+  useEffect(() => {
+    if (location.state && location.state.activeFilter) {
+      setSelectedFilter(location.state.activeFilter);
+    }
+  }, [location.state]);
 
   useEffect(() => {
     if (selectedFilter === "Inbox") {
