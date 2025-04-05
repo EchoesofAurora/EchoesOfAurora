@@ -157,31 +157,6 @@ const TribeLandingPage = () => {
           <h2>Tribe Details</h2>
           <div className="tribe-landing-text">{tribe.tribe_text}</div>
 
-          <a href="#" className="back-button" onClick={(e) => {
-            e.preventDefault();
-            navigate(-1);
-          }}>
-            ← Back
-          </a>
-          
-          {/* Tribe Title */}
-          <h1>{tribe.tribe_name}</h1>
- 
-          {/* Hero Image with Placeholder */}
-          <div className="hero-image-container">
-            {tribe.heroImage ? (
-              <img
-                src={tribe.heroImage}
-                alt={`${tribe.tribe_name} Hero`}
-                className="hero-image"
-              />
-            ) : (
-              <div className="hero-placeholder">
-                <p>Hero Image Placeholder</p>
-              </div>
-            )}
-          </div>
-
           {/* References Section */}
           {tribe.tribe_references && (
             <div className="tribe-landing-references">
