@@ -7,6 +7,8 @@ import "../styles/DashboardLayout.css";
 import DashboardLayout from "../components/DashboardLayout";
 import { Modal, Button } from "react-bootstrap";
 import { useNavigate } from "react-router-dom";
+import ImageUpload from "../components/ImageUpload";
+import ReferenceLinks from "../components/ReferenceLinks";
 
 const HeroAddingStory = () => {
   const [storyTitle, setStoryTitle] = useState("");
@@ -16,7 +18,6 @@ const HeroAddingStory = () => {
   const [description, setDescription] = useState("");
   const [referenceLinks, setReferenceLinks] = useState("");
   const [selectedImages, setSelectedImages] = useState([]);
-  const [imagePreviews, setImagePreviews] = useState([]);
   const [tribes, setTribes] = useState([]);
   const [tribeIds, setTribeIds] = useState({});
   const [newStoryId, setNewStoryId] = useState(null);
@@ -163,31 +164,6 @@ const HeroAddingStory = () => {
     return true;
   };
 
-  // Handle image selection and generate previews
-  const handleImageChange = (e) => {
-    const files = Array.from(e.target.files).filter((file) =>
-      ["image/jpeg", "image/png"].includes(file.type)
-    );
-    if (files.length !== e.target.files.length) {
-      setModalMessage("Only JPG and PNG files are supported.");
-      setShowModal(true);
-      return;
-    }
-    const newPreviews = files.map((file) => URL.createObjectURL(file));
-    setSelectedImages((prev) => [...prev, ...files]);
-    setImagePreviews((prev) => [...prev, ...newPreviews]);
-  };
-
-  // Handle removing an image from the preview
-  const handleRemoveImage = (index) => {
-    setSelectedImages((prev) => prev.filter((_, i) => i !== index));
-    setImagePreviews((prev) => {
-      const removedPreview = prev[index];
-      URL.revokeObjectURL(removedPreview);
-      return prev.filter((_, i) => i !== index);
-    });
-  };
-
   // Form submission handler
   const handleFormSubmit = async (e, publishStatus) => {
     e.preventDefault();
@@ -236,7 +212,7 @@ const HeroAddingStory = () => {
         const formData = new FormData();
         formData.append("story_id", storyData.story_id);
         selectedImages.forEach((image) => {
-          formData.append("images", image);
+          formData.append("images", image.file);
         });
 
         const imageResponse = await fetch("http://localhost:5001/api/images/upload", {
@@ -260,7 +236,7 @@ const HeroAddingStory = () => {
       );
       setShowModal(true);
 
-      // Clear form and previews
+      // Clear form
       setStoryTitle("");
       setSelectedTribe("");
       setStartDate(null);
@@ -268,11 +244,9 @@ const HeroAddingStory = () => {
       setDescription("");
       setReferenceLinks("");
       setSelectedImages([]);
-      setImagePreviews([]);
       setErrors({});
       setFormError("");
       setTouched({});
-      imagePreviews.forEach((preview) => URL.revokeObjectURL(preview));
 
       // Redirect after a short delay to allow modal to show
       setTimeout(() => {
@@ -429,55 +403,26 @@ const HeroAddingStory = () => {
         </div>
 
         <div className="adding-story-form-group">
-          <label className="adding-story-label">Uploaded Images</label>
-          <div className="image-preview-container">
-            {imagePreviews.length > 0 ? (
-              imagePreviews.map((preview, index) => (
-                <div key={index} className="story-image">
-                  <img
-                    src={preview}
-                    alt={`Preview ${index + 1}`}
-                    width="100"
-                    height="100"
-                    onError={(e) => { e.target.src = "/images/placeholder.png"; }}
-                  />
-                  <button
-                    type="button"
-                    className="remove-image-button"
-                    onClick={() => handleRemoveImage(index)}
-                    aria-label={`Remove image ${index + 1}`}
-                  >
-                    Remove
-                  </button>
-                </div>
-              ))
-            ) : (
-              <p>No images selected.</p>
-            )}
-          </div>
+          <label className="adding-story-label">Upload Images</label>
+          <ImageUpload onImagesChange={setSelectedImages} />
+          <p className="adding-story-upload-instruction">Supported formats: JPG, PNG (Max 5MB per file)</p>
         </div>
 
         <div className="adding-story-form-group">
-          <label htmlFor="uploadImages" className="adding-story-label">Upload Images</label>
-          <input type="file" id="uploadImages" multiple onChange={handleImageChange} />
-          <p className="adding-story-upload-instruction">Supported formats: JPG, PNG</p>
-        </div>
-
-        <div className="adding-story-form-group">
-          <label htmlFor="referenceLinks" className="adding-story-label">
-            Reference <span style={{ color: "#dc3545" }}>*</span>
+          <label className="adding-story-label">
+            References <span style={{ color: "#dc3545" }}>*</span>
           </label>
-          <input
-            type="text"
-            id="referenceLinks"
-            ref={referenceRef}
-            className={getInputClassName('referenceLinks')}
-            placeholder="Enter reference links"
-            value={referenceLinks}
-            onChange={(e) => setReferenceLinks(e.target.value)}
-            onBlur={() => handleBlur('referenceLinks')}
-            style={touched.referenceLinks && errors.referenceLinks ? { borderColor: "#dc3545" } : {}}
+          <ReferenceLinks 
+            initialLinks={referenceLinks} 
+            onChange={(links) => {
+              setReferenceLinks(links);
+              if (links.trim()) {
+                setErrors({...errors, referenceLinks: ""});
+                setTouched({...touched, referenceLinks: true});
+              }
+            }} 
           />
+          <p className="adding-story-upload-instruction">Add one or more reference links</p>
           {touched.referenceLinks && errors.referenceLinks && (
             <div className="error-message" style={{ color: "#dc3545", fontSize: "0.875rem", marginTop: "5px" }}>
               {errors.referenceLinks}

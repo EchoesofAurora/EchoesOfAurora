@@ -91,30 +91,51 @@ const StoryLandingPage = () => {
   const formatReferences = (references) => {
     if (!references) return null;
     
-    // Check if reference is a URL
-    if (references.startsWith('http://') || references.startsWith('https://')) {
-      // Extract domain name for display
-      let domain = '';
-      try {
-        domain = new URL(references).hostname.replace('www.', '');
-      } catch (e) {
-        domain = references;
-      }
-      
-      return (
-        <a 
-          href={references} 
-          target="_blank" 
-          rel="noopener noreferrer" 
-          className="story-landing-reference-link"
-        >
-          {domain}
-        </a>
-      );
-    }
+    // Split the references by comma
+    const refArray = references.split(',').map(ref => ref.trim()).filter(ref => ref.length > 0);
     
-    // If not a URL, just return the text
-    return references;
+    return (
+      <div className="reference-links">
+        {refArray.map((reference, index) => {
+          let formattedRef = reference;
+          
+          // Check if it looks like a URL without http/https prefix
+          if (!reference.startsWith('http://') && !reference.startsWith('https://') && 
+              (reference.startsWith('www.') || reference.includes('.com') || 
+               reference.includes('.org') || reference.includes('.gov') || 
+               reference.includes('.edu') || reference.includes('.net'))) {
+            formattedRef = 'https://' + reference;
+          }
+          
+          // Check if reference is a URL (either originally or after adding https://)
+          if (formattedRef.startsWith('http://') || formattedRef.startsWith('https://')) {
+            // Extract domain name for display
+            let domain = '';
+            try {
+              domain = new URL(formattedRef).hostname.replace('www.', '');
+            } catch (e) {
+              domain = reference; // Use original reference for display if URL parsing fails
+            }
+            
+            return (
+              <div key={index} className="reference-link-item">
+                <a 
+                  href={formattedRef} 
+                  target="_blank" 
+                  rel="noopener noreferrer" 
+                  className="story-landing-reference-link"
+                >
+                  {domain}
+                </a>
+              </div>
+            );
+          }
+          
+          // If not a URL, just return the text
+          return <div key={index} className="reference-link-item">{reference}</div>;
+        })}
+      </div>
+    );
   };
 
   if (loading) return <div className="user-frontend"><Header /><p>Loading...</p></div>;

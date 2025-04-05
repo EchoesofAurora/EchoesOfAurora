@@ -7,6 +7,9 @@ import "../styles/ManageStories.css";
 import "../styles/DashboardLayout.css";
 import DashboardLayout from "../components/DashboardLayout";
 import { Modal, Button } from "react-bootstrap";
+import ImageUpload from "../components/ImageUpload";
+import ReferenceLinks from "../components/ReferenceLinks";
+
 
 const HeroEditStory = () => {
   const { id } = useParams();
@@ -20,7 +23,7 @@ const HeroEditStory = () => {
   const [published, setPublished] = useState(false);
   const [tribes, setTribes] = useState([]);
   const [uploadedImages, setUploadedImages] = useState([]); // Persisted images
-  const [newImages, setNewImages] = useState([]); // New image previews
+  const [newImages, setNewImages] = useState([]); // New images from ImageUpload component
   const [imagesToRemove, setImagesToRemove] = useState([]); // Images to delete
   const [imagesUploaded, setImagesUploaded] = useState(false); // Track if new images were uploaded
   const [loading, setLoading] = useState(true);
@@ -206,98 +209,6 @@ const HeroEditStory = () => {
     fetchStory();
   }, [id]);
 
-  const handleImageUpload = async (e) => {
-    const files = Array.from(e.target.files).filter(file => 
-      file.type === "image/jpeg" || file.type === "image/png"
-    );
-    
-    if (files.length !== e.target.files.length) {
-      setModalMessage("Only JPG and PNG files are supported.");
-      setShowModal(true);
-      return;
-    }
-    
-    const newImagePreviews = files.map((file) => ({
-      src: URL.createObjectURL(file),
-      file
-    }));
-    setNewImages((prev) => [...prev, ...newImagePreviews]);
-
-    const formData = new FormData();
-    files.forEach((file) => formData.append('images', file));
-    formData.append('story_id', id);
-
-    try {
-      const response = await fetch("/api/images/upload", {
-        method: "POST",
-        body: formData,
-      });
-
-      if (response.ok) {
-        const imageData = await response.json();
-        const mediaIds = imageData.media_ids || [];
-
-        const currentStoryResponse = await fetch(`/api/admin/stories/${id}`);
-        if (!currentStoryResponse.ok) {
-          throw new Error(`Failed to fetch current story data: ${currentStoryResponse.statusText}`);
-        }
-        const currentStory = await currentStoryResponse.json();
-
-        setImagesUploaded(true);
-
-        const refreshedData = await (await fetch(`/api/admin/stories/${id}`)).json();
-        let refreshedImagePreviews = [];
-        if (refreshedData.images && refreshedData.images.length > 0) {
-          refreshedImagePreviews = refreshedData.images.map((image) => {
-            if (image.image_data && image.media_type && image.media_id) {
-              return {
-                src: `data:${image.media_type};base64,${image.image_data}`,
-                media_id: image.media_id,
-              };
-            }
-            return null;
-          }).filter(preview => preview !== null);
-        }
-        setUploadedImages(refreshedImagePreviews);
-      } else {
-        throw new Error("Failed to upload images.");
-      }
-    } catch (error) {
-      console.error("Error uploading images:", error);
-      setModalMessage(`Failed to upload images: ${error.message}`);
-      setShowModal(true);
-    }
-  };
-
-  const handleRemoveImage = (index) => {
-    const allImages = [...uploadedImages, ...newImages];
-    if (index >= uploadedImages.length) {
-      // Handle removal of new (unuploaded) images
-      const newIndex = index - uploadedImages.length;
-      setNewImages((prev) => {
-        const updatedImages = [...prev];
-        const imageToRemove = updatedImages[newIndex];
-        if (imageToRemove && imageToRemove.src) {
-          URL.revokeObjectURL(imageToRemove.src);
-        }
-        updatedImages.splice(newIndex, 1);
-        return updatedImages;
-      });
-    } else {
-      // Mark persisted (uploaded) images for removal
-      const imageToRemove = uploadedImages[index];
-      if (imageToRemove && imageToRemove.media_id) {
-        setImagesToRemove((prev) => [...prev, imageToRemove.media_id]);
-        setUploadedImages((prev) => prev.filter((_, i) => i !== index));
-      }
-    }
-  };
-
-  // Get input class based on validation state
-  const getInputClassName = (field) => {
-    return `edit-story-input ${touched[field] && errors[field] ? "input-error" : ""}`;
-  };
-
   const handleFormSubmit = async (e, publishStatus) => {
     e.preventDefault();
 
@@ -363,6 +274,23 @@ const HeroEditStory = () => {
           }
           
           setImagesUploaded(true);
+          
+          // Refresh the images list
+          const refreshedData = await (await fetch(`/api/admin/stories/${id}`)).json();
+          let refreshedImagePreviews = [];
+          if (refreshedData.images && refreshedData.images.length > 0) {
+            refreshedImagePreviews = refreshedData.images.map((image) => {
+              if (image.image_data && image.media_type && image.media_id) {
+                return {
+                  src: `data:${image.media_type};base64,${image.image_data}`,
+                  media_id: image.media_id,
+                };
+              }
+              return null;
+            }).filter(preview => preview !== null);
+          }
+          setUploadedImages(refreshedImagePreviews);
+          setNewImages([]);
         } catch (err) {
           console.error("Failed to upload images:", err);
           throw new Error(`Failed to upload images: ${err.message}`);
@@ -406,6 +334,26 @@ const HeroEditStory = () => {
       setModalMessage(`Failed to update story: ${err.message}`);
       setShowModal(true);
     }
+  };
+
+  const handleRemoveImage = (index) => {
+    if (index < uploadedImages.length) {
+      // Handle removing an existing image
+      const imageToRemove = uploadedImages[index];
+      if (imageToRemove && imageToRemove.media_id) {
+        setImagesToRemove((prev) => [...prev, imageToRemove.media_id]);
+        setUploadedImages((prev) => prev.filter((_, i) => i !== index));
+      }
+    } else {
+      // Handle removing a new image
+      const newIndex = index - uploadedImages.length;
+      setNewImages((prev) => prev.filter((_, i) => i !== newIndex));
+    }
+  };
+
+  // Get input class based on validation state
+  const getInputClassName = (field) => {
+    return `edit-story-input ${touched[field] && errors[field] ? "input-error" : ""}`;
   };
 
   return (
@@ -535,61 +483,58 @@ const HeroEditStory = () => {
           </div>
           
           <div className="edit-story-form-group">
-            <label className="edit-story-label">Uploaded Images</label>
-            <div className="image-preview-container">
-              {[...uploadedImages, ...newImages].map((image, index) => (
-                <div key={index} className="story-image">
-                  <img
-                    src={image.src}
-                    alt={`Image ${index + 1}`}
-                    width="100"
-                    height="100"
-                    onError={(e) => {
-                      e.target.src = "/images/placeholder.png";
-                    }}
-                  />
-                  <button
-                    type="button"
-                    className="remove-image-button"
-                    onClick={() => handleRemoveImage(index)}
-                  >
-                    Remove
-                  </button>
-                </div>
-              ))}
-              {[...uploadedImages, ...newImages].length === 0 && (
-                <p>No images uploaded for this story.</p>
-              )}
+            <label className="edit-story-label">Current Images</label>
+            <div className="images-container">
+              <div className="image-preview-gallery">
+                {uploadedImages.length > 0 ? (
+                  uploadedImages.map((image, index) => (
+                    <div key={index} className="image-preview-item">
+                      <div className="image-preview">
+                        <img
+                          src={image.src}
+                          alt={`Story image ${index + 1}`}
+                          onError={(e) => {
+                            e.target.src = "/images/placeholder.png";
+                          }}
+                        />
+                      </div>
+                      <button
+                        type="button"
+                        className="remove-image-btn"
+                        onClick={() => handleRemoveImage(index)}
+                      >
+                        Remove
+                      </button>
+                    </div>
+                  ))
+                ) : (
+                  <p className="no-images-message">No images uploaded for this story.</p>
+                )}
+              </div>
             </div>
           </div>
 
           <div className="edit-story-form-group">
-            <label htmlFor="uploadImages" className="edit-story-label">Upload Images</label>
-            <input 
-              type="file" 
-              id="uploadImages" 
-              className="edit-story-upload-input"
-              multiple 
-              accept="image/jpeg,image/png"
-              onChange={handleImageUpload} 
-            />
+            <label className="edit-story-label">Upload New Images</label>
+            <ImageUpload onImagesChange={setNewImages} />
             <p className="edit-story-upload-instruction">Supported formats: JPG, PNG (Max 5MB per file)</p>
           </div>
           
           <div className="edit-story-form-group">
-            <label htmlFor="referenceLinks" className="edit-story-label">
-              Reference <span style={{ color: "#dc3545" }}>*</span>
+            <label className="edit-story-label">
+              References <span style={{ color: "#dc3545" }}>*</span>
             </label>
-            <input 
-              type="text" 
-              id="referenceLinks" 
-              ref={referenceRef}
-              className={getInputClassName('referenceLinks')}
-              value={referenceLinks} 
-              onChange={(e) => setReferenceLinks(e.target.value)}
-              onBlur={() => handleBlur('referenceLinks')}
-              style={touched.referenceLinks && errors.referenceLinks ? { borderColor: "#dc3545" } : {}}
+            <ReferenceLinks 
+              initialLinks={referenceLinks} 
+              onChange={(links) => {
+                setReferenceLinks(links);
+                if (links.trim()) {
+                  setErrors({...errors, referenceLinks: ""});
+                  setTouched({...touched, referenceLinks: true});
+                }
+              }} 
             />
+            <p className="edit-story-upload-instruction">Add one or more reference links</p>
             {touched.referenceLinks && errors.referenceLinks && (
               <div className="error-message" style={{ color: "#dc3545", fontSize: "0.875rem", marginTop: "5px" }}>
                 {errors.referenceLinks}
