@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import { useParams, Link, useNavigate } from "react-router-dom";
 import Header from "../components/Header";
 import Footer from "../components/Footer";
-import "../styles/StoryLandingPage.css"; // Separate CSS file
+import "../styles/StoryLandingPage.css"; 
 
 const StoryLandingPage = () => {
   const { storyId } = useParams();
@@ -49,6 +49,10 @@ const StoryLandingPage = () => {
     fetchTribes();
   }, [storyId]);
 
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, [storyId]);
+
   const getTribeName = (tribeId) => {
     const tribe = tribes.find(t => t.tribe_id === tribeId);
     return tribe ? tribe.tribe_name : "";
@@ -76,6 +80,24 @@ const StoryLandingPage = () => {
     } catch (e) {
       console.error(`Image not found: ${storyId}.png`);
       return null;
+    }
+  };
+
+  // Get image for a story card
+  const getStoryImage = (story) => {
+    if (story.image_data) {
+      return `data:${story.media_type};base64,${story.image_data}`;
+    }
+    
+    try {
+      return require(`../images/stories/${story.story_id}.png`);
+    } catch (e) {
+      // Default image if story specific image is not found
+      try {
+        return require('../images/stories/1.png');
+      } catch (e) {
+        return null;
+      }
     }
   };
 
@@ -143,7 +165,7 @@ const StoryLandingPage = () => {
   if (!story) return <div className="user-frontend"><Header /><p>Story not found.</p></div>;
 
   const galleryImages = getGalleryImages();
-  const tribeName = getTribeName(story.tribe_id);
+  const tribeName = story.tribeName || getTribeName(story.tribe_id);
   const heroImage = getHeroImage();
 
   return (
@@ -208,6 +230,47 @@ const StoryLandingPage = () => {
                     className="story-landing-gallery-image"
                   />
                   {image.caption && <p className="story-landing-caption">{image.caption}</p>}
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+        
+        {/* Related Stories Section */}
+        {story.relatedStories && story.relatedStories.length > 0 && (
+          <div className="story-related-stories">
+            <h2 className="related-stories-title">More Stories from {tribeName}</h2>
+            <div className="related-stories-grid">
+              {story.relatedStories.map((relStory, index) => (
+                <div className="related-story-card" key={index}>
+                  <img 
+                    src={getStoryImage(relStory)} 
+                    alt={relStory.story_name}
+                    className="related-story-image"
+                    onError={(e) => {
+                      console.error("Failed to load story image");
+                      e.target.onerror = null;
+                      try {
+                        e.target.src = require('../images/stories/1.png');
+                      } catch (err) {
+                        e.target.style.display = 'none';
+                      }
+                    }}
+                  />
+                  <div className="related-story-content">
+                    <h3 className="related-story-title">{relStory.story_name}</h3>
+                    <p className="related-story-summary">
+                      Summary: {relStory.story_text.length > 120 
+                        ? `${relStory.story_text.substring(0, 120)}...` 
+                        : relStory.story_text}
+                    </p>
+                    <Link 
+                      to={`/story/${relStory.story_id}`} 
+                      className="related-story-link"
+                    >
+                      Read More
+                    </Link>
+                  </div>
                 </div>
               ))}
             </div>
