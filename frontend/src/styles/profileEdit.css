@@ -4,7 +4,14 @@
   justify-content: space-between;
   align-items: center;
   width: 100%;
-  margin-bottom: 20px;
+  margin-bottom: 30px;
+}
+
+/* Style for header buttons container */
+.header-buttons {
+  display: flex;
+  gap: 15px;
+  align-items: center;
 }
 
 /* Keep existing styles */
@@ -16,7 +23,7 @@
   width: 100%;
 }
 
-.add-user-button{
+.add-user-button {
   border: none;
   padding: 10px 20px;
   border-radius: 5px;
@@ -40,75 +47,31 @@
   display: flex;
   flex-direction: column;
   gap: 14px;
-  left: 25%;
-  position: absolute;
-  top: 26px;
-  width: 73%;
+  width: 100%;
 }
 
 .left-profile-fields {
   width: 100%;
+  margin-top: 20px;
 }
 
-.text-note{
+.text-note {
   align-content: center;
   padding: 10px;
   color: red;
-  text-align: justify
+  text-align: justify;
+  margin-top: 20px;
 }
 
-.profile-card-container {
+.profile-edit-button {
   display: flex;
   align-items: center;
-  gap: 30px;
-}
-
-.profile-image {
-  width: 155px; 
-  height: 155px; 
-  border-radius: 50%;
-  object-fit: cover;
-}
-
-.profile-info {
-  display: flex;
-  flex-direction: column;
-  gap: 17px;
-  width: 245px;
-}
-
-.profile-details {
-  display: flex;
-  flex-direction: column;
-  gap: 5px;
-}
-
-.profile-name {
-  font-family: "Poppins-Bold", Helvetica, sans-serif; 
-  font-size: 20px;
-  font-weight: 700; 
-  color: #313638; 
-  margin: 0;
-}
-
-.profile-email,
-.profile-phone {
-  font-family: "Poppins-Medium", Helvetica, sans-serif; 
-  font-size: 16px; 
-  font-weight: 500; 
-  color: #313638;
-  margin: 0;
-}
-
-.profile-edit-button{
-  display: flex;
-  align-items: center; 
-  justify-content: center; 
+  justify-content: center;
   background-color: #a49cbe;
   color: white;
-  border: none; 
-  border-radius: 4px; 
-  padding: 8px 22px; 
+  border: none;
+  border-radius: 4px;
+  padding: 8px 22px;
   cursor: pointer;
   box-shadow: var(--elevation-4);
   transition: background-color 0.3s ease;
@@ -118,21 +81,21 @@
   background-color: #928bb0;
 }
 
-.profile-button-content { 
-  display: flex; 
+.update-email-btn {
+  margin-top: 10px;
+  max-width: 150px;
+}
+
+.profile-button-content {
+  display: flex;
   align-items: center;
   gap: 8px;
 }
 
-.profile-edit-icon { 
-  width: 24px; 
-  height: 24px;
-}
-
 .profile-button-text {
   font-family: "Poppins-Regular", Helvetica, sans-serif;
-  font-size: 16px; 
-  font-weight: 400; 
+  font-size: 16px;
+  font-weight: 400;
   color: #ffffff;
 }
 
@@ -140,9 +103,14 @@
   width: 100%;
   display: flex;
   flex-direction: column;
-  gap: 20px;
+  gap: 30px;
   padding-top: 30px;
   box-sizing: border-box;
+}
+
+.input-container {
+  width: 100%;
+  max-width: 600px;
 }
 
 .label {
@@ -150,7 +118,7 @@
   font-weight: 600;
   font-size: 18px;
   line-height: 16px;
-  color: #E5E5E5;
+  color: #333333;
 }
 
 .input-wrapper {
@@ -174,6 +142,11 @@
   background: transparent;
 }
 
+.icon {
+  width: 24px;
+  height: 24px;
+}
+
 .signIn-button,
 .reset-link-button {
   width: 100%;
@@ -188,6 +161,7 @@
   margin: 100px auto auto auto;
   text-decoration: none;
 }
+
 .reset-link-button {
   margin-top: 20px;
   padding: 8px 22px;

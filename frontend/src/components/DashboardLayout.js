@@ -7,7 +7,9 @@ const DashboardLayout = ({ children, activeTab = "dashboard" }) => {
   const location = useLocation();
   const [statsData, setStatsData] = useState({
     tribes: "0",
+    publishedTribes: "0",
     stories: "0",
+    publishedStories: "0",
     messages: "0",
     unreadMessages: "0"
   });
@@ -23,7 +25,9 @@ const DashboardLayout = ({ children, activeTab = "dashboard" }) => {
         setStatsData(prevStats => ({
           ...prevStats,
           tribes: data.tribes || prevStats.tribes,
+          publishedTribes: data.published_tribes || prevStats.publishedTribes,
           stories: data.stories || prevStats.stories,
+          publishedStories: data.published_stories || prevStats.publishedStories,
           messages: data.messages || prevStats.messages,
           unreadMessages: data.unread_messages || prevStats.unreadMessages
         }));
@@ -41,13 +45,19 @@ const DashboardLayout = ({ children, activeTab = "dashboard" }) => {
       case "tribes":
         navigate("/Admin/ManageTribes");
         break;
+      case "publishedTribes":
+        navigate("/Admin/ManageTribes", { state: { filterPublished: true } });
+        break;
       case "stories":
         navigate("/Admin/ManageStories");
         break;
-      case "messages":
-        navigate("/Admin/UserSubmissions", {state: { activeFilter: "Inbox" } });
+      case "publishedStories":
+        navigate("/Admin/ManageStories", { state: { filterPublished: true } });
         break;
-      case "unread-messages":
+      case "messages":
+        navigate("/Admin/UserSubmissions", { state: { activeFilter: "Inbox" } });
+        break;
+      case "unreadMessages":
         // Navigate to UserSubmissions page with a state parameter indicating the unread tab
         navigate("/Admin/UserSubmissions", { state: { activeFilter: "Unread" } });
         break;
@@ -67,12 +77,28 @@ const DashboardLayout = ({ children, activeTab = "dashboard" }) => {
       icon: <TribeIcon />
     },
     { 
+      value: statsData.publishedTribes, 
+      label: "Published Tribes", 
+      type: "publishedTribes",
+      trend: "↑8%", 
+      trendDirection: "up",
+      icon: <PublishedTribeIcon />
+    },
+    { 
       value: statsData.stories, 
       label: "Stories", 
       type: "stories",
       trend: "↑5%", 
       trendDirection: "up",
       icon: <StoryIcon />
+    },
+    { 
+      value: statsData.publishedStories, 
+      label: "Published Stories", 
+      type: "publishedStories",
+      trend: "↑3%", 
+      trendDirection: "up",
+      icon: <PublishedStoryIcon />
     },
     { 
       value: statsData.messages, 
@@ -85,7 +111,7 @@ const DashboardLayout = ({ children, activeTab = "dashboard" }) => {
     { 
       value: statsData.unreadMessages, 
       label: "Unread Messages", 
-      type: "unread-messages",
+      type: "unreadMessages",
       trend: "↑8%", 
       trendDirection: "up",
       icon: <UnreadMessageIcon />
@@ -183,6 +209,16 @@ const TribeIcon = () => (
   </svg>
 );
 
+const PublishedTribeIcon = () => (
+  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+    <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
+    <circle cx="9" cy="7" r="4"></circle>
+    <path d="M23 21v-2a4 4 0 0 0-3-3.87"></path>
+    <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
+    <circle cx="20" cy="4" r="2" fill="currentColor" stroke="none"></circle>
+  </svg>
+);
+
 const StoryIcon = () => (
   <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor">
     <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
@@ -190,6 +226,17 @@ const StoryIcon = () => (
     <line x1="16" y1="13" x2="8" y2="13"></line>
     <line x1="16" y1="17" x2="8" y2="17"></line>
     <polyline points="10 9 9 9 8 9"></polyline>
+  </svg>
+);
+
+const PublishedStoryIcon = () => (
+  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+    <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+    <polyline points="14 2 14 8 20 8"></polyline>
+    <line x1="16" y1="13" x2="8" y2="13"></line>
+    <line x1="16" y1="17" x2="8" y2="17"></line>
+    <polyline points="10 9 9 9 8 9"></polyline>
+    <circle cx="20" cy="4" r="2" fill="currentColor" stroke="none"></circle>
   </svg>
 );
 

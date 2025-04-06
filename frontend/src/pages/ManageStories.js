@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import { Modal } from "react-bootstrap";
 import DashboardLayout from "../components/DashboardLayout";
 import AdminStorySearchBar from "../components/AdminStorySearchBar";
@@ -8,10 +8,13 @@ import "../styles/DashboardLayout.css";
 import "../styles/ManageStories.css";
 
 const ManageStories = () => {
+  const navigate = useNavigate();
+  const location = useLocation();
   const [stories, setStories] = useState([]);
   const [searchResults, setSearchResults] = useState([]);
   const [tribes, setTribes] = useState({});
   const [loading, setLoading] = useState(true);
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [showErrorModal, setShowErrorModal] = useState(false);
   const [selectedStory, setSelectedStory] = useState(null);
   const [error, setError] = useState(null);
@@ -19,97 +22,80 @@ const ManageStories = () => {
   const [storiesPerPage] = useState(10);
   const [statusUpdating, setStatusUpdating] = useState(false);
   
-  const navigate = useNavigate();
-
-  // Background colors for alternating rows - matching ManageTribes
+  const filterPublished = location.state?.filterPublished || false;
   const rowBackgroundColors = [
-    "#f9f0ff", // Lavender whisper  
-    "#f0f9ff", // Baby blue  
-    "#f0fff4"  // Mint cream  
+    "#f9f0ff", "#f0f9ff", "#f0fff4"  
   ];
 
   useEffect(() => {
-    const fetchTribes = async () => {
+    const fetchData = async () => {
       try {
-        const response = await fetch("/api/admin/tribes");
-        if (!response.ok) throw new Error("Failed to fetch tribes");
-        const data = await response.json();
+        // Fetch tribes
+        const tribesResponse = await fetch("/api/admin/tribes");
+        if (!tribesResponse.ok) throw new Error("Failed to fetch tribes");
+        const tribesData = await tribesResponse.json();
         const tribeMap = {};
-        data.forEach((tribe) => {
-          tribeMap[tribe.tribe_id] = tribe.tribe_name;
-        });
+        tribesData.forEach(tribe => tribeMap[tribe.tribe_id] = tribe.tribe_name);
         setTribes(tribeMap);
-      } catch (err) {
-        console.error("Error fetching tribes:", err);
-        setError("Failed to load tribes. Tribe names will be unavailable.");
-        setShowErrorModal(true);
-      }
-    };
 
-    const fetchStories = async () => {
-      setLoading(true);
-      try {
-        const response = await fetch("/api/admin/stories");
-        if (!response.ok) throw new Error("Failed to fetch stories");
-        const data = await response.json();
-        setStories(data);
-        setSearchResults(data);
+        // Fetch stories
+        const storiesResponse = await fetch("/api/admin/stories");
+        if (!storiesResponse.ok) throw new Error("Failed to fetch stories");
+        const storiesData = await storiesResponse.json();
+        const filteredData = filterPublished 
+          ? storiesData.filter(story => story.published) 
+          : storiesData;
+        
+        setStories(storiesData);
+        setSearchResults(filteredData);
+        setLoading(false);
       } catch (err) {
-        console.error("Error fetching stories:", err);
-        setError("Failed to load stories. Please try again later.");
+        console.error("Error:", err);
+        setError("Failed to load data. Please try again later.");
         setShowErrorModal(true);
-      } finally {
         setLoading(false);
       }
     };
 
-    fetchTribes();
-    fetchStories();
-  }, []);
+    fetchData();
+  }, [filterPublished]);
 
   const handleDeleteClick = (story, e) => {
-    e.stopPropagation(); // Prevent row click navigation
+    e.stopPropagation();
     setSelectedStory(story);
-    const confirmDelete = window.confirm(`Are you sure you want to delete "${story.story_name}"?`);
-    
-    if (confirmDelete) {
-      deleteStory(story);
-    }
+    setShowDeleteModal(true);
   };
 
-  const deleteStory = async (story) => {
+  const confirmDelete = async () => {
     try {
-      const response = await fetch(`/api/admin/stories/${story.story_id}`, {
+      const response = await fetch(`/api/admin/stories/${selectedStory.story_id}`, {
         method: "DELETE",
       });
       
       if (!response.ok) throw new Error("Failed to delete story");
       
-      const updatedStories = stories.filter((s) => s.story_id !== story.story_id);
+      const updatedStories = stories.filter(s => s.story_id !== selectedStory.story_id);
       setStories(updatedStories);
-      setSearchResults(updatedStories);
-      setError(`"${story.story_name}" has been deleted successfully.`);
+      setSearchResults(searchResults.filter(s => s.story_id !== selectedStory.story_id));
+      setShowDeleteModal(false);
+      setError(`"${selectedStory.story_name}" deleted successfully.`);
       setShowErrorModal(true);
     } catch (err) {
       console.error("Error deleting story:", err);
-      setError(`Failed to delete story: ${err.message}`);
+      setError(`Failed to delete: ${err.message}`);
       setShowErrorModal(true);
     }
   };
 
   const handleStatusChange = async (story, newPublishStatus, e) => {
-    e.stopPropagation(); // Prevent row click navigation
+    e.stopPropagation();
     setStatusUpdating(true);
     
     try {
-      // First, get the full story data
       const getResponse = await fetch(`/api/admin/stories/${story.story_id}`);
-      if (!getResponse.ok) {
-        throw new Error(`Failed to fetch story data: ${getResponse.statusText}`);
-      }
+      if (!getResponse.ok) throw new Error(`Failed to fetch story data: ${getResponse.statusText}`);
       const fullStory = await getResponse.json();
       
-      // Update only the published field
       const storyData = {
         story_name: fullStory.story_name,
         tribe_id: fullStory.tribe_id,
@@ -119,41 +105,36 @@ const ManageStories = () => {
         published: newPublishStatus
       };
       
-      // Use the existing PUT endpoint
       const response = await fetch(`/api/admin/stories/${story.story_id}`, {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(storyData),
       });
+
+      if (!response.ok) throw new Error(`Failed to update story status: ${response.statusText}`);
       
-      if (!response.ok) {
-        throw new Error(`Failed to update story status: ${response.statusText}`);
-      }
-      
-      // Update state locally
-      const updatedStories = stories.map(s => {
-        if (s.story_id === story.story_id) {
-          return { ...s, published: newPublishStatus };
-        }
-        return s;
-      });
-      
-      setStories(updatedStories);
-      setSearchResults(
-        searchResults.map(s => {
-          if (s.story_id === story.story_id) {
-            return { ...s, published: newPublishStatus };
-          }
-          return s;
-        })
+      const updatedStories = stories.map(s => 
+        s.story_id === story.story_id ? {...s, published: newPublishStatus} : s
       );
       
-      // Show success message
-      setError(`"${story.story_name}" has been ${newPublishStatus ? "published" : "unpublished"} successfully.`);
+      setStories(updatedStories);
+      
+      if (filterPublished) {
+        setSearchResults(prevResults => newPublishStatus 
+          ? [...prevResults.filter(s => s.story_id !== story.story_id), {...story, published: true}]
+          : prevResults.filter(s => s.story_id !== story.story_id)
+        );
+      } else {
+        setSearchResults(prevResults => 
+          prevResults.map(s => s.story_id === story.story_id ? {...s, published: newPublishStatus} : s)
+        );
+      }
+      
+      setError(`"${story.story_name}" ${newPublishStatus ? "published" : "unpublished"} successfully.`);
       setShowErrorModal(true);
     } catch (err) {
       console.error("Error updating story status:", err);
-      setError(`Failed to update story status: ${err.message}`);
+      setError(`Failed to update status: ${err.message}`);
       setShowErrorModal(true);
     } finally {
       setStatusUpdating(false);
@@ -162,12 +143,17 @@ const ManageStories = () => {
 
   const handleSearch = (searchTerm) => {
     if (!searchTerm) {
-      setSearchResults(stories);
+      const filteredResults = filterPublished ? stories.filter(s => s.published) : stories;
+      setSearchResults(filteredResults);
       return;
     }
-    const filteredStories = stories.filter((story) =>
-      story.story_name.toLowerCase().includes(searchTerm.toLowerCase())
+    
+    let filteredStories = stories.filter(s =>
+      s.story_name.toLowerCase().includes(searchTerm.toLowerCase())
     );
+    
+    if (filterPublished) filteredStories = filteredStories.filter(s => s.published);
+    
     setSearchResults(filteredStories);
     setCurrentPage(1);
   };
@@ -189,20 +175,19 @@ const ManageStories = () => {
         break;
       case "tribe-asc":
         sortedStories.sort((a, b) => {
-          const tribeNameA = tribes[a.tribe_id] || "";
-          const tribeNameB = tribes[b.tribe_id] || "";
-          return tribeNameA.localeCompare(tribeNameB);
+          const tribeA = tribes[a.tribe_id] || "";
+          const tribeB = tribes[b.tribe_id] || "";
+          return tribeA.localeCompare(tribeB);
         });
         break;
       case "tribe-desc":
         sortedStories.sort((a, b) => {
-          const tribeNameA = tribes[a.tribe_id] || "";
-          const tribeNameB = tribes[b.tribe_id] || "";
-          return tribeNameB.localeCompare(tribeNameA);
+          const tribeA = tribes[a.tribe_id] || "";
+          const tribeB = tribes[b.tribe_id] || "";
+          return tribeB.localeCompare(tribeA);
         });
         break;
-      default:
-        break;
+      default: break;
     }
     setSearchResults(sortedStories);
     setCurrentPage(1);
@@ -218,46 +203,35 @@ const ManageStories = () => {
       
       if (matchingTribes.length > 0) {
         const tribeIds = matchingTribes.map(([id]) => parseInt(id));
-        filteredStories = filteredStories.filter(story => 
-          tribeIds.includes(story.tribe_id)
-        );
+        filteredStories = filteredStories.filter(s => tribeIds.includes(s.tribe_id));
       }
     }
 
-    if (timeRange && timeRange.length === 2) {
+    if (timeRange?.length === 2) {
       const minYear = parseInt(timeRange[0]);
       const maxYear = parseInt(timeRange[1]);
       
-      if (!isNaN(minYear)) {
-        filteredStories = filteredStories.filter(story => 
-          story.story_year >= minYear
-        );
-      }
-      if (!isNaN(maxYear)) {
-        filteredStories = filteredStories.filter(story => 
-          story.story_year <= maxYear
-        );
-      }
+      if (!isNaN(minYear)) filteredStories = filteredStories.filter(s => s.story_year >= minYear);
+      if (!isNaN(maxYear)) filteredStories = filteredStories.filter(s => s.story_year <= maxYear);
     }
 
-    if (statusFilter !== 'all') {
-      const isPublished = statusFilter === 'published';
-      filteredStories = filteredStories.filter(story => 
-        story.published === isPublished
-      );
+    if (statusFilter === 'published') {
+      filteredStories = filteredStories.filter(s => s.published);
+    } else if (statusFilter === 'unpublished') {
+      filteredStories = filteredStories.filter(s => !s.published);
     }
+    
+    if (filterPublished) filteredStories = filteredStories.filter(s => s.published);
 
     setSearchResults(filteredStories);
     setCurrentPage(1);
   };
 
-  // Get current stories for pagination
   const indexOfLastStory = currentPage * storiesPerPage;
   const indexOfFirstStory = indexOfLastStory - storiesPerPage;
   const currentStories = searchResults.slice(indexOfFirstStory, indexOfLastStory);
   const paginate = (pageNumber) => setCurrentPage(pageNumber);
 
-  // Handle row click to navigate to edit page
   const handleRowClick = (story) => {
     navigate(`/EditStory/${story.story_id}`);
   };
@@ -269,7 +243,8 @@ const ManageStories = () => {
           <AdminStorySearchBar 
             onSearch={handleSearch} 
             onSort={handleSort} 
-            onFilter={handleFilter} 
+            onFilter={handleFilter}
+            defaultStatusFilter={filterPublished ? 'published' : 'all'}
           />
           <button 
             className="new-story-btn"
@@ -346,7 +321,7 @@ const ManageStories = () => {
                 ) : (
                   <tr>
                     <td colSpan="5" style={{ textAlign: 'center', padding: '2rem' }}>
-                      No stories found
+                      {filterPublished ? "No published stories found" : "No stories found"}
                     </td>
                   </tr>
                 )}
@@ -363,45 +338,87 @@ const ManageStories = () => {
             </div>
           </>
         )}
-      </div>
 
-      {/* Error/Status Modal */}
-      <Modal 
-        show={showErrorModal} 
-        onHide={() => {
-          setShowErrorModal(false);
-          setError(null);
-        }} 
-        centered
-      >
-        <Modal.Header closeButton>
-          <Modal.Title>
-            {error && error.includes("Failed") ? "Error" : "Status Update"}
-          </Modal.Title>
-        </Modal.Header>
-        <Modal.Body>
-          {error}
-        </Modal.Body>
-        <Modal.Footer>
-          <button 
-            className="action-btn edit-btn"
-            onClick={() => {
-              setShowErrorModal(false);
-              setError(null);
-            }}
-          >
-            Close
-          </button>
-        </Modal.Footer>
-      </Modal>
-      
-      {/* Loading overlay for status updates */}
-      {statusUpdating && (
-        <div className="status-updating-overlay">
-          <div className="status-updating-spinner"></div>
-          <p>Updating story status...</p>
-        </div>
-      )}
+        {/* Enhanced Delete Modal */}
+        {showDeleteModal && (
+          <div className="modal-overlay">
+            <div className="delete-modal-content">
+              <div className="delete-modal-header">
+                <h3>Confirm Story Deletion</h3>
+              </div>
+              <div className="delete-modal-body">
+                <p>Are you sure you want to permanently delete:</p>
+                <div className="item-to-delete">
+                  <h4>{selectedStory?.story_name}</h4>
+                  <div className="story-meta">
+                    <span>Tribe: {tribes[selectedStory?.tribe_id] || "Unknown"}</span>
+                    <span>Year: {selectedStory?.story_year || "N/A"}</span>
+                  </div>
+                  <p className="current-status">
+                    Status: <span className={`status-indicator ${selectedStory?.published ? "published" : "unpublished"}`}>
+                      {selectedStory?.published ? "Published" : "Unpublished"}
+                    </span>
+                  </p>
+                </div>
+                <div className="delete-warning">
+                  <svg className="warning-icon" viewBox="0 0 24 24">
+                    <path fill="currentColor" d="M12,2L1,21H23M12,6L19.53,19H4.47M11,10V14H13V10M11,16V18H13V16" />
+                  </svg>
+                  <p>This action cannot be undone. The story will be permanently removed from the system.</p>
+                </div>
+              </div>
+              <div className="delete-modal-footer">
+                <button 
+                  className="cancel-btn"
+                  onClick={() => setShowDeleteModal(false)}
+                >
+                  Cancel
+                </button>
+                <button 
+                  className="confirm-delete-btn"
+                  onClick={confirmDelete}
+                >
+                  Delete Permanently
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* Status Modal */}
+        <Modal 
+          show={showErrorModal} 
+          onHide={() => {
+            setShowErrorModal(false);
+            setError(null);
+          }} 
+          centered
+        >
+          <Modal.Header closeButton>
+            <Modal.Title>{error?.includes("Failed") ? "Error" : "Success"}</Modal.Title>
+          </Modal.Header>
+          <Modal.Body>{error}</Modal.Body>
+          <Modal.Footer>
+            <button 
+              className="action-btn edit-btn"
+              onClick={() => {
+                setShowErrorModal(false);
+                setError(null);
+              }}
+            >
+              Close
+            </button>
+          </Modal.Footer>
+        </Modal>
+
+        {/* Loading Overlay */}
+        {statusUpdating && (
+          <div className="status-updating-overlay">
+            <div className="status-updating-spinner"></div>
+            <p>Processing request...</p>
+          </div>
+        )}
+      </div>
     </DashboardLayout>
   );
 };

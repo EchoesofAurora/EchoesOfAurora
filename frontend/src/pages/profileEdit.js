@@ -3,7 +3,6 @@ import "../styles/profileEdit.css";
 import "../styles/DashboardLayout.css";
 import DashboardLayout from "../components/DashboardLayout";
 import ProfileUpdatedPopUp from "../components/profileUpdatedPopUp";
-import lynn1 from "../images/lynn.png";
 import envelope from "../images/envelope.png";
 import person from "../images/personFrame.png";
 
@@ -31,29 +30,25 @@ const MyProfile = () => {
     <div className="profile-content">
       <div className="manage-header">
         <h1>Edit My Profile</h1>
-        <button
-          className="add-user-button"
-          onClick={() => (window.location.href = "/Admin/AddUser")}
-        >
-          Add New User
-        </button>
-      </div>
-      <div className="left-profile-fields">
-        
-        <div className="profile-card-container">
-          <img className="profile-image" src={lynn1} alt="Lynn Hazelman" />
-          <div className="profile-info">
-            <button
-              className="profile-edit-button"
-              onClick={() => (window.location.href = "/Admin/changePassword")}
-            >
-              <div className="profile-button-content">
-                <span className="profile-button-text">Change Password</span>
-              </div>
-            </button>
-          </div>
+        <div className="header-buttons">
+          <button
+            className="profile-edit-button"
+            onClick={() => (window.location.href = "/Admin/changePassword")}
+          >
+            <div className="profile-button-content">
+              <span className="profile-button-text">Change Password</span>
+            </div>
+          </button>
+          <button
+            className="add-user-button"
+            onClick={() => (window.location.href = "/Admin/AddUser")}
+          >
+            Add New User
+          </button>
         </div>
-
+      </div>
+      
+      <div className="left-profile-fields">
         <div className="profile-container">
           <div className="input-container">
             <label className="label">Full Name</label>
@@ -74,7 +69,7 @@ const MyProfile = () => {
                 className="input"
               />
             </div>
-            <button className="profile-edit-button" onClick={() => handleOpenPopup("Email")}>
+            <button className="profile-edit-button update-email-btn" onClick={() => handleOpenPopup("Email")}>
               Update Email
             </button>
           </div>

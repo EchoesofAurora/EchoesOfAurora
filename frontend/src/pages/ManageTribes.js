@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import { Modal } from "react-bootstrap";
 import "../styles/ManageTribes.css";
 import "../styles/pagination.css";
@@ -9,6 +9,8 @@ import AdminTribeSearchBar from "../components/AdminTribeSearchBar";
 import Pagination from "../components/Pagination";
 
 const ManageTribes = () => {
+  const navigate = useNavigate();
+  const location = useLocation();
   const [tribes, setTribes] = useState([]);
   const [searchResults, setSearchResults] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -18,11 +20,13 @@ const ManageTribes = () => {
   const [selectedTribe, setSelectedTribe] = useState(null);
   const [statusUpdating, setStatusUpdating] = useState(false);
   
-  const [currentPage, setCurrentPage] = useState(1);
-  const [tribesPerPage] = useState(7);
+  // Check if we should filter for published tribes only (from navigation state)
+  const filterPublished = location.state?.filterPublished || false;
   
-  const navigate = useNavigate();
-
+  // Pagination states
+  const [currentPage, setCurrentPage] = useState(1);
+  const [tribesPerPage] = useState(7); // Show 7 tribes per page
+  
   const rowBackgroundColors = [
     "#f9f0ff", // Lavender whisper  
     "#f0f9ff", // Baby blue  
@@ -37,8 +41,18 @@ const ManageTribes = () => {
           throw new Error(`Error: ${response.statusText}`);
         }
         const data = await response.json();
-        setTribes(data);
-        setSearchResults(data);
+        
+        // If filterPublished is true, filter for published tribes only
+        const filteredData = filterPublished ? data.filter(tribe => tribe.published) : data;
+        
+        setTribes(data); // Keep all tribes in the original state
+        setSearchResults(filteredData); // Set search results to filtered or all tribes
+        
+        // If we're filtering for published tribes, update the search bar filter
+        if (filterPublished && AdminTribeSearchBar.updateStatusFilter) {
+          AdminTribeSearchBar.updateStatusFilter('published');
+        }
+        
         setLoading(false);
       } catch (err) {
         console.error("Failed to fetch tribes:", err);
@@ -48,7 +62,7 @@ const ManageTribes = () => {
     };
 
     fetchTribes();
-  }, []);
+  }, [filterPublished]);
 
   const handleRowClick = (tribe) => {
     navigate(`/EditTribe/${tribe.tribe_id}`);
@@ -69,9 +83,13 @@ const ManageTribes = () => {
       if (response.ok) {
         const updatedTribes = tribes.filter((tribe) => tribe.tribe_id !== selectedTribe.tribe_id);
         setTribes(updatedTribes);
-        setSearchResults(updatedTribes);
+        setSearchResults(searchResults.filter((tribe) => tribe.tribe_id !== selectedTribe.tribe_id));
         setShowDeleteModal(false);
         setSelectedTribe(null);
+        
+        // Show success message
+        setError(`"${selectedTribe.tribe_name}" has been deleted successfully.`);
+        setShowStatusModal(true);
       } else {
         setError("Failed to delete the tribe. Please try again.");
         setShowStatusModal(true);
@@ -117,6 +135,7 @@ const ManageTribes = () => {
         throw new Error(`Failed to update tribe status: ${response.statusText}`);
       }
       
+      // Update state locally
       const updatedTribes = tribes.map(t => 
         t.tribe_id === tribe.tribe_id 
           ? {...t, published: newPublishStatus} 
@@ -124,15 +143,29 @@ const ManageTribes = () => {
       );
       
       setTribes(updatedTribes);
-      setSearchResults(
-        searchResults.map(t => {
-          if (t.tribe_id === tribe.tribe_id) {
-            return { ...t, published: newPublishStatus };
-          }
-          return t;
-        })
-      );
       
+      // If we're filtering for published tribes, remove unpublished tribes from the results
+      if (filterPublished) {
+        setSearchResults(prevResults => {
+          if (newPublishStatus) {
+            // Tribe was published - make sure it's in the results
+            if (!prevResults.some(t => t.tribe_id === tribe.tribe_id)) {
+              return [...prevResults, {...tribe, published: true}];
+            }
+            return prevResults.map(t => t.tribe_id === tribe.tribe_id ? {...t, published: true} : t);
+          } else {
+            // Tribe was unpublished - remove it from results if we're filtering
+            return prevResults.filter(t => t.tribe_id !== tribe.tribe_id);
+          }
+        });
+      } else {
+        // Just update the status
+        setSearchResults(prevResults => 
+          prevResults.map(t => t.tribe_id === tribe.tribe_id ? {...t, published: newPublishStatus} : t)
+        );
+      }
+      
+      // Show success message
       setError(`"${tribe.tribe_name}" has been ${newPublishStatus ? "published" : "unpublished"} successfully.`);
       setShowStatusModal(true);
       
@@ -147,12 +180,22 @@ const ManageTribes = () => {
 
   const handleSearch = (searchTerm) => {
     if (!searchTerm) {
-      setSearchResults(tribes);
+      // If no search term, but we're filtering for published, only show published tribes
+      const filteredResults = filterPublished ? tribes.filter(tribe => tribe.published) : tribes;
+      setSearchResults(filteredResults);
       return;
     }
-    const filteredTribes = tribes.filter((tribe) =>
+    
+    // First filter by the search term
+    let filteredTribes = tribes.filter((tribe) =>
       tribe.tribe_name.toLowerCase().includes(searchTerm.toLowerCase())
     );
+    
+    // Then apply published filter if needed
+    if (filterPublished) {
+      filteredTribes = filteredTribes.filter(tribe => tribe.published);
+    }
+    
     setSearchResults(filteredTribes);
     setCurrentPage(1);
   };
@@ -188,8 +231,10 @@ const ManageTribes = () => {
   };
 
   const handleFilter = (_, timeRange, statusFilter = 'all') => {
+    // Start from all tribes
     let filteredTribes = [...tribes];
 
+    // Apply time range filter
     if (timeRange && timeRange.length === 2) {
       const minYear = parseInt(timeRange[0]);
       const maxYear = parseInt(timeRange[1]);
@@ -205,21 +250,29 @@ const ManageTribes = () => {
       }
     }
 
-    if (statusFilter !== 'all') {
-      const isPublished = statusFilter === 'published';
-      filteredTribes = filteredTribes.filter(tribe => 
-        tribe.published === isPublished
-      );
+    // Apply status filter
+    if (statusFilter === 'published') {
+      filteredTribes = filteredTribes.filter(tribe => tribe.published);
+    } else if (statusFilter === 'unpublished') {
+      filteredTribes = filteredTribes.filter(tribe => !tribe.published);
+    }
+    
+    // If we're in "published tribes only" mode from sidebar, enforce that filter
+    // regardless of the status filter selection
+    if (filterPublished) {
+      filteredTribes = filteredTribes.filter(tribe => tribe.published);
     }
 
     setSearchResults(filteredTribes);
     setCurrentPage(1);
   };
 
+  // Get current tribes for pagination
   const indexOfLastTribe = currentPage * tribesPerPage;
   const indexOfFirstTribe = indexOfLastTribe - tribesPerPage;
   const currentTribes = searchResults.slice(indexOfFirstTribe, indexOfLastTribe);
   
+  // Change page
   const paginate = (pageNumber) => setCurrentPage(pageNumber);
 
   return (
@@ -229,7 +282,8 @@ const ManageTribes = () => {
           <AdminTribeSearchBar 
             onSearch={handleSearch} 
             onSort={handleSort} 
-            onFilter={handleFilter} 
+            onFilter={handleFilter}
+            defaultStatusFilter={filterPublished ? 'published' : 'all'}
           />
           <button 
             className="new-story-btn"
@@ -306,7 +360,7 @@ const ManageTribes = () => {
                 ) : (
                   <tr>
                     <td colSpan="4" style={{ textAlign: 'center', padding: '2rem' }}>
-                      No tribes found
+                      {filterPublished ? "No published tribes found" : "No tribes found"}
                     </td>
                   </tr>
                 )}
@@ -325,29 +379,38 @@ const ManageTribes = () => {
         )}
       </div>
 
-      {/* Delete Confirmation Modal */}
+      {/* Delete Confirmation Modal - Updated Design */}
       {showDeleteModal && (
-        <div className="modal-overlay">
-          <div className="modal-content">
-            <h3>Confirm Deletion</h3>
-            <p>Are you sure you want to delete "{selectedTribe?.tribe_name}"?</p>
-            <div className="modal-buttons">
-              <button 
-                className="action-btn edit-btn"
-                onClick={() => setShowDeleteModal(false)}
-              >
-                Cancel
-              </button>
-              <button 
-                className="action-btn delete-btn"
-                onClick={confirmDelete}
-              >
-                Delete
-              </button>
+          <div className="modal-overlay">
+            <div className="delete-modal-content">
+              <div className="delete-modal-header">
+                <h3>Confirm Deletion</h3>
+              </div>
+              <div className="delete-modal-body">
+                <p>Are you sure you want to delete the tribe:</p>
+                <div className="tribe-to-delete">
+                  <h4>{selectedTribe?.tribe_name}</h4>
+                  <p>{`${selectedTribe?.start_year || "Unknown"} - ${selectedTribe?.end_year || "Present"}`}</p>
+                </div>
+                <p className="warning-text">This action cannot be undone.</p>
+              </div>
+              <div className="delete-modal-footer">
+                <button 
+                  className="cancel-btn"
+                  onClick={() => setShowDeleteModal(false)}
+                >
+                  Cancel
+                </button>
+                <button 
+                  className="confirm-delete-btn"
+                  onClick={confirmDelete}
+                >
+                  Delete Tribe
+                </button>
+              </div>
             </div>
           </div>
-        </div>
-      )}
+        )}
 
       {/* Status/Error Modal - Updated to clear message on close */}
       <Modal 

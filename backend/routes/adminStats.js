@@ -9,7 +9,9 @@ router.get("/", async (req, res) => {
     const result = await pool.query(`
       SELECT 
         (SELECT COUNT(*) FROM tribes) AS tribes,
+        (SELECT COUNT(*) FROM tribes WHERE published = true) AS published_tribes,
         (SELECT COUNT(*) FROM stories) AS stories,
+        (SELECT COUNT(*) FROM stories WHERE published = true) AS published_stories,
         (SELECT COUNT(*) FROM user_submissions) AS messages,
         (SELECT COUNT(*) FROM user_submissions where is_read=false) AS unread_messages
     `);
