@@ -4,38 +4,12 @@ import "react-datepicker/dist/react-datepicker.css";
 import "../styles/AddingTribe.css";
 import "../styles/ManageTribes.css";
 import "../styles/DashboardLayout.css";
-import { MapContainer, TileLayer, Polygon, Polyline, Circle, useMapEvents } from "react-leaflet";
-import "leaflet/dist/leaflet.css";
 import { Modal, Button } from "react-bootstrap";
 import { useNavigate } from "react-router-dom"; 
 import ImageUpload from "../components/ImageUpload"; 
 import DashboardLayout from "../components/DashboardLayout";
 import ReferenceLinks from "../components/ReferenceLinks";
-
-const MapWithDrawing = ({ isDrawingEnabled, onShapeUpdate, drawnShape, tempMarkers, setTempMarkers }) => {
-  useMapEvents({
-    click: (e) => {
-      if (!isDrawingEnabled) return;
-      const { lat, lng } = e.latlng;
-      setTempMarkers([...tempMarkers, [lat, lng]]);
-      onShapeUpdate([...drawnShape, [lat, lng]]);
-    },
-  });
-
-  return (
-    <>
-      {isDrawingEnabled && drawnShape.length > 1 && (
-        <Polyline positions={drawnShape} color="blue" />
-      )}
-      {!isDrawingEnabled && drawnShape.length > 2 && (
-        <Polygon positions={[...drawnShape, drawnShape[0]]} color="blue" fillColor="blue" fillOpacity={0.4} />
-      )}
-      {tempMarkers.map((pos, idx) => (
-        <Circle key={idx} center={pos} radius={5000} color="blue" fillColor="blue" fillOpacity={0.6} />
-      ))}
-    </>
-  );
-};
+import MapboxAdmin from "../components/MapboxAdmin";
 
 const HeroAddingTribe = () => {
   // Form field refs for scrolling
@@ -61,7 +35,7 @@ const HeroAddingTribe = () => {
   const [geojson, setGeojson] = useState({
     type: "Feature",
     geometry: {
-      type: "MultiPolygon",
+      type: "Polygon",
       coordinates: "",
     },
     properties: {
@@ -175,19 +149,21 @@ const HeroAddingTribe = () => {
       return;
     }
 
-    // Prepare GeoJSON data
-    const geoJsonCoordinates = [drawnShape.map(([lat, lng]) => [lng, lat])]; // Note: GeoJSON uses [longitude, latitude] format
+    // Create proper GeoJSON data from the drawn shape
+    // Convert from [lat, lng] to [lng, lat] format for GeoJSON
+    const geoJsonCoordinates = drawnShape.map(([lat, lng]) => [lng, lat]);
 
     const requestData = {
       tribe_name: tribeName,
       tribe_text: description,
+      // Use only the year value to avoid timezone issues
       start_year: startDate ? startDate.getFullYear() : null,
       end_year: endDate ? endDate.getFullYear() : null,
       map_color: tribeColor,
       tribe_references: referenceLinks,
       geojson_data: {
-        type: "Polygon",
-        coordinates: geoJsonCoordinates,
+        type: "Polygon", // Use Polygon type for new tribes
+        coordinates: [geoJsonCoordinates], // Standard format for Polygon
       },
       published: publishStatus,
     };
@@ -265,9 +241,14 @@ const HeroAddingTribe = () => {
     if (!isDrawingEnabled) {
       setDrawnShape([]);
       setTempMarkers([]);
-      geojson.geometry.coordinates = ""; // Clear coordinates when drawing starts
+      setGeojson({
+        ...geojson,
+        geometry: {
+          ...geojson.geometry,
+          coordinates: ""
+        }
+      });
     } else {
-      // Close the shape if there are at least 3 points
       setDrawnShape((prevShape) => (prevShape.length > 2 ? [...prevShape, prevShape[0]] : prevShape));
     }
     setIsDrawingEnabled(!isDrawingEnabled);
@@ -275,13 +256,19 @@ const HeroAddingTribe = () => {
 
   // Synchronize drawnShape with geojson.geometry.coordinates
   const updateGeojsonCoordinates = (coordinates) => {
-    setGeojson((prev) => ({
-      ...prev,
-      geometry: {
-        ...prev.geometry,
-        coordinates: JSON.stringify([coordinates.map(([lat, lng]) => [lng, lat])]), // Note: GeoJSON uses [longitude, latitude] format
-      },
-    }));
+    if (coordinates && coordinates.length >= 3) {
+      // Convert from [lat, lng] to [lng, lat] for GeoJSON and store as array
+      const geoJsonCoordinates = coordinates.map(([lat, lng]) => [lng, lat]);
+      
+      setGeojson((prev) => ({
+        ...prev,
+        geometry: {
+          ...prev.geometry,
+          type: "Polygon",
+          coordinates: [geoJsonCoordinates]
+        },
+      }));
+    }
   };
 
   // Check if any errors exist
@@ -415,11 +402,12 @@ const HeroAddingTribe = () => {
               Reset Map
             </button>
           </div>
-          <MapContainer center={[40.736, -74.172]} zoom={5} scrollWheelZoom={true} className={`adding-tribe-map ${errors.drawnShape ? 'map-error' : ''}`} style={errors.drawnShape ? { border: '2px solid red' } : {}}>
-            <TileLayer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" />
-            <MapWithDrawing
-              key={JSON.stringify(drawnShape)}
-              isDrawingEnabled={isDrawingEnabled}
+          <div 
+            className={`adding-tribe-map ${errors.drawnShape ? 'map-error' : ''}`} 
+            style={errors.drawnShape ? { border: '2px solid red' } : {}}
+          >
+            <MapboxAdmin
+              key={`addmap-stable`}
               onShapeUpdate={(newShape) => {
                 setDrawnShape(newShape);
                 updateGeojsonCoordinates(newShape);
@@ -427,11 +415,10 @@ const HeroAddingTribe = () => {
                   setErrors({...errors, drawnShape: ""});
                 }
               }}
-              drawnShape={drawnShape}
-              tempMarkers={tempMarkers}
-              setTempMarkers={setTempMarkers}
+              initialCoordinates={drawnShape}
+              tribeColor={tribeColor}
             />
-          </MapContainer>
+          </div>
           {errors.drawnShape && <div className="error-message" style={{ color: 'red', fontSize: '0.8rem', marginTop: '5px' }}>{errors.drawnShape}</div>}
         </div>
 
