@@ -67,6 +67,24 @@ const TribeLandingPage = () => {
     }
   };
 
+  // Get image for a story card
+  const getStoryImage = (story) => {
+    if (story.image_data) {
+      return `data:${story.media_type};base64,${story.image_data}`;
+    }
+    
+    try {
+      return require(`../images/stories/${story.story_id}.png`);
+    } catch (e) {
+      // Default image if story specific image is not found
+      try {
+        return require('../images/stories/1.png');
+      } catch (e) {
+        return null;
+      }
+    }
+  };
+
   // Get remaining images for gallery
   const getGalleryImages = () => {
     if (tribeImages && tribeImages.length > 1) {
@@ -206,6 +224,47 @@ const TribeLandingPage = () => {
                     className="tribe-landing-gallery-image"
                   />
                   {image.caption && <p className="tribe-landing-caption">{image.caption}</p>}
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+        
+        {/* Related Stories Section */}
+        {tribe.relatedStories && tribe.relatedStories.length > 0 && (
+          <div className="tribe-related-stories">
+            <h2 className="related-stories-title">More Stories from {tribe.tribe_name}</h2>
+            <div className="related-stories-grid">
+              {tribe.relatedStories.map((story, index) => (
+                <div className="related-story-card" key={index}>
+                  <img 
+                    src={getStoryImage(story)} 
+                    alt={story.story_name}
+                    className="related-story-image"
+                    onError={(e) => {
+                      console.error("Failed to load story image");
+                      e.target.onerror = null;
+                      try {
+                        e.target.src = require('../images/stories/1.png');
+                      } catch (err) {
+                        e.target.style.display = 'none';
+                      }
+                    }}
+                  />
+                  <div className="related-story-content">
+                    <h3 className="related-story-title">{story.story_name}</h3>
+                    <p className="related-story-summary">
+                      Summary: {story.story_text.length > 120 
+                        ? `${story.story_text.substring(0, 120)}...` 
+                        : story.story_text}
+                    </p>
+                    <Link 
+                      to={`/story/${story.story_id}`} 
+                      className="related-story-link"
+                    >
+                      Read More
+                    </Link>
+                  </div>
                 </div>
               ))}
             </div>

@@ -75,6 +75,49 @@ router.get("/:storyId", async (req, res) => {
       image_data: row.image_data ? row.image_data.toString("base64") : null,
     }));
 
+    // Fetch the tribe information
+    const tribeResult = await pool.query(
+      "SELECT tribe_id, tribe_name FROM tribes WHERE tribe_id = $1",
+      [story.tribe_id]
+    );
+    
+    if (tribeResult.rows.length > 0) {
+      story.tribeName = tribeResult.rows[0].tribe_name;
+      
+      // Fetch other stories from the same tribe (excluding current story)
+      const relatedStoriesResult = await pool.query(`
+        SELECT 
+          s.story_id, 
+          s.story_name, 
+          s.story_year, 
+          s.story_text,
+          i.media_id, 
+          i.media_type, 
+          i.image_data 
+        FROM 
+          public.stories s
+        LEFT JOIN (
+          SELECT DISTINCT ON (story_id) *
+          FROM image_store
+          ORDER BY story_id, media_id ASC
+        ) i ON i.story_id = s.story_id
+        WHERE 
+          s.tribe_id = $1 AND s.published = true AND s.story_id != $2
+        LIMIT 3
+      `, [story.tribe_id, storyId]);
+      
+      // Convert image_data to base64 for related stories
+      story.relatedStories = relatedStoriesResult.rows.map(relStory => ({
+        story_id: relStory.story_id,
+        story_name: relStory.story_name,
+        story_year: relStory.story_year,
+        story_text: relStory.story_text,
+        media_id: relStory.media_id,
+        media_type: relStory.media_type,
+        image_data: relStory.image_data ? relStory.image_data.toString('base64') : null
+      }));
+    }
+
     res.status(200).json(story);
   } catch (err) {
     console.error(`Error fetching story_id ${storyId}:`, err.stack);

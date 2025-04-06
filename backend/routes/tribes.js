@@ -71,6 +71,39 @@ router.get('/:tribeId', async (req, res) => {
       image_data: row.image_data ? row.image_data.toString("base64") : null,
     }));
     
+    // Fetch related stories from the same tribe
+    const relatedStoriesResult = await pool.query(`
+      SELECT 
+        s.story_id, 
+        s.story_name, 
+        s.story_year, 
+        s.story_text,
+        i.media_id, 
+        i.media_type, 
+        i.image_data 
+      FROM 
+        public.stories s
+      LEFT JOIN (
+        SELECT DISTINCT ON (story_id) *
+        FROM image_store
+        ORDER BY story_id, media_id ASC
+      ) i ON i.story_id = s.story_id
+      WHERE 
+        s.tribe_id = $1 AND s.published = true
+      LIMIT 3
+    `, [tribeId]);
+    
+    // Convert image_data to base64 for related stories
+    tribe.relatedStories = relatedStoriesResult.rows.map(story => ({
+      story_id: story.story_id,
+      story_name: story.story_name,
+      story_year: story.story_year,
+      story_text: story.story_text,
+      media_id: story.media_id,
+      media_type: story.media_type,
+      image_data: story.image_data ? story.image_data.toString('base64') : null
+    }));
+    
     res.json(tribe);
   } catch (err) {
     res.status(500).json({ error: err.message });
