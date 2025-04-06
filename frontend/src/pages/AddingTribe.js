@@ -35,7 +35,7 @@ const HeroAddingTribe = () => {
   const [geojson, setGeojson] = useState({
     type: "Feature",
     geometry: {
-      type: "MultiPolygon",
+      type: "Polygon",
       coordinates: "",
     },
     properties: {
@@ -149,19 +149,21 @@ const HeroAddingTribe = () => {
       return;
     }
 
-    // Prepare GeoJSON data
-    const geoJsonCoordinates = [drawnShape.map(([lat, lng]) => [lng, lat])]; // Note: GeoJSON uses [longitude, latitude] format
+    // Create proper GeoJSON data from the drawn shape
+    // Convert from [lat, lng] to [lng, lat] format for GeoJSON
+    const geoJsonCoordinates = drawnShape.map(([lat, lng]) => [lng, lat]);
 
     const requestData = {
       tribe_name: tribeName,
       tribe_text: description,
+      // Use only the year value to avoid timezone issues
       start_year: startDate ? startDate.getFullYear() : null,
       end_year: endDate ? endDate.getFullYear() : null,
       map_color: tribeColor,
       tribe_references: referenceLinks,
       geojson_data: {
-        type: "Polygon",
-        coordinates: geoJsonCoordinates,
+        type: "Polygon", // Use Polygon type for new tribes
+        coordinates: [geoJsonCoordinates], // Standard format for Polygon
       },
       published: publishStatus,
     };
@@ -255,12 +257,15 @@ const HeroAddingTribe = () => {
   // Synchronize drawnShape with geojson.geometry.coordinates
   const updateGeojsonCoordinates = (coordinates) => {
     if (coordinates && coordinates.length >= 3) {
+      // Convert from [lat, lng] to [lng, lat] for GeoJSON and store as array
+      const geoJsonCoordinates = coordinates.map(([lat, lng]) => [lng, lat]);
+      
       setGeojson((prev) => ({
         ...prev,
         geometry: {
           ...prev.geometry,
           type: "Polygon",
-          coordinates: JSON.stringify([coordinates.map(([lat, lng]) => [lng, lat])]), // Note: GeoJSON uses [longitude, latitude] format
+          coordinates: [geoJsonCoordinates]
         },
       }));
     }
@@ -402,6 +407,7 @@ const HeroAddingTribe = () => {
             style={errors.drawnShape ? { border: '2px solid red' } : {}}
           >
             <MapboxAdmin
+              key={`addmap-stable`}
               onShapeUpdate={(newShape) => {
                 setDrawnShape(newShape);
                 updateGeojsonCoordinates(newShape);
