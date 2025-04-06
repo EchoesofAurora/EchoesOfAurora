@@ -1,9 +1,19 @@
 import React from "react";
 import "../styles/profileDropdown.css";
+import { useNavigate } from "react-router-dom";
+import { useAuth } from "../contexts/AuthContext";
 
 const ProfileDropdown = () => {
+    const navigate = useNavigate();
+    const { logout } = useAuth();
+
     const handleItemClick = (path) => {
-      window.location.href = path; // Navigate to the desired path
+      navigate(path);
+    };
+
+    const handleLogout = () => {
+      logout();
+      navigate("/Admin/SignIn");
     };
 
   return (
@@ -24,7 +34,7 @@ const ProfileDropdown = () => {
           </li>
           <li
             className="admin-dropdown-item admin-dropdown-logout"
-            onClick={() => handleItemClick("/Admin/SignIn")}
+            onClick={handleLogout}
           >
             Logout
           </li>

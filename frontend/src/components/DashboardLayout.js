@@ -1,10 +1,12 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import "../styles/DashboardLayout.css";
+import { useAuth } from "../contexts/AuthContext";
 
 const DashboardLayout = ({ children, activeTab = "dashboard" }) => {
   const navigate = useNavigate();
   const location = useLocation();
+  const { logout } = useAuth();
   const [statsData, setStatsData] = useState({
     tribes: "0",
     publishedTribes: "0",
@@ -131,8 +133,8 @@ const DashboardLayout = ({ children, activeTab = "dashboard" }) => {
   };
 
   const handleSignOut = () => {
-    // Perform sign out actions here
-    // For example, clear local storage, cookies, etc.
+    // Use auth context logout function
+    logout();
     navigate("/Admin/SignIn");
   };
 

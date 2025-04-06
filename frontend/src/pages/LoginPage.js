@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import "../styles/AdminStyle.css"
 import envelope from '../images/envelope.png';
@@ -6,6 +6,7 @@ import lock from '../images/Component 1.png';
 import Header from '../components/AHeader.js';
 import Footer from '../components/Footer.js';
 import HeroContainer from '../components/HeroContainer.js';
+import { useAuth } from '../contexts/AuthContext';
 
 const HeroSection = () => {
   const [user, setUser] = useState({
@@ -14,7 +15,15 @@ const HeroSection = () => {
   });
 
   const [errors, setErrors] = useState({});
-  const navigate = useNavigate(); // Initialize useNavigate hook
+  const navigate = useNavigate();
+  const { login, isAuthenticated } = useAuth();
+
+  // If already authenticated, redirect to admin dashboard
+  useEffect(() => {
+    if (isAuthenticated) {
+      navigate('/Admin/ManageStories');
+    }
+  }, [isAuthenticated, navigate]);
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
@@ -47,7 +56,11 @@ const HeroSection = () => {
     e.preventDefault();
     if (validateForm()) {
       if (user.email === "testing@test.com" && user.password === "test123") {
-        // Redirect to the dashboard if credentials are correct
+        // Use auth context to log in
+        login({
+          email: user.email,
+          name: 'Admin' // You can customize this with actual user data
+        });
         navigate('/Admin/ManageStories');
       } else {
         setErrors({ general: "Invalid email or password." });
