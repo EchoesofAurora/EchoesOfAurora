@@ -192,7 +192,6 @@ const HeroAddingStory = () => {
       setShowModal(true);
       return;
     }
-    console.log(tribeId, 'tribeId');
 
     // Use the first available year (startDate or endDate)
     const storyYear = startDate ? startDate.getFullYear().toString() : 

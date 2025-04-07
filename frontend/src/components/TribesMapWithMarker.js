@@ -567,23 +567,7 @@ const TribesMapWithMarker = ({ tribeId }) => {
           </p>
         )}
         
-        {selectedTribeId && tribesData && (
-          <div style={{ 
-            marginTop: "15px", 
-            paddingTop: "15px", 
-            borderTop: "1px solid #dee2e6",
-            backgroundColor: "rgba(255, 255, 204, 0.3)", 
-            padding: "10px",
-            borderRadius: "4px",
-            border: "1px solid #ffe066" 
-          }}>
-            <p style={{ fontSize: "16px", fontWeight: "bold" }}>
-              Selected Tribe: {
-                tribesData.features.find(f => f.id.toString() === selectedTribeId.toString())?.properties.Name || 'Unknown'
-              }
-            </p>
-          </div>
-        )}
+        
       </div>
     </div>
   );
