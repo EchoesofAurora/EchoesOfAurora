@@ -22,6 +22,7 @@ const HeroAddingStory = () => {
   const [tribes, setTribes] = useState([]);
   const [tribeIds, setTribeIds] = useState({});
   const [newStoryId, setNewStoryId] = useState(null);
+  const [selectedTribeId, setSelectedTribeId] = useState(null);
   
   const [showModal, setShowModal] = useState(false);
   const [modalMessage, setModalMessage] = useState("");
@@ -65,6 +66,17 @@ const HeroAddingStory = () => {
     };
     fetchTribes();
   }, []);
+
+  useEffect(() => {
+    if (selectedTribe) {
+      const tribeId = tribeIds[selectedTribe];
+      if (tribeId) {
+        setSelectedTribeId(tribeId);
+      } else {
+        setSelectedTribeId(null);
+      }
+    }
+  }, [selectedTribe, tribeIds, selectedTribeId]);
 
   // Handle field touch events
   const handleBlur = (field) => {
@@ -180,6 +192,7 @@ const HeroAddingStory = () => {
       setShowModal(true);
       return;
     }
+    console.log(tribeId, 'tribeId');
 
     // Use the first available year (startDate or endDate)
     const storyYear = startDate ? startDate.getFullYear().toString() : 
@@ -265,6 +278,7 @@ const HeroAddingStory = () => {
   const getInputClassName = (field) => {
     return `adding-story-input ${touched[field] && errors[field] ? "input-error" : ""}`;
   };
+  console.log(selectedTribe,'selectedTribe');
 
   return (
     <div className="adding-story-frame">
@@ -405,7 +419,9 @@ const HeroAddingStory = () => {
 
         <div>
         <label className="adding-story-label">Mark the Coordinate</label>
-          <TribesMapWithMarker tribeId={selectedTribe} />
+          <TribesMapWithMarker
+            tribeId={selectedTribeId}   
+            />
         </div>
 
         <div className="adding-story-form-group">

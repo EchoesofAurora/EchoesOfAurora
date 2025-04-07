@@ -57,37 +57,52 @@ const TribesMapWithMarker = ({ tribeId }) => {
   
   // Effect to update selectedTribeId when tribeId prop changes
   useEffect(() => {
-    if (tribeId) {
+    if (tribeId && tribeId !== selectedTribeId) {
       setSelectedTribeId(tribeId);
-      console.log("Tribe ID from props:", tribeId);
     }
-  }, [tribeId]);
+  }, [tribeId, selectedTribeId]);
   
   // Handle window resize
   useEffect(() => {
     const handleResize = () => {
       const width = window.innerWidth;
       const height = window.innerHeight;
-      setScreenSize({
-        width,
-        height,
-        isMobile: width < 768
-      });
+      const isMobile = width < 768;
       
-      // Adjust viewport based on screen size
-      setViewport(prev => ({
-        ...prev,
-        width: "100%",
-        height: "70vh", // Reduced from 100vh to 70vh
-        zoom: width < 768 ? 0.8 : 1.6, // Adjust zoom level for mobile
-      }));
+      // Only update if there's an actual change
+      if (
+        screenSize.width !== width ||
+        screenSize.height !== height ||
+        screenSize.isMobile !== isMobile
+      ) {
+        setScreenSize({
+          width,
+          height,
+          isMobile
+        });
+        
+        // Only update viewport if size category changes (mobile/desktop)
+        if (screenSize.isMobile !== isMobile) {
+          setViewport(prev => ({
+            ...prev,
+            width: "100%",
+            height: "70vh",
+            zoom: isMobile ? 0.8 : 1.6,
+          }));
+        }
+      }
     };
 
     window.addEventListener('resize', handleResize);
-    handleResize(); // Initial call
     
-    return () => window.removeEventListener('resize', handleResize);
-  }, []);
+    // Initial call wrapped in a timeout to avoid immediate update
+    const timer = setTimeout(handleResize, 0);
+    
+    return () => {
+      window.removeEventListener('resize', handleResize);
+      clearTimeout(timer);
+    };
+  }, [screenSize]); // Add screenSize as dependency
 
   // Store reference to the map instance when loaded
   const onLoad = useCallback(event => {
@@ -98,6 +113,8 @@ const TribesMapWithMarker = ({ tribeId }) => {
 
   // Fetch tribes data from API
   useEffect(() => {
+    let isMounted = true;
+    
     const fetchData = async () => {
       setIsLoading(true);
       try {
@@ -105,6 +122,9 @@ const TribesMapWithMarker = ({ tribeId }) => {
         const tribesResponse = await fetch('/api/mapData');
         const data = await tribesResponse.json();
 
+        // Guard against component unmounting during async operation
+        if (!isMounted) return;
+        
         const tribesJson = data["tribes"];
         
         // Transform tribes data to match expected format
@@ -123,30 +143,34 @@ const TribesMapWithMarker = ({ tribeId }) => {
             geometry: tribe.geojson_data
           }))
         };
+        
         setTribesData(transformedTribesData);
-        console.log("Tribes data loaded");
       } catch (error) {
         console.error("Error fetching data:", error);
       } finally {
-        setIsLoading(false);
+        if (isMounted) {
+          setIsLoading(false);
+        }
       }
     };
 
     fetchData();
-  }, [tribeId]); // Also reload when tribeId changes
+    
+    // Cleanup function
+    return () => {
+      isMounted = false;
+    };
+  }, [tribeId]); // Only reload when tribeId changes
   
   // Function to zoom to a tribe's geometry bounds with enhanced padding and smoother transition
   const zoomToTribe = useCallback((tribeId) => {
     if (!tribesData || !mapRef.current) return;
     
-    console.log("Attempting to zoom to tribe:", tribeId);
     
     // Find the selected tribe
     const selectedTribe = tribesData.features.find(feature => 
       feature.id.toString() === tribeId.toString()
     );
-    
-    console.log("Found matching tribe:", selectedTribe);
     
     if (!selectedTribe || !selectedTribe.geometry) return;
     
@@ -183,12 +207,12 @@ const TribesMapWithMarker = ({ tribeId }) => {
         const maxDimension = Math.max(boundsWidth, boundsHeight);
         
         // Default to zoom level 4 for very small or point geometries
-        let zoomLevel = 4;
+        let zoomLevel = 5;
         
         // Only calculate custom zoom for larger areas
         if (maxDimension > 0.1) {
           // Convert the dimension to a zoom level (logarithmic scale)
-          zoomLevel = Math.max(2, Math.min(6, 7 - Math.log2(maxDimension)));
+          zoomLevel = Math.max(3, Math.min(6, 8 - Math.log2(maxDimension)));
         }
         
         // Add visual highlight animation on tribe selection
@@ -207,32 +231,43 @@ const TribesMapWithMarker = ({ tribeId }) => {
           }, 500); // Increased timeout for layer readiness
         }
         
-        const newViewport = {
-          ...viewport,
-          longitude: bounds.getCenter().lng,
-          latitude: bounds.getCenter().lat,
-          zoom: zoomLevel,
-          transitionDuration: 1000, // Smooth transition but not too slow
-          transitionInterpolator: new FlyToInterpolator({ speed: 1.2 })
-        };
-        
-        setViewport(newViewport);
-        console.log("Zoomed to tribe coordinates with level:", zoomLevel);
+        // Check if the new viewport values are actually different
+        if (
+          Math.abs(viewport.longitude - bounds.getCenter().lng) > 0.0001 ||
+          Math.abs(viewport.latitude - bounds.getCenter().lat) > 0.0001 ||
+          Math.abs(viewport.zoom - zoomLevel) > 0.01
+        ) {
+          const newViewport = {
+            ...viewport,
+            longitude: bounds.getCenter().lng,
+            latitude: bounds.getCenter().lat,
+            zoom: zoomLevel,
+            transitionDuration: 1000, // Smooth transition but not too slow
+            transitionInterpolator: new FlyToInterpolator({ speed: 1.2 })
+          };
+          
+          setViewport(newViewport);
+        }
       }
     } catch (error) {
       console.error("Error zooming to tribe:", error);
     }
-  }, [tribesData, viewport, screenSize.isMobile]);
+  }, [tribesData, viewport]); // Remove screenSize.isMobile dependency
 
   // Zoom to selected tribe when it's available or changes
   useEffect(() => {
-    if (selectedTribeId && tribesData) {
-      zoomToTribe(selectedTribeId);
+    if (selectedTribeId && tribesData && mapRef.current) {
+      // Add a small delay to ensure the map is ready
+      const timer = setTimeout(() => {
+        zoomToTribe(selectedTribeId);
+      }, 100);
+      
+      return () => clearTimeout(timer);
     }
   }, [selectedTribeId, tribesData, zoomToTribe]);
 
   // Handle click solely for marker placement
-  const handleClick = (event) => {
+  const handleClick = useCallback((event) => {
     // Get click coordinates
     const coordinates = [event.lngLat[0], event.lngLat[1]];
     
@@ -242,12 +277,12 @@ const TribesMapWithMarker = ({ tribeId }) => {
       latitude: coordinates[1],
       title: `Selected Location (${coordinates[0].toFixed(4)}, ${coordinates[1].toFixed(4)})`
     });
-  };
+  }, []);
 
   // Handler to clear the marker
-  const clearMarker = () => {
+  const clearMarker = useCallback(() => {
     setMarker(null);
-  };
+  }, []);
 
   // Enhanced styling for non-selected tribes - slightly dimmed
   const fillLayer = {
