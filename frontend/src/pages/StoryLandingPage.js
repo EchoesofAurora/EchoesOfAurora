@@ -4,9 +4,12 @@ import Header from "../components/Header";
 import Footer from "../components/Footer";
 import "../styles/StoryLandingPage.css"; 
 
+// Import default image for consistency with stories page
+import defaultStoryImage from "../images/stories/1.png";
+
 const StoryLandingPage = () => {
   const { storyId } = useParams();
-    const navigate = useNavigate();
+  const navigate = useNavigate();
   
   const [story, setStory] = useState(null);
   const [tribes, setTribes] = useState([]);
@@ -42,6 +45,7 @@ const StoryLandingPage = () => {
         setTribes(data);
       } catch (error) {
         console.error("Error fetching tribes:", error);
+        setError(error.message);
       }
     };
 
@@ -55,7 +59,7 @@ const StoryLandingPage = () => {
 
   const getTribeName = (tribeId) => {
     const tribe = tribes.find(t => t.tribe_id === tribeId);
-    return tribe ? tribe.tribe_name : "";
+    return tribe ? tribe.tribe_name : "Unknown Tribe";
   };
 
   const openGalleryModal = (image) => {
@@ -75,11 +79,12 @@ const StoryLandingPage = () => {
     }
     
     try {
-      const imagesContext = require.context("../images/stories", false, /\.png$/);
-      return imagesContext(`./${storyId}.png`);
+      // Try to load story-specific image
+      return require(`../images/stories/${story.story_id}.png`);
     } catch (e) {
-      console.error(`Image not found: ${storyId}.png`);
-      return null;
+      console.error(`Image not found for story ID: ${story.story_id}`);
+      // Use default image
+      return defaultStoryImage;
     }
   };
 
@@ -93,11 +98,7 @@ const StoryLandingPage = () => {
       return require(`../images/stories/${story.story_id}.png`);
     } catch (e) {
       // Default image if story specific image is not found
-      try {
-        return require('../images/stories/1.png');
-      } catch (e) {
-        return null;
-      }
+      return defaultStoryImage;
     }
   };
 
@@ -242,7 +243,7 @@ const StoryLandingPage = () => {
             <h2 className="related-stories-title">More Stories from {tribeName}</h2>
             <div className="related-stories-grid">
               {story.relatedStories.map((relStory, index) => (
-                <div className="related-story-card" key={index}>
+                <div className="related-story-card" key={relStory.story_id || index}>
                   <img 
                     src={getStoryImage(relStory)} 
                     alt={relStory.story_name}
@@ -250,11 +251,7 @@ const StoryLandingPage = () => {
                     onError={(e) => {
                       console.error("Failed to load story image");
                       e.target.onerror = null;
-                      try {
-                        e.target.src = require('../images/stories/1.png');
-                      } catch (err) {
-                        e.target.style.display = 'none';
-                      }
+                      e.target.src = defaultStoryImage;
                     }}
                   />
                   <div className="related-story-content">

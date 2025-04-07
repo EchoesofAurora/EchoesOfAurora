@@ -31,6 +31,7 @@ function TribesSection() {
         setTribes(data);
         setSearchResults(data.sort((a, b) => a.tribe_name.localeCompare(b.tribe_name))); // Initialize with sorted results
       } catch (error) {
+        console.error("Error fetching tribes:", error);
         setError(error.message);
       } finally {
         setLoading(false);
@@ -53,7 +54,6 @@ function TribesSection() {
       return require(`../images/tribes/${tribe.tribe_id}.png`);
     } catch (e) {
       // If tribe-specific image not found, use the generic default
-      console.error(`Error loading specific image for tribe ${tribe.tribe_id}:`, e);
       return defaultTribeImage;
     }
   };
@@ -135,15 +135,13 @@ function TribesSection() {
           <>
             <div className="tribes-list">
               {currentTribes.map((tribe, index) => (
-                <div className="tribe-card" key={index}>
+                <div className="tribe-card" key={tribe.tribe_id || index}>
                   <img
                     src={getTribeImage(tribe)}
                     alt={tribe.tribe_name}
                     className="tribe-image"
                     onError={(e) => {
-                      console.log(
-                        `Error loading image for tribe ${tribe.tribe_id}, using default`
-                      );
+                      console.error(`Error loading image for tribe ${tribe.tribe_id}, using default`);
                       e.target.onerror = null; // Prevent infinite loops
                       e.target.src = defaultTribeImage;
                     }}
