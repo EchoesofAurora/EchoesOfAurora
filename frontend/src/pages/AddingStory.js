@@ -9,7 +9,6 @@ import { Modal, Button } from "react-bootstrap";
 import { useNavigate } from "react-router-dom";
 import ImageUpload from "../components/ImageUpload";
 import ReferenceLinks from "../components/ReferenceLinks";
-import MapMarker from "../components/MapMarker";
 import TribesMapWithMarker from "../components/TribesMapWithMarker";
 
 const HeroAddingStory = () => {
