@@ -36,7 +36,7 @@ const MapBoxComponent = () => {
     longitude: -100,
     zoom: 1.6,
     width: "100%",
-    height: "100vh",
+    height: "calc(100vh - 12vh)", // Adjusted to match container height
     transitionDuration: 0, // Disable transition animation for immediate response
     transitionInterpolator: new FlyToInterpolator(),
   });
@@ -234,34 +234,34 @@ const MapBoxComponent = () => {
       if (screenSize.isMobile) {
         // For mobile: move timeline to bottom-right with more space from bottom
         return {
-          position: "fixed", // Changed from absolute to fixed
-          bottom: 100,      // Increased from 60 to 100 for better visibility
+          position: "fixed", 
+          bottom: 20,      
           right: 10,
           left: 'auto',
           width: "60%",
-          zIndex: 50       // Increased z-index
+          zIndex: 1000      // Ensure it's above map but below other controls
         };
       } else {
         // For desktop: move timeline to right side with more space from bottom
         return {
-          position: "fixed", // Changed from absolute to fixed
-          bottom: 40,       // Increased from 10 to 40
+          position: "fixed", 
+          bottom: 20,      
           right: 350,       // Adjusted based on side panel width
           left: 'auto',
           width: "40%",
-          zIndex: 50        // Increased z-index
+          zIndex: 1000     // Ensure it's above map but below other controls
         };
       }
     } else {
       // Default position when side panel is closed
       return {
-        position: "fixed",  // Changed from absolute to fixed
-        bottom: 20,         // Increased from 20 to 80
+        position: "fixed",  
+        bottom: 20,         
         left: "50%",
         transform: "translateX(-50%)",
         width: screenSize.isMobile ? "95%" : "60%",
         maxWidth: "800px",
-        zIndex: 50          // Increased z-index
+        zIndex: 1000       // Ensure it's above map but below other controls
       };
     }
   };
@@ -337,7 +337,7 @@ const MapBoxComponent = () => {
     <div 
       ref={mapContainerRef} 
       className="map-container" 
-      style={{ width: "100%", height: "100vh", position: "relative" }}
+      style={{ width: "100%", height: "calc(100vh - 12vh)", position: "relative" }}
     >
       <MapGL
         {...viewport}
@@ -383,19 +383,71 @@ const MapBoxComponent = () => {
           </Source>
         )}
 
+        {/* Mobile Controls Toggle Button */}
+        {screenSize.isMobile && (
+          <button
+            className="controls-toggle-btn"
+            onClick={toggleControls}
+            style={{
+              position: "fixed",
+              top: "calc(12vh + 10px)", // Position below header
+              right: 150,
+              zIndex: 1001,
+              background: "rgba(255, 255, 255, 0.95)",
+              border: "none",
+              borderRadius: "4px",
+              padding: "8px",
+              boxShadow: "0 2px 8px rgba(0, 0, 0, 0.3)"
+            }}
+          >
+            {showControls ? "Hide Controls" : "Show Controls"}
+          </button>
+        )}
+
+        {/* 3D and Stories Toggle - Responsive */}
+        {(screenSize.isMobile ? showControls : true) && (
+          <div 
+            className="map-toggle-controls"
+            style={{ 
+              position: "fixed",
+              top: "calc(12vh + 10px)", // Position below header
+              right: 10,
+              zIndex: 1001
+            }}
+          >
+            <div className="toggle-container">
+              <span>3D</span>
+              <label className="switch">
+                <input type="checkbox" checked={is3dOn} onChange={handleToggle} />
+                <span className="slider round"></span>
+              </label>
+              <span>Stories</span>
+              <label className="switch">
+                <input
+                  type="checkbox"
+                  checked={isStoriesOn}
+                  onChange={handleStoriesToggle}
+                />
+                <span className="slider round"></span>
+              </label>
+            </div>
+          </div>
+        )}
+
         {/* Navigation Controls */}
         <div 
+          className="map-navigation-controls"
           style={{ 
-            position: "absolute", 
-            top: screenSize.isMobile ? 60 : 90, 
-            right: screenSize.isMobile ? 10 : 50,
-            zIndex: 5,
+            position: "fixed",
+            top: screenSize.isMobile ? "calc(12vh + 60px)" : "calc(12vh + 10px)", // Position below header
+            right: screenSize.isMobile ? 10 : 220, // Position to the left of the toggle
+            zIndex: 1001,
             display: "flex",
             flexDirection: "row",
             backgroundColor: "white",
             borderRadius: "4px",
             padding: "0",
-            boxShadow: "0 0 0 2px rgba(0,0,0,0.1)",
+            boxShadow: "0 2px 8px rgba(0, 0, 0, 0.3)",
           }}
         >
           {/* Custom Zoom In Button */}
@@ -485,58 +537,6 @@ const MapBoxComponent = () => {
             </svg>
           </button>
         </div>
-
-        {/* Interaction controls are enabled but the UI panel is removed */}
-
-        {/* Mobile Controls Toggle Button */}
-        {screenSize.isMobile && (
-          <button
-            className="controls-toggle-btn"
-            onClick={toggleControls}
-            style={{
-              position: "absolute",
-              top: 10,
-              right: 10,
-              zIndex: 10,
-              background: "rgba(255, 255, 255, 0.8)",
-              border: "none",
-              borderRadius: "4px",
-              padding: "8px",
-              boxShadow: "0 2px 4px rgba(0, 0, 0, 0.2)"
-            }}
-          >
-            {showControls ? "Hide Controls" : "Show Controls"}
-          </button>
-        )}
-
-        {/* 3D and Stories Toggle - Responsive */}
-        {(screenSize.isMobile ? showControls : true) && (
-          <div 
-            style={{ 
-              position: "absolute", 
-              top: 10, 
-              right: screenSize.isMobile ? 120 : 10, // Adjust position for mobile
-              zIndex: 5
-            }}
-          >
-            <div className="toggle-container">
-              <span>3D</span>
-              <label className="switch">
-                <input type="checkbox" checked={is3dOn} onChange={handleToggle} />
-                <span className="slider round"></span>
-              </label>
-              <span>Stories</span>
-              <label className="switch">
-                <input
-                  type="checkbox"
-                  checked={isStoriesOn}
-                  onChange={handleStoriesToggle}
-                />
-                <span className="slider round"></span>
-              </label>
-            </div>
-          </div>
-        )}
        
         {/* Side Panel for tribes and stories - Responsive */}
         {selectedTribe && (

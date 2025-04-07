@@ -4,7 +4,7 @@ import "../styles/SidePanel.css";
 import tribesIcon from "../images/tribes/bg-tribe.png";
 import storiesIcon from "../images/stories/bg-stories.png";
 
-const SidePanel = ({ tribe, onClose }) => {
+const SidePanel = ({ tribe, onClose, isMobile }) => {
   const navigate = useNavigate(); // Initialize navigate function
   const [activeTab, setActiveTab] = useState("tribes");
   const [currentStoryIndex, setCurrentStoryIndex] = useState(0);
@@ -22,7 +22,7 @@ const SidePanel = ({ tribe, onClose }) => {
   };
 
   return (
-    <div className="side-panel">
+    <div className={`side-panel ${isMobile ? 'mobile' : ''}`}>
       {/* Navigation Tabs */}
       <div className="tabs">
         <button
