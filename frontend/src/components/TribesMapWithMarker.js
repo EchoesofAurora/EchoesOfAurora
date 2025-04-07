@@ -1,5 +1,5 @@
 import React, { useState, useCallback, useEffect, useRef } from "react";
-import MapGL, { Source, Layer, Marker } from "react-map-gl";
+import MapGL, { Source, Layer, Marker, NavigationControl } from "react-map-gl";
 import { FlyToInterpolator } from "react-map-gl";
 import mapboxgl from "mapbox-gl";
 import "mapbox-gl/dist/mapbox-gl.css";
@@ -9,6 +9,7 @@ import "rc-slider/assets/index.css"; // Required for rc-slider
 const TribesMapWithMarker = ({ tribeId }) => {
   const mapContainerRef = useRef(null);
   const mapRef = useRef(null);
+  console.log(tribeId, "tribeId prop");
   
   // State to track screen size 
   const [screenSize, setScreenSize] = useState({
@@ -59,6 +60,7 @@ const TribesMapWithMarker = ({ tribeId }) => {
   useEffect(() => {
     if (tribeId && tribeId !== selectedTribeId) {
       setSelectedTribeId(tribeId);
+      console.log("Tribe ID from props:", tribeId);
     }
   }, [tribeId, selectedTribeId]);
   
@@ -145,6 +147,7 @@ const TribesMapWithMarker = ({ tribeId }) => {
         };
         
         setTribesData(transformedTribesData);
+        console.log("Tribes data loaded");
       } catch (error) {
         console.error("Error fetching data:", error);
       } finally {
@@ -166,11 +169,14 @@ const TribesMapWithMarker = ({ tribeId }) => {
   const zoomToTribe = useCallback((tribeId) => {
     if (!tribesData || !mapRef.current) return;
     
+    console.log("Attempting to zoom to tribe:", tribeId);
     
     // Find the selected tribe
     const selectedTribe = tribesData.features.find(feature => 
       feature.id.toString() === tribeId.toString()
     );
+    
+    console.log("Found matching tribe:", selectedTribe);
     
     if (!selectedTribe || !selectedTribe.geometry) return;
     
@@ -247,6 +253,7 @@ const TribesMapWithMarker = ({ tribeId }) => {
           };
           
           setViewport(newViewport);
+          console.log("Zoomed to tribe coordinates with level:", zoomLevel);
         }
       }
     } catch (error) {
@@ -491,9 +498,9 @@ const TribesMapWithMarker = ({ tribeId }) => {
             <Marker 
               longitude={marker.longitude} 
               latitude={marker.latitude} 
-              offsetTop={-10} // Reduced from -20 to -10
+              offsetTop={-10} 
               offsetLeft={-10}
-              anchor="bottom" // Added explicit anchor point
+              anchor="bottom" 
             >
               <div className="map-marker">
                 <svg 
@@ -504,7 +511,7 @@ const TribesMapWithMarker = ({ tribeId }) => {
                     cursor: 'pointer',
                     fill: '#d00',
                     stroke: 'none',
-                    transform: 'translate(0, 0)' // Removed the transform that was moving the marker
+                    transform: 'translate(0, 0)'
                   }}
                 >
                   <path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7z" />
@@ -513,128 +520,11 @@ const TribesMapWithMarker = ({ tribeId }) => {
             </Marker>
           )}
 
-          {/* Navigation Controls */}
-          <div 
-            style={{ 
-              position: "absolute", 
-              top: screenSize.isMobile ? 60 : 90, 
-              right: screenSize.isMobile ? 10 : 50,
-              zIndex: 5,
-              display: "flex",
-              flexDirection: "row",
-              backgroundColor: "white",
-              borderRadius: "4px",
-              padding: "0",
-              boxShadow: "0 0 0 2px rgba(0,0,0,0.1)",
-            }}
-          >
-            {/* Custom Zoom In Button */}
-            <button 
-              className="mapboxgl-ctrl-zoom-in" 
-              aria-label="Zoom In"
-              style={{
-                width: screenSize.isMobile ? "28px" : "30px",
-                height: screenSize.isMobile ? "28px" : "30px",
-                border: "none",
-                borderRight: "1px solid rgba(0,0,0,0.1)",
-                background: "white",
-                cursor: "pointer",
-                padding: "5px",
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "center"
-              }}
-              onClick={() => {
-                setViewport(prev => ({
-                  ...prev,
-                  zoom: prev.zoom + 1,
-                  transitionDuration: 200
-                }));
-              }}
-            >
-              <span style={{ fontSize: "18px", fontWeight: "bold" }}>+</span>
-            </button>
-            
-            {/* Custom Zoom Out Button */}
-            <button 
-              className="mapboxgl-ctrl-zoom-out" 
-              aria-label="Zoom Out"
-              style={{
-                width: screenSize.isMobile ? "28px" : "30px",
-                height: screenSize.isMobile ? "28px" : "30px",
-                border: "none",
-                borderRight: "1px solid rgba(0,0,0,0.1)",
-                background: "white",
-                cursor: "pointer",
-                padding: "5px",
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "center"
-              }}
-              onClick={() => {
-                setViewport(prev => ({
-                  ...prev,
-                  zoom: prev.zoom - 1,
-                  transitionDuration: 200
-                }));
-              }}
-            >
-              <span style={{ fontSize: "18px", fontWeight: "bold" }}>−</span>
-            </button>
-            
-            {/* Custom Compass Button */}
-            <button 
-              className="mapboxgl-ctrl-compass" 
-              aria-label="Reset Bearing to North"
-              style={{
-                width: screenSize.isMobile ? "28px" : "30px",
-                height: screenSize.isMobile ? "28px" : "30px",
-                border: "none",
-                background: "white",
-                cursor: "pointer",
-                padding: "5px",
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "center"
-              }}
-              onClick={() => {
-                setViewport(prev => ({
-                  ...prev,
-                  bearing: 0,
-                  pitch: 0,
-                  transitionDuration: 500
-                }));
-              }}
-            >
-              <svg 
-                viewBox="0 0 20 20" 
-                style={{ width: "20px", height: "20px" }}
-              >
-                <polygon points="6,9 10,1 14,9" style={{ fill: "black" }}></polygon>
-                <polygon points="6,11 10,19 14,11" style={{ fill: "gray" }}></polygon>
-              </svg>
-            </button>
-          </div>
-
-          {/* Mobile Controls Toggle Button */}
-          {screenSize.isMobile && (
-            <button
-              className="controls-toggle-btn"
-              onClick={() => setShowControls(!showControls)}
-              style={{
-                position: "absolute",
-                top: 10,
-                right: 10,
-                zIndex: 10,
-                background: "rgba(255, 255, 255, 0.8)",
-                border: "none",
-                borderRadius: "4px",
-                padding: "8px",
-                boxShadow: "0 2px 4px rgba(0, 0, 0, 0.2)"
-              }}
-            >
-              {showControls ? "Hide Controls" : "Show Controls"}
-            </button>
+          {/* Built-in Navigation Controls - This is the key change */}
+          {showControls && (
+            <div style={{ position: 'absolute', top: 10, right: 40 }}>
+              <NavigationControl showCompass={true} />
+            </div>
           )}
         </MapGL>
       </div>
@@ -682,10 +572,10 @@ const TribesMapWithMarker = ({ tribeId }) => {
             marginTop: "15px", 
             paddingTop: "15px", 
             borderTop: "1px solid #dee2e6",
-            backgroundColor: "rgba(255, 255, 204, 0.3)", // Light yellow background
+            backgroundColor: "rgba(255, 255, 204, 0.3)", 
             padding: "10px",
             borderRadius: "4px",
-            border: "1px solid #ffe066" // Light yellow border
+            border: "1px solid #ffe066" 
           }}>
             <p style={{ fontSize: "16px", fontWeight: "bold" }}>
               Selected Tribe: {
