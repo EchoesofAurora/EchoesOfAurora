@@ -1,0 +1,667 @@
+import React, { useState, useCallback, useEffect, useRef } from "react";
+import MapGL, { Source, Layer, Marker } from "react-map-gl";
+import { FlyToInterpolator } from "react-map-gl";
+import mapboxgl from "mapbox-gl";
+import "mapbox-gl/dist/mapbox-gl.css";
+import "../styles/mapBox.css";
+import "rc-slider/assets/index.css"; // Required for rc-slider
+
+const TribesMapWithMarker = ({ tribeId }) => {
+  const mapContainerRef = useRef(null);
+  const mapRef = useRef(null);
+  
+  // State to track screen size 
+  const [screenSize, setScreenSize] = useState({
+    width: typeof window !== 'undefined' ? window.innerWidth : 0,
+    height: typeof window !== 'undefined' ? window.innerHeight : 0,
+    isMobile: typeof window !== 'undefined' ? window.innerWidth < 768 : false
+  });
+
+  // State for interaction controls with enhanced scroll zoom options
+  const [interactionState, setInteractionState] = useState({
+    scrollZoom: {
+      speed: 0.01, // Using your preferred high value for faster zooming
+      smooth: false, // Disable smooth zooming to eliminate delay between scroll actions
+      eventFire: 'wheel' // Respond immediately to wheel events
+    },
+    dragPan: true,
+    keyboard: true,
+    doubleClickZoom: true
+  });
+
+  // Update viewport with additional settings to improve zoom responsiveness
+  const [viewport, setViewport] = useState({
+    latitude: 60,
+    longitude: -100,
+    zoom: 1.6,
+    width: "100%",
+    height: "70vh", // Reduced from 100vh to 70vh
+    transitionDuration: 0, // Disable transition animation for immediate response
+    transitionInterpolator: new FlyToInterpolator(),
+  });
+
+  // Data states
+  const [tribesData, setTribesData] = useState(null);
+  
+  // UI states
+  const [selectedTribeId, setSelectedTribeId] = useState(tribeId || null);
+  const [mapStyle] = useState(
+    "mapbox://styles/kodalis2/cm7kvvsfl00x601qo0597eedp"
+  );
+  
+  const [isLoading, setIsLoading] = useState(true);
+  const [showControls, setShowControls] = useState(true);
+  
+  // New state for marker
+  const [marker, setMarker] = useState(null);
+  
+  // Effect to update selectedTribeId when tribeId prop changes
+  useEffect(() => {
+    if (tribeId) {
+      setSelectedTribeId(tribeId);
+      console.log("Tribe ID from props:", tribeId);
+    }
+  }, [tribeId]);
+  
+  // Handle window resize
+  useEffect(() => {
+    const handleResize = () => {
+      const width = window.innerWidth;
+      const height = window.innerHeight;
+      setScreenSize({
+        width,
+        height,
+        isMobile: width < 768
+      });
+      
+      // Adjust viewport based on screen size
+      setViewport(prev => ({
+        ...prev,
+        width: "100%",
+        height: "70vh", // Reduced from 100vh to 70vh
+        zoom: width < 768 ? 0.8 : 1.6, // Adjust zoom level for mobile
+      }));
+    };
+
+    window.addEventListener('resize', handleResize);
+    handleResize(); // Initial call
+    
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
+
+  // Store reference to the map instance when loaded
+  const onLoad = useCallback(event => {
+    if (event && event.target) {
+      mapRef.current = event.target;
+    }
+  }, []);
+
+  // Fetch tribes data from API
+  useEffect(() => {
+    const fetchData = async () => {
+      setIsLoading(true);
+      try {
+        // Fetch tribes data
+        const tribesResponse = await fetch('/api/mapData');
+        const data = await tribesResponse.json();
+
+        const tribesJson = data["tribes"];
+        
+        // Transform tribes data to match expected format
+        const transformedTribesData = {
+          type: "FeatureCollection",
+          features: tribesJson.map(tribe => ({
+            type: "Feature",
+            id: tribe.tribe_id,
+            properties: {
+              id: tribe.tribe_id,
+              Name: tribe.tribe_name,
+              color: tribe.map_color,
+              description: tribe.description || `Information about ${tribe.tribe_name}`,
+              isSelected: tribe.tribe_id.toString() === (tribeId || '').toString() // Mark selected tribe
+            },
+            geometry: tribe.geojson_data
+          }))
+        };
+        setTribesData(transformedTribesData);
+        console.log("Tribes data loaded");
+      } catch (error) {
+        console.error("Error fetching data:", error);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    fetchData();
+  }, [tribeId]); // Also reload when tribeId changes
+  
+  // Function to zoom to a tribe's geometry bounds with enhanced padding and smoother transition
+  const zoomToTribe = useCallback((tribeId) => {
+    if (!tribesData || !mapRef.current) return;
+    
+    console.log("Attempting to zoom to tribe:", tribeId);
+    
+    // Find the selected tribe
+    const selectedTribe = tribesData.features.find(feature => 
+      feature.id.toString() === tribeId.toString()
+    );
+    
+    console.log("Found matching tribe:", selectedTribe);
+    
+    if (!selectedTribe || !selectedTribe.geometry) return;
+    
+    try {
+      // Calculate the bounds of the tribe's geometry
+      const bounds = new mapboxgl.LngLatBounds();
+      
+      // Handle different geometry types
+      if (selectedTribe.geometry.type === 'Polygon') {
+        selectedTribe.geometry.coordinates[0].forEach(coord => {
+          bounds.extend(coord);
+        });
+      } else if (selectedTribe.geometry.type === 'MultiPolygon') {
+        selectedTribe.geometry.coordinates.forEach(polygon => {
+          polygon[0].forEach(coord => {
+            bounds.extend(coord);
+          });
+        });
+      } else if (selectedTribe.geometry.type === 'Point') {
+        // Handle point geometry
+        bounds.extend(selectedTribe.geometry.coordinates);
+      } else if (selectedTribe.geometry.type === 'LineString') {
+        // Handle line geometry
+        selectedTribe.geometry.coordinates.forEach(coord => {
+          bounds.extend(coord);
+        });
+      }
+      
+      // If we have valid bounds, update the viewport
+      if (!bounds.isEmpty()) {
+        // Calculate optimal zoom level based on the size of the bounds
+        const boundsWidth = bounds.getEast() - bounds.getWest();
+        const boundsHeight = bounds.getNorth() - bounds.getSouth();
+        const maxDimension = Math.max(boundsWidth, boundsHeight);
+        
+        // Default to zoom level 4 for very small or point geometries
+        let zoomLevel = 4;
+        
+        // Only calculate custom zoom for larger areas
+        if (maxDimension > 0.1) {
+          // Convert the dimension to a zoom level (logarithmic scale)
+          zoomLevel = Math.max(2, Math.min(6, 7 - Math.log2(maxDimension)));
+        }
+        
+        // Add visual highlight animation on tribe selection
+        if (mapRef.current) {
+          // Slight delay to ensure layers are ready
+          setTimeout(() => {
+            // Check if the layer exists before trying to modify it
+            try {
+              if (mapRef.current.getLayer('selected-tribe-fill')) {
+                // Pulse animation for the selected tribe
+                mapRef.current.setPaintProperty('selected-tribe-fill', 'fill-opacity', 0.9);
+              }
+            } catch (e) {
+              console.log("Layer not yet ready for animation:", e);
+            }
+          }, 500); // Increased timeout for layer readiness
+        }
+        
+        const newViewport = {
+          ...viewport,
+          longitude: bounds.getCenter().lng,
+          latitude: bounds.getCenter().lat,
+          zoom: zoomLevel,
+          transitionDuration: 1000, // Smooth transition but not too slow
+          transitionInterpolator: new FlyToInterpolator({ speed: 1.2 })
+        };
+        
+        setViewport(newViewport);
+        console.log("Zoomed to tribe coordinates with level:", zoomLevel);
+      }
+    } catch (error) {
+      console.error("Error zooming to tribe:", error);
+    }
+  }, [tribesData, viewport, screenSize.isMobile]);
+
+  // Zoom to selected tribe when it's available or changes
+  useEffect(() => {
+    if (selectedTribeId && tribesData) {
+      zoomToTribe(selectedTribeId);
+    }
+  }, [selectedTribeId, tribesData, zoomToTribe]);
+
+  // Handle click solely for marker placement
+  const handleClick = (event) => {
+    // Get click coordinates
+    const coordinates = [event.lngLat[0], event.lngLat[1]];
+    
+    // Set the marker at the clicked location
+    setMarker({
+      longitude: coordinates[0],
+      latitude: coordinates[1],
+      title: `Selected Location (${coordinates[0].toFixed(4)}, ${coordinates[1].toFixed(4)})`
+    });
+  };
+
+  // Handler to clear the marker
+  const clearMarker = () => {
+    setMarker(null);
+  };
+
+  // Enhanced styling for non-selected tribes - slightly dimmed
+  const fillLayer = {
+    id: "tribe-fill",
+    type: "fill",
+    source: "tribes",
+    paint: {
+      "fill-color": ["get", "color"],
+      "fill-opacity": 0.3, // Reduced from 0.4 to create more contrast with selected tribe
+    },
+    filter: ["!=", ["to-string", ["get", "id"]], selectedTribeId ? selectedTribeId.toString() : ""]
+  };
+
+  // Enhanced highlighting for selected tribe with increased opacity and emphasis
+  const selectedTribeLayer = {
+    id: "selected-tribe-fill",
+    type: "fill",
+    source: "tribes",
+    paint: {
+      "fill-color": ["get", "color"],
+      "fill-opacity": 0.9, // Very opaque to stand out
+    },
+    filter: ["==", ["to-string", ["get", "id"]], selectedTribeId ? selectedTribeId.toString() : ""],
+  };
+
+  // Add a bold border for the selected tribe with animation
+  const selectedTribeBorderLayer = {
+    id: "selected-tribe-border",
+    type: "line",
+    source: "tribes",
+    paint: {
+      "line-color": "#000",
+      "line-width": 3,
+      "line-dasharray": [3, 3],
+      // Simplified animation to avoid potential compatibility issues
+      "line-opacity": 0.8
+    },
+    filter: ["==", ["to-string", ["get", "id"]], selectedTribeId ? selectedTribeId.toString() : ""],
+  };
+
+  // Add a glow effect layer for the selected tribe
+  const selectedTribeGlowLayer = {
+    id: "selected-tribe-glow",
+    type: "line",
+    source: "tribes",
+    paint: {
+      "line-color": "#ffffff",
+      "line-width": 5,
+      "line-blur": 3,
+      "line-opacity": 0.8,
+    },
+    filter: ["==", ["to-string", ["get", "id"]], selectedTribeId ? selectedTribeId.toString() : ""],
+  };
+
+  // Enhance labels with emphasis for selected tribe
+  const labelLayer = {
+    id: "tribe-label",
+    type: "symbol",
+    source: "tribes",
+    layout: {
+      "text-field": ["coalesce", ["get", "Name"], "Unnamed"],
+      "text-font": ["Open Sans Bold", "Arial Unicode MS Bold"],
+      "text-size": [
+        "case",
+        ["==", ["to-string", ["get", "id"]], selectedTribeId ? selectedTribeId.toString() : ""],
+        screenSize.isMobile ? 14 : 16, // Larger text for selected tribe
+        screenSize.isMobile ? 10 : 12  // Regular size for other tribes
+      ],
+      "text-offset": [0, 0.8],
+      "text-anchor": "top",
+      "symbol-placement": "point",
+      "text-allow-overlap": true, // Allow all labels to overlap (simpler approach)
+      "text-ignore-placement": false, // Don't ignore placement rules
+    },
+    paint: {
+      "text-color": [
+        "case",
+        ["==", ["to-string", ["get", "id"]], selectedTribeId ? selectedTribeId.toString() : ""],
+        "#000000", // Black text for selected tribe
+        "#555555"  // Grey text for other tribes
+      ],
+      "text-halo-color": "#ffffff",
+      "text-halo-width": [
+        "case",
+        ["==", ["to-string", ["get", "id"]], selectedTribeId ? selectedTribeId.toString() : ""],
+        2, // Thicker halo for selected tribe
+        1
+      ],
+    },
+  };
+
+  if (isLoading) {
+    return <div className="loading">Loading map data...</div>;
+  }
+
+  return (
+    <div>
+      <div 
+        ref={mapContainerRef} 
+        className="map-container" 
+        style={{ 
+          width: "100%", 
+          height: "70vh", 
+          position: "relative",
+          border: "1px solid #ccc",
+          borderRadius: "8px",
+          overflow: "hidden",
+          margin: "20px 0"
+        }}
+      >
+        <MapGL
+          {...viewport}
+          mapboxApiAccessToken={process.env.REACT_APP_MAPBOX_TOKEN}
+          mapStyle={mapStyle}
+          onLoad={onLoad}
+          onViewportChange={(newViewport) =>
+            setViewport({
+              ...newViewport,
+              transitionDuration: 0, // Keep transition duration at 0 for immediate response
+            })
+          }
+          onClick={handleClick}
+          interactiveLayerIds={tribesData ? ["tribe-fill"] : []}
+          // Set interaction controls based on state with enhanced scroll zoom
+          scrollZoom={interactionState.scrollZoom}
+          dragPan={interactionState.dragPan}
+          keyboard={interactionState.keyboard}
+          doubleClickZoom={interactionState.doubleClickZoom}
+          // Add these options to maintain smooth interaction flow
+          clickZoom={false} // Disable automatic zoom on click
+          touchAction="pan-y" // Allow vertical touch scrolling while maintaining map interactions
+        >
+          {/* Tribes Source and Layers */}
+          {tribesData && (
+            <Source id="tribes" type="geojson" data={tribesData}>
+              <Layer key="tribe-fill" {...fillLayer} />
+              {selectedTribeId && (
+                <>
+                  <Layer key="selected-tribe-glow" {...selectedTribeGlowLayer} />
+                  <Layer key="selected-tribe-fill" {...selectedTribeLayer} />
+                  <Layer key="selected-tribe-border" {...selectedTribeBorderLayer} />
+                </>
+              )}
+              <Layer key="tribe-label" {...labelLayer} />
+            </Source>
+          )}
+          
+          {/* Add a separate highlighted label for the selected tribe */}
+          {selectedTribeId && tribesData && (
+            <Source 
+              id="selected-tribe-label-source" 
+              type="geojson" 
+              data={{
+                type: "FeatureCollection",
+                features: tribesData.features.filter(
+                  feature => feature.id.toString() === selectedTribeId.toString()
+                )
+              }}
+            >
+              <Layer
+                id="selected-tribe-label"
+                type="symbol"
+                layout={{
+                  "text-field": ["coalesce", ["get", "Name"], "Unnamed"],
+                  "text-font": ["Open Sans Bold", "Arial Unicode MS Bold"],
+                  "text-size": screenSize.isMobile ? 14 : 16,
+                  "text-offset": [0, 0.8],
+                  "text-anchor": "top",
+                  "symbol-placement": "point",
+                  "text-allow-overlap": true,
+                  "text-max-width": 12,
+                  "text-letter-spacing": 0.05,
+                }}
+                paint={{
+                  "text-color": "#000000",
+                  "text-halo-color": "#ffffff",
+                  "text-halo-width": 2,
+                }}
+              />
+            </Source>
+          )}
+
+          {/* Selected Tribe Indicator */}
+          {selectedTribeId && tribesData && (
+            <div
+              style={{
+                position: "absolute",
+                top: 10,
+                left: 10,
+                backgroundColor: "rgba(255, 255, 255, 0.9)",
+                padding: "10px",
+                borderRadius: "4px",
+                boxShadow: "0 2px 4px rgba(0, 0, 0, 0.2)",
+                zIndex: 5,
+                maxWidth: "300px"
+              }}
+            >
+              <strong>Selected Tribe:</strong> {
+                tribesData.features.find(f => f.id.toString() === selectedTribeId.toString())?.properties.Name || 'Unknown'
+              }
+            </div>
+          )}
+
+          {/* Single Map Marker */}
+          {marker && (
+            <Marker 
+              longitude={marker.longitude} 
+              latitude={marker.latitude} 
+              offsetTop={-10} // Reduced from -20 to -10
+              offsetLeft={-10}
+              anchor="bottom" // Added explicit anchor point
+            >
+              <div className="map-marker">
+                <svg 
+                  height="20" 
+                  width="20" 
+                  viewBox="0 0 24 24" 
+                  style={{
+                    cursor: 'pointer',
+                    fill: '#d00',
+                    stroke: 'none',
+                    transform: 'translate(0, 0)' // Removed the transform that was moving the marker
+                  }}
+                >
+                  <path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7z" />
+                </svg>
+              </div>
+            </Marker>
+          )}
+
+          {/* Navigation Controls */}
+          <div 
+            style={{ 
+              position: "absolute", 
+              top: screenSize.isMobile ? 60 : 90, 
+              right: screenSize.isMobile ? 10 : 50,
+              zIndex: 5,
+              display: "flex",
+              flexDirection: "row",
+              backgroundColor: "white",
+              borderRadius: "4px",
+              padding: "0",
+              boxShadow: "0 0 0 2px rgba(0,0,0,0.1)",
+            }}
+          >
+            {/* Custom Zoom In Button */}
+            <button 
+              className="mapboxgl-ctrl-zoom-in" 
+              aria-label="Zoom In"
+              style={{
+                width: screenSize.isMobile ? "28px" : "30px",
+                height: screenSize.isMobile ? "28px" : "30px",
+                border: "none",
+                borderRight: "1px solid rgba(0,0,0,0.1)",
+                background: "white",
+                cursor: "pointer",
+                padding: "5px",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center"
+              }}
+              onClick={() => {
+                setViewport(prev => ({
+                  ...prev,
+                  zoom: prev.zoom + 1,
+                  transitionDuration: 200
+                }));
+              }}
+            >
+              <span style={{ fontSize: "18px", fontWeight: "bold" }}>+</span>
+            </button>
+            
+            {/* Custom Zoom Out Button */}
+            <button 
+              className="mapboxgl-ctrl-zoom-out" 
+              aria-label="Zoom Out"
+              style={{
+                width: screenSize.isMobile ? "28px" : "30px",
+                height: screenSize.isMobile ? "28px" : "30px",
+                border: "none",
+                borderRight: "1px solid rgba(0,0,0,0.1)",
+                background: "white",
+                cursor: "pointer",
+                padding: "5px",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center"
+              }}
+              onClick={() => {
+                setViewport(prev => ({
+                  ...prev,
+                  zoom: prev.zoom - 1,
+                  transitionDuration: 200
+                }));
+              }}
+            >
+              <span style={{ fontSize: "18px", fontWeight: "bold" }}>−</span>
+            </button>
+            
+            {/* Custom Compass Button */}
+            <button 
+              className="mapboxgl-ctrl-compass" 
+              aria-label="Reset Bearing to North"
+              style={{
+                width: screenSize.isMobile ? "28px" : "30px",
+                height: screenSize.isMobile ? "28px" : "30px",
+                border: "none",
+                background: "white",
+                cursor: "pointer",
+                padding: "5px",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center"
+              }}
+              onClick={() => {
+                setViewport(prev => ({
+                  ...prev,
+                  bearing: 0,
+                  pitch: 0,
+                  transitionDuration: 500
+                }));
+              }}
+            >
+              <svg 
+                viewBox="0 0 20 20" 
+                style={{ width: "20px", height: "20px" }}
+              >
+                <polygon points="6,9 10,1 14,9" style={{ fill: "black" }}></polygon>
+                <polygon points="6,11 10,19 14,11" style={{ fill: "gray" }}></polygon>
+              </svg>
+            </button>
+          </div>
+
+          {/* Mobile Controls Toggle Button */}
+          {screenSize.isMobile && (
+            <button
+              className="controls-toggle-btn"
+              onClick={() => setShowControls(!showControls)}
+              style={{
+                position: "absolute",
+                top: 10,
+                right: 10,
+                zIndex: 10,
+                background: "rgba(255, 255, 255, 0.8)",
+                border: "none",
+                borderRadius: "4px",
+                padding: "8px",
+                boxShadow: "0 2px 4px rgba(0, 0, 0, 0.2)"
+              }}
+            >
+              {showControls ? "Hide Controls" : "Show Controls"}
+            </button>
+          )}
+        </MapGL>
+      </div>
+
+      {/* Location Information Below Map Instead of Popup */}
+      <div 
+        style={{
+          marginTop: "20px",
+          padding: "15px",
+          backgroundColor: "#f8f9fa",
+          borderRadius: "8px",
+          border: "1px solid #dee2e6"
+        }}
+      >
+        <h4 style={{ marginBottom: "15px" }}>Selected Location</h4>
+        
+        {marker ? (
+          <div>
+            <p style={{ fontSize: "16px", marginBottom: "15px" }}>
+              <strong>Coordinates:</strong> {marker.longitude.toFixed(6)}, {marker.latitude.toFixed(6)}
+            </p>
+            <button
+              onClick={clearMarker}
+              style={{
+                background: "#f44336",
+                color: "white",
+                border: "none",
+                padding: "8px 15px",
+                borderRadius: "4px",
+                cursor: "pointer",
+                fontWeight: "500"
+              }}
+            >
+              Clear Marker
+            </button>
+          </div>
+        ) : (
+          <p style={{ color: "#6c757d", fontStyle: "italic" }}>
+            Click on the map to select a location
+          </p>
+        )}
+        
+        {selectedTribeId && tribesData && (
+          <div style={{ 
+            marginTop: "15px", 
+            paddingTop: "15px", 
+            borderTop: "1px solid #dee2e6",
+            backgroundColor: "rgba(255, 255, 204, 0.3)", // Light yellow background
+            padding: "10px",
+            borderRadius: "4px",
+            border: "1px solid #ffe066" // Light yellow border
+          }}>
+            <p style={{ fontSize: "16px", fontWeight: "bold" }}>
+              Selected Tribe: {
+                tribesData.features.find(f => f.id.toString() === selectedTribeId.toString())?.properties.Name || 'Unknown'
+              }
+            </p>
+          </div>
+        )}
+      </div>
+    </div>
+  );
+};
+
+export default TribesMapWithMarker;

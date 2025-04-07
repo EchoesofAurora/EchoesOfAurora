@@ -9,6 +9,8 @@ import { Modal, Button } from "react-bootstrap";
 import { useNavigate } from "react-router-dom";
 import ImageUpload from "../components/ImageUpload";
 import ReferenceLinks from "../components/ReferenceLinks";
+import MapMarker from "../components/MapMarker";
+import TribesMapWithMarker from "../components/TribesMapWithMarker";
 
 const HeroAddingStory = () => {
   const [storyTitle, setStoryTitle] = useState("");
@@ -400,6 +402,11 @@ const HeroAddingStory = () => {
               {errors.description}
             </div>
           )}
+        </div>
+
+        <div>
+        <label className="adding-story-label">Mark the Coordinate</label>
+          <TribesMapWithMarker tribeId={selectedTribe} />
         </div>
 
         <div className="adding-story-form-group">
