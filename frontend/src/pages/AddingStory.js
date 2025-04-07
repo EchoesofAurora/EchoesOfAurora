@@ -47,7 +47,7 @@ const HeroAddingStory = () => {
   useEffect(() => {
     const fetchTribes = async () => {
       try {
-        const response = await fetch("http://localhost:5001/api/admin/tribes");
+        const response = await fetch("/api/admin/tribes");
         if (!response.ok) throw new Error("Failed to fetch tribes");
         const data = await response.json();
         const tribeMap = {};
@@ -194,7 +194,7 @@ const HeroAddingStory = () => {
     };
 
     try {
-      const response = await fetch("http://localhost:5001/api/admin/stories", {
+      const response = await fetch("/api/admin/stories", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(requestData),
@@ -215,7 +215,7 @@ const HeroAddingStory = () => {
           formData.append("images", image.file);
         });
 
-        const imageResponse = await fetch("http://localhost:5001/api/images/upload", {
+        const imageResponse = await fetch("/api/images/upload", {
           method: "POST",
           body: formData,
         });
