@@ -14,6 +14,13 @@ const SidePanel = ({ tribe, onClose, isMobile }) => {
     setCurrentStoryIndex(index);
   };
 
+  const stopAllEvents = (e) => {
+    e.stopPropagation();
+    e.preventDefault();
+    e.nativeEvent.stopImmediatePropagation();
+    return false;
+  };
+
   const getStoryImage = (image) => {
     if (image) {
       return `data:${image.media_type};base64,${image.image_data}`;
@@ -22,17 +29,19 @@ const SidePanel = ({ tribe, onClose, isMobile }) => {
   };
 
   return (
-    <div className={`side-panel ${isMobile ? 'mobile' : ''}`}>
+    <div 
+      className={`side-panel ${isMobile ? 'mobile' : ''}`}
+    >
       {/* Navigation Tabs */}
       <div className="tabs">
         <button
-          className={activeTab === "tribes" ? "tab active" : "tab"}
+          className={activeTab === "tribes" ? "sidebar-tab active" : "sidebar-tab"}
           onClick={() => setActiveTab("tribes")}
         >
           Tribes
         </button>
         <button
-          className={activeTab === "stories" ? "tab active" : "tab"}
+          className={activeTab === "stories" ? "sidebar-tab active" : "sidebar-tab"}
           onClick={() => setActiveTab("stories")}
         >
           Stories

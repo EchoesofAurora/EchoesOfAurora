@@ -38,13 +38,12 @@
 @media (max-width: 768px) {
   .map-navigation-controls {
     top: calc(12vh + 60px) !important; /* Position below the toggle controls on mobile */
-    right: 10px !important;
   }
   
   .controls-toggle-btn {
     position: fixed !important;
     top: calc(12vh + 10px) !important;
-    right: 150px !important;
+    left: 10px !important;
     z-index: 1001 !important;
   }
 }
@@ -253,22 +252,6 @@ input:checked + .slider:before {
   background-color: #e1bee7 !important;
 }
 
-/* Side Panel styles */
-.side-panel {
-  position: fixed;
-  top: 0.5px;
-  width: 320px;
-  max-width: 90vw;
-  background: rgba(255, 255, 255, 0.95);
-  border-radius: 8px;
-  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
-  padding: 15px;
-  max-height: calc(100vh - 80px - 20px);
-  overflow-y: auto;
-  z-index: 10;
-  border-top: 4px solid #9c27b0;
-}
-
 .side-panel-mobile {
   top: auto;
   bottom: 10px;
@@ -468,9 +451,4 @@ input:checked + .slider:before {
 /* Override any mapbox default controls positioning */
 .mapboxgl-ctrl-top-right {
   top: calc(12vh + 10px) !important;
-}
-
-/* Ensure other controls are visible and properly positioned */
-.mapbox-timeline-container {
-  z-index: 1000 !important;
 }
