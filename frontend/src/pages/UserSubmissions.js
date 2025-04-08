@@ -12,6 +12,7 @@ const HeroUserSubmissions = () => {
   const location = useLocation();
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [submissionToDelete, setSubmissionToDelete] = useState(null);
+  const [selectedSubmission, setSelectedSubmission] = useState(null);
 
   // Fetch submissions based on the selected filter
   const fetchSubmissions = async (endpoint) => {
@@ -60,8 +61,10 @@ const HeroUserSubmissions = () => {
   };
 
   // Function to Open Delete Confirmation Modal
-  const handleDeleteClick = (id) => {
-    setSubmissionToDelete(id);
+  const handleDeleteClick = (e, submission) => {
+    e.stopPropagation();
+    setSelectedSubmission(submission);
+    setSubmissionToDelete(submission.id);
     setShowDeleteModal(true);
   };
 
@@ -85,6 +88,7 @@ const HeroUserSubmissions = () => {
   // Function to Cancel Delete
   const cancelDelete = () => {
     setShowDeleteModal(false);
+    setSelectedSubmission(null);
   };
 
   // Function to handle submission click and mark as read
@@ -102,6 +106,15 @@ const HeroUserSubmissions = () => {
     } catch (error) {
       console.error('Error marking as read or navigating:', error);
     }
+  };
+
+  // Format date for display in the modal
+  const formatDate = (dateString) => {
+    return new Date(dateString).toLocaleDateString('en-US', {
+      month: 'short',
+      day: 'numeric',
+      year: 'numeric',
+    });
   };
 
   return (
@@ -136,13 +149,9 @@ const HeroUserSubmissions = () => {
               <div className="submission-sender">{submission.name}</div>
               <div className="submission-subject">{submission.topic}</div>
               <div className="submission-date">
-                {new Date(submission.created_at).toLocaleDateString('en-US', {
-                  month: 'short',
-                  day: 'numeric',
-                  year: 'numeric',
-                })}
+                {formatDate(submission.created_at)}
               </div>
-              <div className="submission-trash" onClick={(e) => { e.stopPropagation(); handleDeleteClick(submission.id); }}>
+              <div className="submission-trash" onClick={(e) => { handleDeleteClick(e, submission); }}>
                 <FaTrash />
               </div>
             </div>
@@ -152,24 +161,34 @@ const HeroUserSubmissions = () => {
         )}
       </div>
 
-      {/* Delete Confirmation Popup */}
-      {showDeleteModal && (
+      {/* Delete Confirmation Modal - Updated Design */}
+      {showDeleteModal && selectedSubmission && (
         <div className="modal-overlay">
-          <div className="modal-content">
-            <h3>Confirm Deletion</h3>
-            <p>Are you sure you want to delete this submission?</p>
-            <div className="modal-buttons">
+          <div className="delete-modal-content">
+            <div className="delete-modal-header">
+              <h3>Confirm Deletion</h3>
+            </div>
+            <div className="delete-modal-body">
+              <p>Are you sure you want to delete this submission:</p>
+              <div className="tribe-to-delete">
+                <h4>{selectedSubmission.topic}</h4>
+                <p>From: {selectedSubmission.name}</p>
+                <p>Received: {formatDate(selectedSubmission.created_at)}</p>
+              </div>
+              <p className="warning-text">This action cannot be undone.</p>
+            </div>
+            <div className="delete-modal-footer">
               <button 
-                className="action-btn edit-btn"
+                className="cancel-btn"
                 onClick={cancelDelete}
               >
                 Cancel
               </button>
               <button 
-                className="action-btn delete-btn"
+                className="confirm-delete-btn"
                 onClick={confirmDelete}
               >
-                Delete
+                Delete Submission
               </button>
             </div>
           </div>

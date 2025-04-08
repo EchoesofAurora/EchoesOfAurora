@@ -4,6 +4,11 @@ import Header from "../components/Header";
 import Footer from "../components/Footer";
 import "../styles/tribeLandingPage.css";
 
+// Import default image for consistency with tribes page
+import defaultTribeImage from "../images/tribes/1.png";
+// Import default story image for related stories
+import defaultStoryImage from "../images/stories/1.png";
+
 const TribeLandingPage = () => {
   const { tribeId } = useParams();
   const navigate = useNavigate();
@@ -22,7 +27,6 @@ const TribeLandingPage = () => {
           throw new Error(`HTTP error! Status: ${response.status}`);
         }
         const data = await response.json();
-        console.log("Tribe data received:", data);
         setTribe(data);
         if (data.images && data.images.length > 0) {
           setTribeImages(data.images);
@@ -38,6 +42,10 @@ const TribeLandingPage = () => {
     fetchTribe();
   }, [tribeId]);
 
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, [tribeId]);
+
   const openGalleryModal = (image) => {
     setActiveImage(image);
     setShowGalleryModal(true);
@@ -50,20 +58,30 @@ const TribeLandingPage = () => {
 
   // Get hero image from database or static files
   const getHeroImage = () => {
-    console.log("Getting hero image, available images:", tribeImages);
     if (tribeImages && tribeImages.length > 0) {
-      console.log("Using image from database:", tribeImages[0]);
       return `data:${tribeImages[0].media_type};base64,${tribeImages[0].image_data}`;
     }
     
     try {
-      // Fallback to static image
-      console.log("Attempting to load static image for tribeId:", tribeId);
-      // Simple approach for testing - use a hardcoded image first
+      // Use consistent tribe-id specific image
       return require(`../images/tribes/${tribeId}.png`);
     } catch (e) {
-      console.error(`Image not found: ${tribeId}.png`, e);
-      return null;
+      console.error(`Image not found for tribe ID: ${tribeId}`);
+      return defaultTribeImage;
+    }
+  };
+
+  // Get image for a story card
+  const getStoryImage = (story) => {
+    if (story.image_data) {
+      return `data:${story.media_type};base64,${story.image_data}`;
+    }
+    
+    try {
+      return require(`../images/stories/${story.story_id}.png`);
+    } catch (e) {
+      // Default image if story specific image is not found
+      return defaultStoryImage;
     }
   };
 
@@ -132,7 +150,6 @@ const TribeLandingPage = () => {
 
   const galleryImages = getGalleryImages();
   const heroImage = getHeroImage();
-  console.log("Hero image URL:", heroImage);
 
   return (
     <div className="user-frontend">
@@ -150,10 +167,9 @@ const TribeLandingPage = () => {
                 alt={tribe.tribe_name} 
                 className="tribe-landing-hero-image"
                 onError={(e) => {
-                  console.error("Failed to load image:", heroImage);
-                  e.target.style.display = 'none';
-                  // Show placeholder instead
-                  e.target.parentNode.classList.add('hero-placeholder');
+                  console.error("Failed to load tribe hero image");
+                  e.target.onerror = null;
+                  e.target.src = defaultTribeImage;
                 }}
               />
               <div className="tribe-landing-hero-overlay">
@@ -206,6 +222,43 @@ const TribeLandingPage = () => {
                     className="tribe-landing-gallery-image"
                   />
                   {image.caption && <p className="tribe-landing-caption">{image.caption}</p>}
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+        
+        {/* Related Stories Section */}
+        {tribe.relatedStories && tribe.relatedStories.length > 0 && (
+          <div className="tribe-related-stories">
+            <h2 className="related-stories-title">More Stories from {tribe.tribe_name}</h2>
+            <div className="related-stories-grid">
+              {tribe.relatedStories.map((story, index) => (
+                <div className="related-story-card" key={story.story_id || index}>
+                  <img 
+                    src={getStoryImage(story)} 
+                    alt={story.story_name}
+                    className="related-story-image"
+                    onError={(e) => {
+                      console.error("Failed to load story image");
+                      e.target.onerror = null;
+                      e.target.src = defaultStoryImage;
+                    }}
+                  />
+                  <div className="related-story-content">
+                    <h3 className="related-story-title">{story.story_name}</h3>
+                    <p className="related-story-summary">
+                      Summary: {story.story_text.length > 120 
+                        ? `${story.story_text.substring(0, 120)}...` 
+                        : story.story_text}
+                    </p>
+                    <Link 
+                      to={`/story/${story.story_id}`} 
+                      className="related-story-link"
+                    >
+                      Read More
+                    </Link>
+                  </div>
                 </div>
               ))}
             </div>

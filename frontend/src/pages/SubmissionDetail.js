@@ -62,6 +62,15 @@ const HeroSubmissionDetail = () => {
     }
   };
 
+  // Format date for display
+  const formatDate = (dateString) => {
+    return new Date(dateString).toLocaleDateString('en-US', {
+      month: 'short',
+      day: 'numeric',
+      year: 'numeric',
+    });
+  };
+
   if (error) {
     return <div className="sd-submission-detail-main">{error}</div>;
   }
@@ -84,11 +93,7 @@ const HeroSubmissionDetail = () => {
           <div className="sd-sender-email">{submission.email}</div>
         </div>
         <div className="sd-submission-date">
-          {new Date(submission.created_at).toLocaleDateString('en-US', {
-            month: 'short',
-            day: 'numeric',
-            year: 'numeric',
-          })}
+          {formatDate(submission.created_at)}
         </div>
       </motion.div>
 
@@ -113,24 +118,34 @@ const HeroSubmissionDetail = () => {
         </motion.button>
       </motion.div>
 
-      {/* Delete Confirmation Modal */}
+      {/* Updated Delete Confirmation Modal */}
       {showDeleteModal && (
         <div className="modal-overlay">
-          <div className="modal-content">
-            <h3>Confirm Deletion</h3>
-            <p>Are you sure you want to delete this submission?</p>
-            <div className="modal-buttons">
+          <div className="delete-modal-content">
+            <div className="delete-modal-header">
+              <h3>Confirm Deletion</h3>
+            </div>
+            <div className="delete-modal-body">
+              <p>Are you sure you want to delete this submission:</p>
+              <div className="tribe-to-delete">
+                <h4>{submission.topic}</h4>
+                <p>From: {submission.name}</p>
+                <p>Received: {formatDate(submission.created_at)}</p>
+              </div>
+              <p className="warning-text">This action cannot be undone.</p>
+            </div>
+            <div className="delete-modal-footer">
               <button 
-                className="action-btn edit-btn"
+                className="cancel-btn"
                 onClick={cancelDelete}
               >
                 Cancel
               </button>
               <button 
-                className="action-btn delete-btn"
+                className="confirm-delete-btn"
                 onClick={confirmDelete}
               >
-                {isDeleting ? 'Deleting...' : 'Delete'}
+                {isDeleting ? 'Deleting...' : 'Delete Submission'}
               </button>
             </div>
           </div>

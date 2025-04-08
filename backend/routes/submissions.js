@@ -21,11 +21,7 @@ router.post('/', async (req, res) => {
     res.status(201).json(result.rows[0]);
   } catch (err) {
     console.error('Error saving submission:', err.stack);
-    if (err.code === '23505') { // Unique violation
-      res.status(400).json({ error: 'Email already exists', details: err.message });
-    } else {
-      res.status(500).json({ error: 'Failed to save submission', details: err.message });
-    }
+    res.status(500).json({ error: 'Failed to save submission', details: err.message });
   }
 });
 

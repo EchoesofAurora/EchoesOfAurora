@@ -20,7 +20,7 @@ const DashboardLayout = ({ children, activeTab = "dashboard" }) => {
   useEffect(() => {
     const fetchStatsData = async () => {
       try {
-        const response = await fetch('http://localhost:5001/api/adminStats'); // Adjust the API endpoint as needed
+        const response = await fetch('/api/adminStats'); // Adjust the API endpoint as needed
         const data = await response.json();
         
         // Update the stats with API data, keeping default values for any missing stats

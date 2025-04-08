@@ -3,8 +3,10 @@
 /* Base Styles */
 .map-container {
   width: 100%;
-  height: 100vh;
+  height: calc(100vh - 12vh); /* Adjusted to account for header height */
   position: relative;
+  margin-top: 0; /* Ensure no additional margin */
+  overflow: hidden; /* Prevent any content from spilling out */
 }
 
 .loading {
@@ -19,6 +21,42 @@
   color: #333;
 }
 
+/* Map control positioning - Fixed to use viewport units to be consistent with header height */
+.map-toggle-controls {
+  position: fixed !important; /* Use fixed instead of absolute to position relative to viewport */
+  top: calc(12vh + 10px) !important; /* Position below header with some margin */
+  right: 10px !important;
+  z-index: 1001 !important; /* Above header to ensure visibility */
+}
+
+.map-navigation-controls {
+  position: fixed !important; /* Use fixed instead of absolute to position relative to viewport */
+  z-index: 1001 !important; /* Above header to ensure visibility */
+}
+
+/* For mobile, position controls vertically */
+@media (max-width: 768px) {
+  .map-navigation-controls {
+    top: calc(12vh + 60px) !important; /* Position below the toggle controls on mobile */
+    right: 10px !important;
+  }
+  
+  .controls-toggle-btn {
+    position: fixed !important;
+    top: calc(12vh + 10px) !important;
+    right: 150px !important;
+    z-index: 1001 !important;
+  }
+}
+
+/* For desktop, position controls horizontally */
+@media (min-width: 769px) {
+  .map-navigation-controls {
+    top: calc(12vh + 10px) !important; /* Position at same height as toggle but to the left */
+    right: 220px !important; /* Provide enough space to not overlap with the toggle */
+  }
+}
+
 /* Toggle Container Styles */
 .toggle-container {
   display: flex;
@@ -26,11 +64,13 @@
   gap: 10px;
   font-family: Arial, sans-serif;
   font-size: 14px;
-  background: rgba(255, 255, 255, 0.9);
+  background: rgba(255, 255, 255, 0.95); /* Increased opacity */
   padding: 10px;
   border-radius: 8px;
-  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3); /* Stronger shadow */
   color: #333;
+  z-index: 1001 !important; /* Ensure it's above everything */
+  position: relative; /* Enable proper z-index stacking */
 }
 
 .toggle-container-mobile {
@@ -311,6 +351,12 @@ input:checked + .slider:before {
     height: 16px !important;
     margin-top: -5px !important;
   }
+  
+  .toggle-container {
+    font-size: 12px;
+    padding: 8px;
+    gap: 5px;
+  }
 }
 
 @media (max-width: 480px) {
@@ -417,4 +463,14 @@ input:checked + .slider:before {
   .small-switch input:checked + .slider:before {
     transform: translateX(14px);
   }
+}
+
+/* Override any mapbox default controls positioning */
+.mapboxgl-ctrl-top-right {
+  top: calc(12vh + 10px) !important;
+}
+
+/* Ensure other controls are visible and properly positioned */
+.mapbox-timeline-container {
+  z-index: 1000 !important;
 }
