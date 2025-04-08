@@ -30,7 +30,6 @@ const HeroSection = () => {
   }, [images.length]);
 
   return (
-
     <section className="user-hero user-hero-section user-section-background"
              style={{
                background: `url(${images[currentImageIndex]}) no-repeat center center/cover`,
@@ -90,63 +89,50 @@ const StoriesSection = () => {
         const data = await response.json();
         setStories(data.slice(0, 4)); // Display only the first 4 stories
       } catch (error) {
+        console.error("Error fetching stories:", error);
         setError(error.message);
       } finally {
         setLoading(false);
       }
     };
-    fetchStories();
 
     const fetchTribes = async () => {
       try {
-        const response = await fetch("/api/tribes"); // Fetch stories from backend
+        const response = await fetch("/api/tribes"); // Fetch tribes from backend
         if (!response.ok) {
           throw new Error(`HTTP error! Status: ${response.status}`);
         }
         const data = await response.json();
         setTribes(data);
       } catch (error) {
+        console.error("Error fetching tribes:", error);
         setError(error.message);
-      } finally {
-        setLoading(false);
       }
     };
 
+    fetchStories();
     fetchTribes();
   }, []);
 
   const tribeDictionary = tribes.reduce((acc, tribe) => {
-    acc[tribe.tribe_id] = tribe.tribe_name;  // Use tribe_name as the key and tribe_id as the value
+    acc[tribe.tribe_id] = tribe.tribe_name;
     return acc;
   }, {});
 
-  const getImageUrl = (story) => {
+  // Get the first image for a story or return a default image
+  const getStoryImage = (story) => {
     if (story.image_data) {
       return `data:${story.media_type};base64,${story.image_data}`;
     }
+
+    // Use consistent image based on story_id instead of random
     try {
-          const imagesContext = require.context(
-            "../images/stories",
-            false,
-            /\.png$/
-          );
-          const imageKeys = imagesContext.keys();
-    
-          if (imageKeys.length > 0) {
-            // Select a random image key from available images
-            const randomIndex = Math.floor(Math.random() * imageKeys.length);
-            return imagesContext(imageKeys[randomIndex]);
-          } else {
-            // If no images available in the folder
-            return defaultStoryImage;
-          }
-    
-          // const fallbackImage = require("../images/stories/fallback-story.png");
-          // return fallbackImage;
-        } catch (e) {
-          console.error("Error loading random story image:", e);
-          return defaultStoryImage;
-        }
+      // Default to story ID-specific image
+      return require(`../images/stories/${story.story_id}.png`);
+    } catch (e) {
+      // If story-specific image doesn't exist, use default image 
+      return defaultStoryImage;
+    }
   };
 
   const goToStories = () => {
@@ -167,17 +153,22 @@ const StoriesSection = () => {
         ) : error ? (
           <p>Error: {error}</p>
         ) : stories.length > 0 ? (
-          stories.map((story, index) => (
-            <div className="story-card" key={index}>
+          stories.map((story) => (
+            <div className="story-card" key={story.story_id}>
               <img
-                src={getImageUrl(story)}
+                src={getStoryImage(story)}
                 alt={story.story_name}
                 className="story-image"
+                onError={(e) => {
+                  console.error(`Error loading image for story ${story.story_id}, using default`);
+                  e.target.onerror = null; // Prevent infinite loops
+                  e.target.src = defaultStoryImage;
+                }}
               />
               <div className="story-content">
                 <div className="story-card-top-bar">
                   <h3 className="story-title">{story.story_name}</h3>
-                  <h2 className="story-tribe">{tribeDictionary[story.tribe_id]}</h2>
+                  <h2 className="story-tribe">{tribeDictionary[story.tribe_id] || "Unknown Tribe"}</h2>
                 </div>
                 <p className="story-description">
                   <strong>Description:</strong> {story.story_text.slice(0, 150)}...
@@ -216,7 +207,6 @@ const MapSection = () => (
     </Link>
   </section>
 );
-
 
 // Home Page Component
 const HomePage = () => {
