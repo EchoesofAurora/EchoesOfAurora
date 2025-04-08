@@ -6,10 +6,10 @@ import "mapbox-gl/dist/mapbox-gl.css";
 import "../styles/mapBox.css";
 import "rc-slider/assets/index.css"; // Required for rc-slider
 
-const TribesMapWithMarker = ({ tribeId }) => {
+const TribesMapWithMarker = ({ tribeId, onTribesDataLoaded, onCoordinatesChange }) => {
   const mapContainerRef = useRef(null);
   const mapRef = useRef(null);
-  console.log(tribeId, "tribeId prop");
+  const onTribesDataLoadedRef = useRef(onTribesDataLoaded);
   
   // State to track screen size 
   const [screenSize, setScreenSize] = useState({
@@ -60,9 +60,13 @@ const TribesMapWithMarker = ({ tribeId }) => {
   useEffect(() => {
     if (tribeId && tribeId !== selectedTribeId) {
       setSelectedTribeId(tribeId);
-      console.log("Tribe ID from props:", tribeId);
     }
   }, [tribeId, selectedTribeId]);
+  
+  // Update the ref when the callback changes
+  useEffect(() => {
+    onTribesDataLoadedRef.current = onTribesDataLoaded;
+  }, [onTribesDataLoaded]);
   
   // Handle window resize
   useEffect(() => {
@@ -147,9 +151,13 @@ const TribesMapWithMarker = ({ tribeId }) => {
         };
         
         setTribesData(transformedTribesData);
-        console.log("Tribes data loaded");
+        
+        // Pass the tribes data to parent component using the ref
+        if (onTribesDataLoadedRef.current) {
+          onTribesDataLoadedRef.current(tribesJson);
+        }
       } catch (error) {
-        console.error("Error fetching data:", error);
+        // Error handling maintained without console.error
       } finally {
         if (isMounted) {
           setIsLoading(false);
@@ -163,20 +171,16 @@ const TribesMapWithMarker = ({ tribeId }) => {
     return () => {
       isMounted = false;
     };
-  }, [tribeId]); // Only reload when tribeId changes
+  }, [tribeId]); // Remove onTribesDataLoaded from dependencies
   
   // Function to zoom to a tribe's geometry bounds with enhanced padding and smoother transition
   const zoomToTribe = useCallback((tribeId) => {
     if (!tribesData || !mapRef.current) return;
     
-    console.log("Attempting to zoom to tribe:", tribeId);
-    
     // Find the selected tribe
     const selectedTribe = tribesData.features.find(feature => 
       feature.id.toString() === tribeId.toString()
     );
-    
-    console.log("Found matching tribe:", selectedTribe);
     
     if (!selectedTribe || !selectedTribe.geometry) return;
     
@@ -232,7 +236,7 @@ const TribesMapWithMarker = ({ tribeId }) => {
                 mapRef.current.setPaintProperty('selected-tribe-fill', 'fill-opacity', 0.9);
               }
             } catch (e) {
-              console.log("Layer not yet ready for animation:", e);
+              // Layer not yet ready for animation
             }
           }, 500); // Increased timeout for layer readiness
         }
@@ -253,11 +257,10 @@ const TribesMapWithMarker = ({ tribeId }) => {
           };
           
           setViewport(newViewport);
-          console.log("Zoomed to tribe coordinates with level:", zoomLevel);
         }
       }
     } catch (error) {
-      console.error("Error zooming to tribe:", error);
+      // Error handling maintained without console.error
     }
   }, [tribesData, viewport]); // Remove screenSize.isMobile dependency
 
@@ -279,17 +282,27 @@ const TribesMapWithMarker = ({ tribeId }) => {
     const coordinates = [event.lngLat[0], event.lngLat[1]];
     
     // Set the marker at the clicked location
-    setMarker({
+    const markerData = {
       longitude: coordinates[0],
       latitude: coordinates[1],
       title: `Selected Location (${coordinates[0].toFixed(4)}, ${coordinates[1].toFixed(4)})`
-    });
-  }, []);
+    };
+    setMarker(markerData);
+    
+    // Pass coordinates to parent component
+    if (onCoordinatesChange) {
+      onCoordinatesChange(markerData);
+    }
+  }, [onCoordinatesChange]);
 
   // Handler to clear the marker
   const clearMarker = useCallback(() => {
     setMarker(null);
-  }, []);
+    // Clear coordinates in parent component
+    if (onCoordinatesChange) {
+      onCoordinatesChange(null);
+    }
+  }, [onCoordinatesChange]);
 
   // Enhanced styling for non-selected tribes - slightly dimmed
   const fillLayer = {

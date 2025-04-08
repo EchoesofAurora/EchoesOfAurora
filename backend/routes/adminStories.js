@@ -47,7 +47,7 @@ router.get('/:storyId', async (req, res) => {
 
 // POST - Add a new story
 router.post('/', async (req, res) => {
-  const { story_name, tribe_id, story_year, story_text, story_references, published } = req.body;
+  const { story_name, tribe_id, story_year, story_text, story_references, published, latitude, longitude } = req.body;
 
   // Validate required fields
   if (!story_name || !tribe_id || !story_year || !story_text) {
@@ -55,14 +55,30 @@ router.post('/', async (req, res) => {
   }
 
   try {
-    const result = await client.query(
-      `INSERT INTO stories (story_name, tribe_id, story_year, story_text, story_references, published)
-       VALUES ($1, $2, $3, $4, $5, $6) RETURNING *`,
-      [story_name, tribe_id, story_year, story_text, story_references || null, published || false]
-    );
+    // Single query to insert story with all fields including coordinates
+    const query = `
+      INSERT INTO stories (
+        story_name, tribe_id, story_year, story_text, 
+        story_references, published, latitude, longitude
+      ) 
+      VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
+      RETURNING *;
+    `;
+
+    const values = [
+      story_name,
+      Number(tribe_id),
+      Number(story_year),
+      story_text,
+      story_references || null,
+      published || false,
+      latitude !== null ? Number(latitude) : null,
+      longitude !== null ? Number(longitude) : null
+    ];
+
+    const result = await client.query(query, values);
     res.status(201).json(result.rows[0]);
   } catch (err) {
-    console.error('Error creating story:', err.stack);
     res.status(500).json({ error: 'Failed to create story', details: err.message });
   }
 });

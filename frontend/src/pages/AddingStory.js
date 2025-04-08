@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect, useRef, useCallback } from "react";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 import "../styles/AddingStory.css";
@@ -23,6 +23,7 @@ const HeroAddingStory = () => {
   const [tribeIds, setTribeIds] = useState({});
   const [newStoryId, setNewStoryId] = useState(null);
   const [selectedTribeId, setSelectedTribeId] = useState(null);
+  const [coordinates, setCoordinates] = useState(null);
   
   const [showModal, setShowModal] = useState(false);
   const [modalMessage, setModalMessage] = useState("");
@@ -45,26 +46,14 @@ const HeroAddingStory = () => {
 
   const handleClose = () => setShowModal(false);
 
-  // Fetch tribes from the database
-  useEffect(() => {
-    const fetchTribes = async () => {
-      try {
-        const response = await fetch("http://localhost:5001/api/admin/tribes");
-        if (!response.ok) throw new Error("Failed to fetch tribes");
-        const data = await response.json();
-        const tribeMap = {};
-        data.forEach((tribe) => {
-          tribeMap[tribe.tribe_name] = tribe.tribe_id;
-        });
-        setTribes(Object.keys(tribeMap));
-        setTribeIds(tribeMap);
-      } catch (error) {
-        console.error("Error fetching tribes:", error);
-        setModalMessage(`Failed to load tribes: ${error.message}`);
-        setShowModal(true);
-      }
-    };
-    fetchTribes();
+  // Handle tribes data from child component
+  const handleTribesDataLoaded = useCallback((tribesJson) => {
+    const tribeMap = {};
+    tribesJson.forEach((tribe) => {
+      tribeMap[tribe.tribe_name] = tribe.tribe_id;
+    });
+    setTribes(tribesJson.map(tribe => tribe.tribe_name));
+    setTribeIds(tribeMap);
   }, []);
 
   useEffect(() => {
@@ -197,33 +186,50 @@ const HeroAddingStory = () => {
     const storyYear = startDate ? startDate.getFullYear().toString() : 
                       endDate ? endDate.getFullYear().toString() : null;
 
+    // Ensure coordinates are valid numbers
+    const lat = coordinates && coordinates.latitude ? Number(coordinates.latitude) : null;
+    const lng = coordinates && coordinates.longitude ? Number(coordinates.longitude) : null;
+
+    // Validate coordinates if they exist
+    if ((coordinates && coordinates.latitude && isNaN(lat)) || 
+        (coordinates && coordinates.longitude && isNaN(lng))) {
+      setModalMessage("Invalid coordinates format.");
+      setShowModal(true);
+      return;
+    }
+
     const requestData = {
       story_name: storyTitle,
-      tribe_id: tribeId,
-      story_year: storyYear,
+      tribe_id: Number(tribeId),
+      story_year: Number(storyYear),
       story_text: description,
       story_references: referenceLinks,
       published: publishStatus,
+      latitude: lat,
+      longitude: lng
     };
 
     try {
       const response = await fetch("http://localhost:5001/api/admin/stories", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(requestData),
+        headers: { 
+          "Content-Type": "application/json",
+          "Accept": "application/json"
+        },
+        body: JSON.stringify(requestData)
       });
 
+      const responseData = await response.json();
+
       if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.error || "Failed to add story");
+        throw new Error(responseData.error || "Failed to add story");
       }
 
-      const storyData = await response.json();
-      setNewStoryId(storyData.story_id);
+      setNewStoryId(responseData.story_id);
 
       if (selectedImages.length > 0) {
         const formData = new FormData();
-        formData.append("story_id", storyData.story_id);
+        formData.append("story_id", responseData.story_id);
         selectedImages.forEach((image) => {
           formData.append("images", image.file);
         });
@@ -234,18 +240,15 @@ const HeroAddingStory = () => {
         });
 
         if (!imageResponse.ok) {
-          const errorData = await imageResponse.json().catch(() => ({ message: "No JSON response" }));
+          const errorData = await imageResponse.json();
           throw new Error(`Image upload failed: ${errorData.message}`);
         }
-
-        const imageData = await imageResponse.json();
-        console.log("Image upload success:", imageData);
       }
 
       setModalMessage(
         publishStatus
-          ? `"${storyData.story_name}" has been successfully Published.`
-          : `"${storyData.story_name}" has been added in Editing mode.`
+          ? `"${responseData.story_name}" has been successfully Published.`
+          : `"${responseData.story_name}" has been added in Editing mode.`
       );
       setShowModal(true);
 
@@ -257,18 +260,18 @@ const HeroAddingStory = () => {
       setDescription("");
       setReferenceLinks("");
       setSelectedImages([]);
+      setCoordinates(null);
       setErrors({});
       setFormError("");
       setTouched({});
 
-      // Redirect after a short delay to allow modal to show
+      // Redirect after a short delay
       setTimeout(() => {
         navigate("/Admin/ManageStories");
         window.scrollTo(0, 0);
       }, 2000);
-    } catch (error) {
-      console.error("Error in handleFormSubmit:", error);
-      setModalMessage(`Failed to add story or upload images: ${error.message}`);
+    } catch (err) {
+      setModalMessage(`Failed to add story: ${err.message}`);
       setShowModal(true);
     }
   };
@@ -277,7 +280,19 @@ const HeroAddingStory = () => {
   const getInputClassName = (field) => {
     return `adding-story-input ${touched[field] && errors[field] ? "input-error" : ""}`;
   };
-  console.log(selectedTribe,'selectedTribe');
+
+  // Add handler for coordinates
+  const handleCoordinatesChange = (marker) => {
+    if (marker) {
+      const coords = {
+        latitude: Number(marker.latitude),
+        longitude: Number(marker.longitude)
+      };
+      setCoordinates(coords);
+    } else {
+      setCoordinates(null);
+    }
+  };
 
   return (
     <div className="adding-story-frame">
@@ -420,7 +435,9 @@ const HeroAddingStory = () => {
         <label className="adding-story-label">Mark the Coordinate</label>
           <TribesMapWithMarker
             tribeId={selectedTribeId}   
-            />
+            onTribesDataLoaded={handleTribesDataLoaded}
+            onCoordinatesChange={handleCoordinatesChange}
+          />
         </div>
 
         <div className="adding-story-form-group">
