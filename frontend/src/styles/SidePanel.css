@@ -2,7 +2,7 @@
 .side-panel {
   width: 450px;
   height: calc(100vh - 12vh); /* Adjusted for header height */
-  background: #b08ae6;
+  background: #7846ac;
   color: white;
   overflow: hidden;
   box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.2);
@@ -13,6 +13,10 @@
   display: flex;
   flex-direction: column;
   z-index: 500; /* Lower than header but above map */
+  max-height: 86vh;
+  padding: 15px;
+  border-radius: 0px 8px 8px 8px; /* Rounded corners */
+  pointer-events: auto;
 }
 
 /* Mobile side panel */
@@ -30,11 +34,11 @@
   display: flex;
   justify-content: flex-start;
   background: #7846ac;
-  padding: 10px;
+  padding: 10px 2px;
   position: relative;
 }
 
-.tab {
+.sidebar-tab {
   flex: 1;
   text-align: center;
   padding: 10px;
@@ -49,13 +53,13 @@
   margin: 0 4px;
 }
 
-.tab.active {
+.sidebar-tab.active {
   background: #b08ae6;
 }
 
 /* Content Section */
 .content {
-  padding: 20px;
+  padding: 0px 5px;;
   flex: 1;
   height: calc(100% - 0px); 
   position: relative;
@@ -65,21 +69,25 @@
 
 /* Story/Tribe Content Styling */
 .story-container{
-  background: rgba(255, 255, 255, 0.1);
+  background: #b08ae6;
   border-radius: 10px;
   padding: 15px;
   margin-bottom: 15px;
-  height: calc(100% - 0px); /* Adjust to leave space for pagination */
+  height: 75%; /* Adjust to leave space for pagination */
   overflow-y: auto;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.3);
+  border: 5px solid #b08ae6;
 }
 
 .tribe-container {
-  background: rgba(255, 255, 255, 0.1);
+  background: #b08ae6;
   border-radius: 10px;
   padding: 15px;
   margin-bottom: 15px;
-  height: calc(100% - 70px); /* Adjust to leave space for pagination */
+  height: 87%; /* Adjust to leave space for pagination */
   overflow-y: auto;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.3);
+  border: 5px solid #b08ae6;
 }
 
 /* Tab Icons */
@@ -106,6 +114,7 @@
   margin-bottom: 12px;
   line-height: 1.5;
   font-size: 15px;
+  overflow-wrap: break-word;
 }
 
 .section-label {
@@ -155,8 +164,8 @@
 /* Style the close button */
 .close-btn {
   position: absolute;
-  top: 10px;
-  right: 10px;
+  top: -15px;
+  right: -10px;
   background: none;
   border: none;
   font-size: 24px;
@@ -227,8 +236,12 @@
   padding: 10px; /* Less padding on mobile */
 }
 
-.side-panel.mobile .tribe-container,
+.side-panel.mobile .tribe-container {
+  height: 88%; /* Adjust for mobile */
+  padding: 10px;
+}
+
 .side-panel.mobile .story-container {
-  height: calc(100% - 50px); /* Adjust for mobile */
+  height: 75%;
   padding: 10px;
 }

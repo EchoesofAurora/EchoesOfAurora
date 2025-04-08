@@ -2,11 +2,11 @@
     background: 
         linear-gradient(to right, pink, green, pink), /* Gradient overlay */
         url('../images/general/background.png') repeat-y, /* Background image */
-        rgba(250, 181, 246, 0.8); /* Overlay color */
+        rgba(250, 181, 246, 0.9); /* Overlay color */
     background-size: 100% auto, 100% auto, 100% auto;
     background-position: center, center, center;
     background-repeat: repeat-y, repeat-y, repeat-y;
-    background-blend-mode: overlay;
+    background-blend-mode: overlay, overlay, overlay;
 }
 
 .long-section-background {
@@ -54,7 +54,7 @@
     letter-spacing: 1px; /* Slightly increase spacing for impact */
     word-wrap: break-word; /* Allow breaking if necessary */
     margin: 0 auto 20px auto; /* Center the text horizontally */
-    padding-top: 100px; /* default top space */
+    padding-top: 25px; /* default top space */
   }
 
 .user-hero-subtext {

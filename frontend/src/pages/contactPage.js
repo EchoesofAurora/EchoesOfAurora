@@ -15,7 +15,7 @@ function ContactPage() {
                 <h1 className='user-hero-title'>Contact us</h1>
                 <p className='user-hero-subtext'>Have questions, feedback, or stories to share?</p>
             </div>
-            <div className="contactus-page-body-section">
+            <div className="contactus-page-body-section user-section-shadow">
                 {/* ... existing contact details ... */}
                 <div className="contactus-page-contact-section">
                     <div className="contact-info">
@@ -106,15 +106,16 @@ const ContactForm = () => {
             )}
             <form ref={form} onSubmit={sendEmail}>
                 <div className="form-group">
-                    <label htmlFor="name">Your name <span className="required-field">*</span></label>
+                    <label htmlFor="name">Name<span className="required-field">*</span></label>
                     <input type="text" id="name" name="name" placeholder="John Smith" required />
                 </div>
                 <div className="form-group">
-                    <label htmlFor="email">Your email <span className="required-field">*</span></label>
+                    <label htmlFor="email">Email <span className="required-field">*</span></label>
                     <input type="email" id="email" name="email" placeholder="email@gmail.com" required />
                 </div>
                 <div className="form-group">
-                    <label htmlFor="topic">Your Topic <span className="required-field">*</span></label>
+                    <label htmlFor="topic">Topic <span className="required-field">*</span></label>
+
                     <select id="topic" name="topic" required>
                         <option value="">Selection</option>
                         <option value="general">General Inquiry</option>
@@ -123,11 +124,13 @@ const ContactForm = () => {
                     </select>
                 </div>
                 <div className="form-group">
-                    <label htmlFor="phone">Your phone no (optional)</label>
-                    <input type="tel" id="phone" name="phone" placeholder="+12332432333" />
+
+                    <label htmlFor="phone">Phone Number</label>
+                    <input type="tel" id="phone" name="phone" placeholder="+12332432333" required />
                 </div>
                 <div className="form-group">
-                    <label htmlFor="message">Your message <span className="required-field">*</span></label>
+                    <label htmlFor="message">Message <span className="required-field">*</span></label>
+
                     <textarea id="message" name="message" placeholder="Type your message here..." required></textarea>
                 </div>
                 <div className='contact-page-btn-div'>

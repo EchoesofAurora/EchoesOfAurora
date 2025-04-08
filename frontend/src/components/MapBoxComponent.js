@@ -52,6 +52,9 @@ const MapBoxComponent = () => {
   const [mapStyle, setMapStyle] = useState(
     "mapbox://styles/kodalis2/cm7kvvsfl00x601qo0597eedp"
   );
+
+  // Control map clicks
+  const [ignoreMapClicks, setIgnoreMapClicks] = useState(false);
   
   // Define year constants
   const startYear = 1000;
@@ -106,6 +109,17 @@ const MapBoxComponent = () => {
   const toggleDragPan = () => setInteractionState(prev => ({ ...prev, dragPan: !prev.dragPan }));
   const toggleKeyboard = () => setInteractionState(prev => ({ ...prev, keyboard: !prev.keyboard }));
   const toggleDoubleClickZoom = () => setInteractionState(prev => ({ ...prev, doubleClickZoom: !prev.doubleClickZoom }));
+
+  // Handle sidepanel close
+  const handlePanelClose = () => {
+    setSelectedTribe(null);
+    setIgnoreMapClicks(true);
+    
+    // Reset the flag after a short delay
+    setTimeout(() => {
+      setIgnoreMapClicks(false);
+    }, 300);
+  };
 
   // Fetch tribes and stories data from API
   useEffect(() => {
@@ -201,6 +215,8 @@ const MapBoxComponent = () => {
   }, []);
 
   const handleClick = (event) => {
+    if (ignoreMapClicks) return;
+
     const features = event.features;
     // Only process tribe clicks, not general map clicks
     if (features && features.length > 0) {
@@ -239,16 +255,16 @@ const MapBoxComponent = () => {
           right: 10,
           left: 'auto',
           width: "60%",
-          zIndex: 1000      // Ensure it's above map but below other controls
+          zIndex: -2000    // Ensure it's above map but below other controls
         };
       } else {
         // For desktop: move timeline to right side with more space from bottom
         return {
           position: "fixed", 
           bottom: 20,      
-          right: 350,       // Adjusted based on side panel width
+          right: 20,       // Adjusted based on side panel width
           left: 'auto',
-          width: "40%",
+          width: "50%",
           zIndex: 1000     // Ensure it's above map but below other controls
         };
       }
@@ -350,14 +366,13 @@ const MapBoxComponent = () => {
             transitionDuration: 0, // Keep transition duration at 0 for immediate response
           })
         }
-        onClick={handleClick}
-        onHover={handleHover}
-        interactiveLayerIds={["tribe-fill"]}
-        // Set interaction controls based on state with enhanced scroll zoom
-        scrollZoom={interactionState.scrollZoom}
-        dragPan={interactionState.dragPan}
-        keyboard={interactionState.keyboard}
-        doubleClickZoom={interactionState.doubleClickZoom}
+        onClick={selectedTribe && screenSize.isMobile ? null : handleClick}
+        onHover={selectedTribe && screenSize.isMobile ? null : handleHover}
+        interactiveLayerIds={selectedTribe && screenSize.isMobile ? [] : ["tribe-fill"]}
+        scrollZoom={selectedTribe && screenSize.isMobile ? false : interactionState.scrollZoom}
+        dragPan={selectedTribe && screenSize.isMobile ? false : interactionState.dragPan}
+        keyboard={selectedTribe && screenSize.isMobile ? false : interactionState.keyboard}
+        doubleClickZoom={selectedTribe && screenSize.isMobile ? false : interactionState.doubleClickZoom}
         // Add these options to maintain smooth interaction flow
         clickZoom={false} // Disable automatic zoom on click
         touchAction="pan-y" // Allow vertical touch scrolling while maintaining map interactions
@@ -391,7 +406,6 @@ const MapBoxComponent = () => {
             style={{
               position: "fixed",
               top: "calc(12vh + 10px)", // Position below header
-              right: 150,
               zIndex: 1001,
               background: "rgba(255, 255, 255, 0.95)",
               border: "none",
@@ -542,7 +556,7 @@ const MapBoxComponent = () => {
         {selectedTribe && (
           <SidePanel
             tribe={selectedTribe}
-            onClose={() => setSelectedTribe(null)}
+            onClose={handlePanelClose}
             isMobile={screenSize.isMobile}
           />
         )}
