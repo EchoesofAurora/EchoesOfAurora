@@ -17,6 +17,7 @@ const ManageTribes = () => {
   const [error, setError] = useState(null);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [selectedTribe, setSelectedTribe] = useState(null);
+  const [showStatusModal, setShowStatusModal] = useState(false);
   const [statusUpdating, setStatusUpdating] = useState(false);
   
   // Check if we should filter for published tribes only (from navigation state)
@@ -33,12 +34,11 @@ const ManageTribes = () => {
   ];
 
   useEffect(() => {
-    const fetchTribes = async () => {
+    const fetchData = async () => {
       try {
+        // Fetch tribes
         const response = await fetch("/api/admin/tribes");
-        if (!response.ok) {
-          throw new Error(`Error: ${response.statusText}`);
-        }
+        if (!response.ok) throw new Error("Failed to fetch tribes");
         const data = await response.json();
         
         // If filterPublished is true, filter for published tribes only
@@ -46,21 +46,16 @@ const ManageTribes = () => {
         
         setTribes(data); // Keep all tribes in the original state
         setSearchResults(filteredData); // Set search results to filtered or all tribes
-        
-        // If we're filtering for published tribes, update the search bar filter
-        if (filterPublished && AdminTribeSearchBar.updateStatusFilter) {
-          AdminTribeSearchBar.updateStatusFilter('published');
-        }
-        
         setLoading(false);
       } catch (err) {
         console.error("Failed to fetch tribes:", err);
         setError("Failed to fetch tribes. Please try again later.");
+        setShowStatusModal(true);
         setLoading(false);
       }
     };
 
-    fetchTribes();
+    fetchData();
   }, [filterPublished]);
 
   const handleRowClick = (tribe) => {
@@ -85,23 +80,14 @@ const ManageTribes = () => {
         setSearchResults(searchResults.filter((tribe) => tribe.tribe_id !== selectedTribe.tribe_id));
         setShowDeleteModal(false);
         setSelectedTribe(null);
-        // Removing the status modal trigger completely
       } else {
-        // Only show error message if deletion fails
         setError("Failed to delete the tribe. Please try again.");
-        // Keep the error modal for failure cases
-        Modal.error({
-          title: "Error",
-          content: "Failed to delete the tribe. Please try again.",
-        });
+        setShowStatusModal(true);
       }
     } catch (err) {
       console.error("Error deleting tribe:", err);
-      // Only show error message if deletion fails
-      Modal.error({
-        title: "Error",
-        content: "An error occurred while deleting the tribe.",
-      });
+      setError("An error occurred while deleting the tribe.");
+      setShowStatusModal(true);
     }
   };
 
@@ -168,15 +154,15 @@ const ManageTribes = () => {
           prevResults.map(t => t.tribe_id === tribe.tribe_id ? {...t, published: newPublishStatus} : t)
         );
       }
+
+      // Show success message
+      setError(`"${tribe.tribe_name}" has been ${newPublishStatus ? "published" : "unpublished"} successfully.`);
+      setShowStatusModal(true);
       
     } catch (err) {
       console.error(`Error updating tribe status:`, err);
       setError(`Failed to update tribe status: ${err.message}`);
-      // Show error modal only for failed status updates
-      Modal.error({
-        title: "Error",
-        content: `Failed to update tribe status: ${err.message}`,
-      });
+      setShowStatusModal(true);
     } finally {
       setStatusUpdating(false);
     }
@@ -257,7 +243,7 @@ const ManageTribes = () => {
     // Apply status filter
     if (statusFilter === 'published') {
       filteredTribes = filteredTribes.filter(tribe => tribe.published);
-    } else if (statusFilter === 'unpublished') {
+    } else if (statusFilter === 'editing') {
       filteredTribes = filteredTribes.filter(tribe => !tribe.published);
     }
     
@@ -299,7 +285,7 @@ const ManageTribes = () => {
 
         {loading ? (
           <div className="loading">Loading tribes...</div>
-        ) : error ? (
+        ) : error && !showStatusModal ? (
           <div className="error-message">{error}</div>
         ) : (
           <>
@@ -381,10 +367,9 @@ const ManageTribes = () => {
             </div>
           </>
         )}
-      </div>
 
-      {/* Delete Confirmation Modal - Updated Design */}
-      {showDeleteModal && (
+        {/* Delete Confirmation Modal */}
+        {showDeleteModal && (
           <div className="modal-overlay">
             <div className="delete-modal-content">
               <div className="delete-modal-header">
@@ -416,15 +401,42 @@ const ManageTribes = () => {
           </div>
         )}
 
-      {/* Removed the showStatusModal modal completely */}
-      
-      {/* Loading overlay for status updates */}
-      {statusUpdating && (
-        <div className="status-updating-overlay">
-          <div className="status-updating-spinner"></div>
-          <p>Updating tribe status...</p>
-        </div>
-      )}
+        {/* Status/Error Modal */}
+        <Modal 
+          show={showStatusModal} 
+          onHide={() => {
+            setShowStatusModal(false);
+            setError(null);
+          }} 
+          centered
+          backdrop="static"
+          keyboard={false}
+        >
+          <Modal.Header closeButton>
+            <Modal.Title>{error && error.includes("Failed") ? "Error" : "Status Update"}</Modal.Title>
+          </Modal.Header>
+          <Modal.Body>{error}</Modal.Body>
+          <Modal.Footer>
+            <button 
+              className="action-btn edit-btn"
+              onClick={() => {
+                setShowStatusModal(false);
+                setError(null);
+              }}
+            >
+              Close
+            </button>
+          </Modal.Footer>
+        </Modal>
+
+        {/* Loading overlay for status updates */}
+        {statusUpdating && (
+          <div className="status-updating-overlay">
+            <div className="status-updating-spinner"></div>
+            <p>Updating tribe status...</p>
+          </div>
+        )}
+      </div>
     </DashboardLayout>
   );
 };

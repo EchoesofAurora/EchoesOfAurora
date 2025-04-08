@@ -280,7 +280,7 @@ const ManageStories = () => {
     // Filter by publication status
     if (statusFilter === 'published') {
       filteredStories = filteredStories.filter(story => story.published);
-    } else if (statusFilter === 'unpublished') {
+    } else if (statusFilter === 'editing') {
       filteredStories = filteredStories.filter(story => !story.published);
     }
     
