@@ -50,6 +50,7 @@ function StoriesPage() {
         const data = await response.json();
         setTribes(data);
       } catch (error) {
+        console.error("Error fetching tribes:", error);
         setError(error.message);
       }
     };
@@ -73,28 +74,12 @@ function StoriesPage() {
       return `data:${story.media_type};base64,${story.image_data}`;
     }
 
-    // Get a random image from the stories folder
+    // Use consistent image based on story_id instead of random
     try {
-      const imagesContext = require.context(
-        "../images/stories",
-        false,
-        /\.png$/
-      );
-      const imageKeys = imagesContext.keys();
-
-      if (imageKeys.length > 0) {
-        // Select a random image key from available images
-        const randomIndex = Math.floor(Math.random() * imageKeys.length);
-        return imagesContext(imageKeys[randomIndex]);
-      } else {
-        // If no images available in the folder
-        return defaultStoryImage;
-      }
-
-      // const fallbackImage = require("../images/stories/fallback-story.png");
-      // return fallbackImage;
+      // Default to story ID-specific image
+      return require(`../images/stories/${story.story_id}.png`);
     } catch (e) {
-      console.error("Error loading random story image:", e);
+      // If story-specific image doesn't exist, use default image 
       return defaultStoryImage;
     }
   };
@@ -198,7 +183,7 @@ function StoriesPage() {
           <>
             <div className="stories-container">
               {currentStories.map((story, index) => (
-                <div className="story-card" key={index}>
+                <div className="story-card" key={story.story_id || index}>
                   <img
                     src={getStoryImage(story)}
                     alt={story.story_name}
@@ -215,7 +200,7 @@ function StoriesPage() {
                     <div className="story-card-top-bar">
                       <h3 className="story-title">{story.story_name}</h3>
                       <h2 className="story-tribe">
-                        {reverseTribeDictionary[story.tribe_id]}
+                        {reverseTribeDictionary[story.tribe_id] || "Unknown Tribe"}
                       </h2>
                     </div>
                     <p className="story-description">

@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect, useRef, useCallback } from "react";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 import "../styles/AddingStory.css";
@@ -9,18 +9,20 @@ import { Modal, Button } from "react-bootstrap";
 import { useNavigate } from "react-router-dom";
 import ImageUpload from "../components/ImageUpload";
 import ReferenceLinks from "../components/ReferenceLinks";
+import TribesMapWithMarker from "../components/TribesMapWithMarker";
 
 const HeroAddingStory = () => {
   const [storyTitle, setStoryTitle] = useState("");
   const [selectedTribe, setSelectedTribe] = useState("");
   const [startDate, setStartDate] = useState(null);
-  const [endDate, setEndDate] = useState(null);
   const [description, setDescription] = useState("");
   const [referenceLinks, setReferenceLinks] = useState("");
   const [selectedImages, setSelectedImages] = useState([]);
   const [tribes, setTribes] = useState([]);
   const [tribeIds, setTribeIds] = useState({});
   const [newStoryId, setNewStoryId] = useState(null);
+  const [selectedTribeId, setSelectedTribeId] = useState(null);
+  const [coordinates, setCoordinates] = useState(null);
   
   const [showModal, setShowModal] = useState(false);
   const [modalMessage, setModalMessage] = useState("");
@@ -35,7 +37,6 @@ const HeroAddingStory = () => {
   const titleRef = useRef(null);
   const tribeRef = useRef(null);
   const startYearRef = useRef(null);
-  const endYearRef = useRef(null);
   const descriptionRef = useRef(null);
   const referenceRef = useRef(null);
 
@@ -43,27 +44,26 @@ const HeroAddingStory = () => {
 
   const handleClose = () => setShowModal(false);
 
-  // Fetch tribes from the database
-  useEffect(() => {
-    const fetchTribes = async () => {
-      try {
-        const response = await fetch("http://localhost:5001/api/admin/tribes");
-        if (!response.ok) throw new Error("Failed to fetch tribes");
-        const data = await response.json();
-        const tribeMap = {};
-        data.forEach((tribe) => {
-          tribeMap[tribe.tribe_name] = tribe.tribe_id;
-        });
-        setTribes(Object.keys(tribeMap));
-        setTribeIds(tribeMap);
-      } catch (error) {
-        console.error("Error fetching tribes:", error);
-        setModalMessage(`Failed to load tribes: ${error.message}`);
-        setShowModal(true);
-      }
-    };
-    fetchTribes();
+  // Handle tribes data from child component
+  const handleTribesDataLoaded = useCallback((tribesJson) => {
+    const tribeMap = {};
+    tribesJson.forEach((tribe) => {
+      tribeMap[tribe.tribe_name] = tribe.tribe_id;
+    });
+    setTribes(tribesJson.map(tribe => tribe.tribe_name));
+    setTribeIds(tribeMap);
   }, []);
+
+  useEffect(() => {
+    if (selectedTribe) {
+      const tribeId = tribeIds[selectedTribe];
+      if (tribeId) {
+        setSelectedTribeId(tribeId);
+      } else {
+        setSelectedTribeId(null);
+      }
+    }
+  }, [selectedTribe, tribeIds, selectedTribeId]);
 
   // Handle field touch events
   const handleBlur = (field) => {
@@ -91,19 +91,10 @@ const HeroAddingStory = () => {
         }
         break;
       case 'startDate':
-        if (!startDate && !endDate) {
-          newErrors.startDate = "Either start or end year is required";
+        if (!startDate) {
+          newErrors.startDate = "Start year is required";
         } else {
           delete newErrors.startDate;
-          delete newErrors.endDate; // Clear end date error if start date is provided
-        }
-        break;
-      case 'endDate':
-        if (!startDate && !endDate) {
-          newErrors.endDate = "Either start or end year is required";
-        } else {
-          delete newErrors.endDate;
-          delete newErrors.startDate; // Clear start date error if end date is provided
         }
         break;
       case 'description':
@@ -120,6 +111,13 @@ const HeroAddingStory = () => {
           delete newErrors.referenceLinks;
         }
         break;
+      case 'coordinates':
+        if (!coordinates) {
+          newErrors.coordinates = "Location coordinates are required";
+        } else {
+          delete newErrors.coordinates;
+        }
+        break;
       default:
         break;
     }
@@ -134,7 +132,7 @@ const HeroAddingStory = () => {
     const newTouched = {};
     
     // Mark all fields as touched
-    ['storyTitle', 'selectedTribe', 'startDate', 'endDate', 'description', 'referenceLinks'].forEach(field => {
+    ['storyTitle', 'selectedTribe', 'startDate', 'description', 'referenceLinks', 'coordinates'].forEach(field => {
       newTouched[field] = true;
     });
     setTouched(newTouched);
@@ -142,9 +140,10 @@ const HeroAddingStory = () => {
     // Validate each field
     if (!storyTitle.trim()) newErrors.storyTitle = "Story title is required";
     if (!selectedTribe) newErrors.selectedTribe = "Tribe selection is required";
-    if (!startDate && !endDate) newErrors.startDate = "Either start or end year is required";
+    if (!startDate) newErrors.startDate = "Start year is required";
     if (!description.trim()) newErrors.description = "Description is required";
     if (!referenceLinks.trim()) newErrors.referenceLinks = "Reference is required";
+    if (!coordinates) newErrors.coordinates = "Location coordinates are required";
     
     setErrors(newErrors);
     
@@ -180,37 +179,44 @@ const HeroAddingStory = () => {
       return;
     }
 
-    // Use the first available year (startDate or endDate)
-    const storyYear = startDate ? startDate.getFullYear().toString() : 
-                      endDate ? endDate.getFullYear().toString() : null;
+    const storyYear = startDate.getFullYear().toString();
+
+    // Ensure coordinates are valid numbers
+    const lat = coordinates.latitude;
+    const lng = coordinates.longitude;
 
     const requestData = {
       story_name: storyTitle,
-      tribe_id: tribeId,
-      story_year: storyYear,
+      tribe_id: Number(tribeId),
+      story_year: Number(storyYear),
       story_text: description,
       story_references: referenceLinks,
       published: publishStatus,
+      latitude: lat,
+      longitude: lng
     };
 
     try {
       const response = await fetch("http://localhost:5001/api/admin/stories", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(requestData),
+        headers: { 
+          "Content-Type": "application/json",
+          "Accept": "application/json"
+        },
+        body: JSON.stringify(requestData)
       });
 
+      const responseData = await response.json();
+
       if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.error || "Failed to add story");
+        throw new Error(responseData.error || "Failed to add story");
       }
 
-      const storyData = await response.json();
-      setNewStoryId(storyData.story_id);
+      setNewStoryId(responseData.story_id);
 
       if (selectedImages.length > 0) {
         const formData = new FormData();
-        formData.append("story_id", storyData.story_id);
+        formData.append("story_id", responseData.story_id);
         selectedImages.forEach((image) => {
           formData.append("images", image.file);
         });
@@ -221,18 +227,15 @@ const HeroAddingStory = () => {
         });
 
         if (!imageResponse.ok) {
-          const errorData = await imageResponse.json().catch(() => ({ message: "No JSON response" }));
+          const errorData = await imageResponse.json();
           throw new Error(`Image upload failed: ${errorData.message}`);
         }
-
-        const imageData = await imageResponse.json();
-        console.log("Image upload success:", imageData);
       }
 
       setModalMessage(
         publishStatus
-          ? `"${storyData.story_name}" has been successfully Published.`
-          : `"${storyData.story_name}" has been added in Editing mode.`
+          ? `"${responseData.story_name}" has been successfully Published.`
+          : `"${responseData.story_name}" has been added in Editing mode.`
       );
       setShowModal(true);
 
@@ -240,22 +243,21 @@ const HeroAddingStory = () => {
       setStoryTitle("");
       setSelectedTribe("");
       setStartDate(null);
-      setEndDate(null);
       setDescription("");
       setReferenceLinks("");
       setSelectedImages([]);
+      setCoordinates(null);
       setErrors({});
       setFormError("");
       setTouched({});
 
-      // Redirect after a short delay to allow modal to show
+      // Redirect after a short delay
       setTimeout(() => {
         navigate("/Admin/ManageStories");
         window.scrollTo(0, 0);
       }, 2000);
-    } catch (error) {
-      console.error("Error in handleFormSubmit:", error);
-      setModalMessage(`Failed to add story or upload images: ${error.message}`);
+    } catch (err) {
+      setModalMessage(`Failed to add story: ${err.message}`);
       setShowModal(true);
     }
   };
@@ -263,6 +265,21 @@ const HeroAddingStory = () => {
   // Get input class based on validation state
   const getInputClassName = (field) => {
     return `adding-story-input ${touched[field] && errors[field] ? "input-error" : ""}`;
+  };
+
+  // Add handler for coordinates
+  const handleCoordinatesChange = (marker) => {
+    if (marker) {
+      const coords = {
+        latitude: Number(marker.latitude),
+        longitude: Number(marker.longitude)
+      };
+      setCoordinates(coords);
+      validateField('coordinates');
+    } else {
+      setCoordinates(null);
+      setErrors(prev => ({ ...prev, coordinates: "Location coordinates are required" }));
+    }
   };
 
   return (
@@ -335,7 +352,7 @@ const HeroAddingStory = () => {
           <div className="storyRange">
             <div className="year-range">
               <label className="adding-story-label">
-                Start Year <span style={{ color: "#dc3545" }}>*</span>
+                Year <span style={{ color: "#dc3545" }}>*</span>
               </label>
               <DatePicker
                 ref={startYearRef}
@@ -344,7 +361,7 @@ const HeroAddingStory = () => {
                 showYearPicker
                 dateFormat="yyyy"
                 className={getInputClassName('startDate')}
-                placeholderText="Select start year"
+                placeholderText="Select year"
                 onBlur={() => handleBlur('startDate')}
                 style={touched.startDate && errors.startDate ? { borderColor: "#dc3545" } : {}}
               />
@@ -354,31 +371,7 @@ const HeroAddingStory = () => {
                 </div>
               )}
             </div>
-            <div className="year-range">
-              <label className="adding-story-label">
-                End Year 
-              </label>
-              <DatePicker
-                ref={endYearRef}
-                selected={endDate}
-                onChange={(date) => setEndDate(date)}
-                showYearPicker
-                dateFormat="yyyy"
-                className={getInputClassName('endDate')}
-                placeholderText="Select end year"
-                onBlur={() => handleBlur('endDate')}
-                style={touched.endDate && errors.endDate ? { borderColor: "#dc3545" } : {}}
-              />
-              {touched.endDate && errors.endDate && (
-                <div className="error-message" style={{ color: "#dc3545", fontSize: "0.875rem", marginTop: "5px" }}>
-                  {errors.endDate}
-                </div>
-              )}
-            </div>
           </div>
-          <p className="form-hint" style={{ fontSize: "0.8rem", color: "#6c757d", marginTop: "5px" }}>
-            At least one year field is required.
-          </p>
         </div>
 
         <div className="adding-story-form-group">
@@ -398,6 +391,22 @@ const HeroAddingStory = () => {
           {touched.description && errors.description && (
             <div className="error-message" style={{ color: "#dc3545", fontSize: "0.875rem", marginTop: "5px" }}>
               {errors.description}
+            </div>
+          )}
+        </div>
+
+        <div>
+          <label className="adding-story-label">
+            Mark the Location <span style={{ color: "#dc3545" }}>*</span>
+          </label>
+          <TribesMapWithMarker
+            tribeId={selectedTribeId}   
+            onTribesDataLoaded={handleTribesDataLoaded}
+            onCoordinatesChange={handleCoordinatesChange}
+          />
+          {touched.coordinates && errors.coordinates && (
+            <div className="error-message" style={{ color: "#dc3545", fontSize: "0.875rem", marginTop: "5px" }}>
+              {errors.coordinates}
             </div>
           )}
         </div>

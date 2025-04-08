@@ -1,4 +1,4 @@
-import React, { useRef } from 'react';
+import React, { useRef, useState } from 'react';
 import Header from '../components/Header';
 import Footer from '../components/Footer';
 import '../styles/contactPage.css';
@@ -31,6 +31,8 @@ function ContactPage() {
 
 const ContactForm = () => {
     const form = useRef();
+    const [showPopup, setShowPopup] = useState(false);
+    const [isSubmitting, setIsSubmitting] = useState(false);
 
     const sendToDatabase = async (formData) => {
         try {
@@ -54,6 +56,7 @@ const ContactForm = () => {
 
     const sendEmail = async (e) => {
         e.preventDefault();
+        setIsSubmitting(true);
 
         const formData = {
             name: form.current.name.value,
@@ -80,9 +83,11 @@ const ContactForm = () => {
                 }
             );
 
+        setIsSubmitting(false);
+        
         if (dbSuccess) {
             e.target.reset();
-            // You might want to add a success message here
+            setShowPopup(true);
         } else {
             // You might want to add an error message here
         }
@@ -90,17 +95,27 @@ const ContactForm = () => {
 
     return (
         <div className="contact-form">
+            {showPopup && (
+                <div className="confirmation-popup">
+                    <div className="popup-content">
+                        <h3>Thank You!</h3>
+                        <p>Your message has been sent successfully. We'll get back to you soon.</p>
+                        <button onClick={() => setShowPopup(false)}>Close</button>
+                    </div>
+                </div>
+            )}
             <form ref={form} onSubmit={sendEmail}>
                 <div className="form-group">
-                    <label htmlFor="name">Name</label>
+                    <label htmlFor="name">Name<span className="required-field">*</span></label>
                     <input type="text" id="name" name="name" placeholder="John Smith" required />
                 </div>
                 <div className="form-group">
-                    <label htmlFor="email">Email</label>
+                    <label htmlFor="email">Email <span className="required-field">*</span></label>
                     <input type="email" id="email" name="email" placeholder="email@gmail.com" required />
                 </div>
                 <div className="form-group">
-                    <label htmlFor="topic">Topic</label>
+                    <label htmlFor="topic">Topic <span className="required-field">*</span></label>
+
                     <select id="topic" name="topic" required>
                         <option value="">Selection</option>
                         <option value="general">General Inquiry</option>
@@ -109,15 +124,19 @@ const ContactForm = () => {
                     </select>
                 </div>
                 <div className="form-group">
+
                     <label htmlFor="phone">Phone Number</label>
                     <input type="tel" id="phone" name="phone" placeholder="+12332432333" required />
                 </div>
                 <div className="form-group">
-                    <label htmlFor="message">Message</label>
+                    <label htmlFor="message">Message <span className="required-field">*</span></label>
+
                     <textarea id="message" name="message" placeholder="Type your message here..." required></textarea>
                 </div>
-                <div className='contact-page-btn-div' >
-                <button class='button' type="submit">Send Message</button>
+                <div className='contact-page-btn-div'>
+                    <button className='button' type="submit" disabled={isSubmitting}>
+                        {isSubmitting ? 'Sending...' : 'Send Message'}
+                    </button>
                 </div>
             </form>
         </div>
