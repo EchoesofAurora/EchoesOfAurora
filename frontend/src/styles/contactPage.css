@@ -109,7 +109,9 @@
   .form-group label {
     display: block;
     margin-bottom: 5px;
-    color: #333;
+    font-size: 1.2rem;
+    font-weight: bold;
+    color: rgba(76, 41, 82, 0.95);
   }
   
   .form-group input,
@@ -117,10 +119,11 @@
   .form-group textarea {
     width: 100%;
     padding: 10px;
-    /* border-radius: 5px; */
+    border: 2px solid #888;
+    border-radius: 5px;
     font-size: 16px;
-    border-bottom: 2px solid #1a1a2e; /* Highlight color on focus */
-    background-color: transparent;
+    border-bottom: 2px solid #666; /* Highlight color on focus */
+    background-color: rgb(255, 255, 255, 0.75);
   
   
   }

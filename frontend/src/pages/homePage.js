@@ -31,17 +31,20 @@ const HeroSection = () => {
 
   return (
 
-    <section className="user-hero user-hero-section user-section-background"
+    <section className="user-hero user-hero-section user-section-background smaller-hero-header"
              style={{
                background: `url(${images[currentImageIndex]}) no-repeat center center/cover`,
              }}>
       <h1 className="user-hero-title">Echoes of Aurora</h1>
-      <p className="user-hero-subtext">
-        Welcome to "Echoes of Aurora", where we catalog and display North American indigenous storytelling about the aurora borealis with historical space weather data.
-      </p>
     </section>
   );
 };
+
+/* Removed hero subtext for now
+      <p className="user-hero-subtext">
+        Welcome to "Echoes of Aurora", where we catalog and display North American indigenous storytelling about the aurora borealis with historical space weather data.
+      </p>
+*/
 
 // About Section Component
 const AboutSection = () => {
