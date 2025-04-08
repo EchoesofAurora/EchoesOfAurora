@@ -6,7 +6,7 @@ import "mapbox-gl/dist/mapbox-gl.css";
 import "../styles/mapBox.css";
 import "rc-slider/assets/index.css"; // Required for rc-slider
 
-const TribesMapWithMarker = ({ tribeId, onTribesDataLoaded, onCoordinatesChange }) => {
+const TribesMapWithMarker = ({ tribeId, onTribesDataLoaded, onCoordinatesChange, initialMarker }) => {
   const mapContainerRef = useRef(null);
   const mapRef = useRef(null);
   const onTribesDataLoadedRef = useRef(onTribesDataLoaded);
@@ -32,9 +32,9 @@ const TribesMapWithMarker = ({ tribeId, onTribesDataLoaded, onCoordinatesChange 
 
   // Update viewport with additional settings to improve zoom responsiveness
   const [viewport, setViewport] = useState({
-    latitude: 60,
-    longitude: -100,
-    zoom: 1.6,
+    latitude: initialMarker ? initialMarker.latitude : 60,
+    longitude: initialMarker ? initialMarker.longitude : -100,
+    zoom: initialMarker ? 3 : 1.6,
     width: "100%",
     height: "70vh", // Reduced from 100vh to 70vh
     transitionDuration: 0, // Disable transition animation for immediate response
@@ -54,7 +54,32 @@ const TribesMapWithMarker = ({ tribeId, onTribesDataLoaded, onCoordinatesChange 
   const [showControls, setShowControls] = useState(true);
   
   // New state for marker
-  const [marker, setMarker] = useState(null);
+  const [marker, setMarker] = useState(initialMarker ? {
+    longitude: initialMarker.longitude,
+    latitude: initialMarker.latitude,
+    title: `Selected Location (${initialMarker.longitude.toFixed(4)}, ${initialMarker.latitude.toFixed(4)})`
+  } : null);
+  
+  // Effect to initialize marker from prop
+  useEffect(() => {
+    if (initialMarker && !marker) {
+      const markerData = {
+        longitude: initialMarker.longitude,
+        latitude: initialMarker.latitude,
+        title: `Selected Location (${initialMarker.longitude.toFixed(4)}, ${initialMarker.latitude.toFixed(4)})`
+      };
+      setMarker(markerData);
+      
+      // Update viewport to center on the marker
+      setViewport(prev => ({
+        ...prev,
+        latitude: initialMarker.latitude,
+        longitude: initialMarker.longitude,
+        zoom: 3,
+        transitionDuration: 1000
+      }));
+    }
+  }, [initialMarker]);
   
   // Effect to update selectedTribeId when tribeId prop changes
   useEffect(() => {
@@ -93,7 +118,7 @@ const TribesMapWithMarker = ({ tribeId, onTribesDataLoaded, onCoordinatesChange 
             ...prev,
             width: "100%",
             height: "70vh",
-            zoom: isMobile ? 0.8 : 1.6,
+            zoom: isMobile ? 0.8 : prev.zoom,
           }));
         }
       }
@@ -579,8 +604,6 @@ const TribesMapWithMarker = ({ tribeId, onTribesDataLoaded, onCoordinatesChange 
             Click on the map to select a location
           </p>
         )}
-        
-        
       </div>
     </div>
   );

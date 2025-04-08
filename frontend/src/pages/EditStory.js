@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect, useRef, useCallback } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
@@ -9,7 +9,7 @@ import DashboardLayout from "../components/DashboardLayout";
 import { Modal, Button } from "react-bootstrap";
 import ImageUpload from "../components/ImageUpload";
 import ReferenceLinks from "../components/ReferenceLinks";
-
+import TribesMapWithMarker from "../components/TribesMapWithMarker";
 
 const HeroEditStory = () => {
   const { id } = useParams();
@@ -27,6 +27,8 @@ const HeroEditStory = () => {
   const [imagesToRemove, setImagesToRemove] = useState([]); // Images to delete
   const [imagesUploaded, setImagesUploaded] = useState(false); // Track if new images were uploaded
   const [loading, setLoading] = useState(true);
+  const [coordinates, setCoordinates] = useState(null);
+  const [tribeIds, setTribeIds] = useState({});
   
   // Form validation states
   const [errors, setErrors] = useState({});
@@ -102,6 +104,13 @@ const HeroEditStory = () => {
           delete newErrors.referenceLinks;
         }
         break;
+      case 'coordinates':
+        if (!coordinates) {
+          newErrors.coordinates = "Location coordinates are required";
+        } else {
+          delete newErrors.coordinates;
+        }
+        break;
       default:
         break;
     }
@@ -116,7 +125,7 @@ const HeroEditStory = () => {
     const newTouched = {};
     
     // Mark all fields as touched
-    ['storyTitle', 'selectedTribe', 'startDate', 'description', 'referenceLinks'].forEach(field => {
+    ['storyTitle', 'selectedTribe', 'startDate', 'description', 'referenceLinks', 'coordinates'].forEach(field => {
       newTouched[field] = true;
     });
     setTouched(newTouched);
@@ -127,6 +136,7 @@ const HeroEditStory = () => {
     if (!startDate) newErrors.startDate = "Story year is required";
     if (!description.trim()) newErrors.description = "Description is required";
     if (!referenceLinks.trim()) newErrors.referenceLinks = "Reference is required";
+    if (!coordinates) newErrors.coordinates = "Location coordinates are required";
     
     setErrors(newErrors);
     
@@ -145,6 +155,15 @@ const HeroEditStory = () => {
     setFormError("");
     return true;
   };
+
+  // Handle tribes data from child component
+  const handleTribesDataLoaded = useCallback((tribesJson) => {
+    const tribeMap = {};
+    tribesJson.forEach((tribe) => {
+      tribeMap[tribe.tribe_name] = tribe.tribe_id;
+    });
+    setTribeIds(tribeMap);
+  }, []);
 
   useEffect(() => {
     if (!id) {
@@ -172,6 +191,14 @@ const HeroEditStory = () => {
 
         const year = story.story_year ? parseInt(story.story_year, 10) : null;
         setStartDate(year ? new Date(year, 0, 1) : null);
+
+        // Set coordinates if they exist
+        if (story.latitude && story.longitude) {
+          setCoordinates({
+            latitude: Number(story.latitude),
+            longitude: Number(story.longitude)
+          });
+        }
 
         // Set images
         let imagePreviews = [];
@@ -304,6 +331,8 @@ const HeroEditStory = () => {
         story_text: description,
         story_references: referenceLinks,
         published: publishStatus,
+        latitude: coordinates.latitude,
+        longitude: coordinates.longitude
       };
 
       const response = await fetch(`/api/admin/stories/${id}`, {
@@ -354,6 +383,21 @@ const HeroEditStory = () => {
   // Get input class based on validation state
   const getInputClassName = (field) => {
     return `edit-story-input ${touched[field] && errors[field] ? "input-error" : ""}`;
+  };
+
+  // Add handler for coordinates
+  const handleCoordinatesChange = (marker) => {
+    if (marker) {
+      const coords = {
+        latitude: Number(marker.latitude),
+        longitude: Number(marker.longitude)
+      };
+      setCoordinates(coords);
+      validateField('coordinates');
+    } else {
+      setCoordinates(null);
+      setErrors(prev => ({ ...prev, coordinates: "Location coordinates are required" }));
+    }
   };
 
   return (
@@ -482,6 +526,23 @@ const HeroEditStory = () => {
             )}
           </div>
           
+          <div>
+            <label className="edit-story-label">
+              Mark the Location <span style={{ color: "#dc3545" }}>*</span>
+            </label>
+            <TribesMapWithMarker
+              tribeId={tribeIds[selectedTribe]}
+              onTribesDataLoaded={handleTribesDataLoaded}
+              onCoordinatesChange={handleCoordinatesChange}
+              initialMarker={coordinates}
+            />
+            {touched.coordinates && errors.coordinates && (
+              <div className="error-message" style={{ color: "#dc3545", fontSize: "0.875rem", marginTop: "5px" }}>
+                {errors.coordinates}
+              </div>
+            )}
+          </div>
+
           <div className="edit-story-form-group">
             <label className="edit-story-label">Current Images</label>
             <div className="images-container">

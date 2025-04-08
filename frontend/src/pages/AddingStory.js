@@ -15,7 +15,6 @@ const HeroAddingStory = () => {
   const [storyTitle, setStoryTitle] = useState("");
   const [selectedTribe, setSelectedTribe] = useState("");
   const [startDate, setStartDate] = useState(null);
-  const [endDate, setEndDate] = useState(null);
   const [description, setDescription] = useState("");
   const [referenceLinks, setReferenceLinks] = useState("");
   const [selectedImages, setSelectedImages] = useState([]);
@@ -38,7 +37,6 @@ const HeroAddingStory = () => {
   const titleRef = useRef(null);
   const tribeRef = useRef(null);
   const startYearRef = useRef(null);
-  const endYearRef = useRef(null);
   const descriptionRef = useRef(null);
   const referenceRef = useRef(null);
 
@@ -93,19 +91,10 @@ const HeroAddingStory = () => {
         }
         break;
       case 'startDate':
-        if (!startDate && !endDate) {
-          newErrors.startDate = "Either start or end year is required";
+        if (!startDate) {
+          newErrors.startDate = "Start year is required";
         } else {
           delete newErrors.startDate;
-          delete newErrors.endDate; // Clear end date error if start date is provided
-        }
-        break;
-      case 'endDate':
-        if (!startDate && !endDate) {
-          newErrors.endDate = "Either start or end year is required";
-        } else {
-          delete newErrors.endDate;
-          delete newErrors.startDate; // Clear start date error if end date is provided
         }
         break;
       case 'description':
@@ -122,6 +111,13 @@ const HeroAddingStory = () => {
           delete newErrors.referenceLinks;
         }
         break;
+      case 'coordinates':
+        if (!coordinates) {
+          newErrors.coordinates = "Location coordinates are required";
+        } else {
+          delete newErrors.coordinates;
+        }
+        break;
       default:
         break;
     }
@@ -136,7 +132,7 @@ const HeroAddingStory = () => {
     const newTouched = {};
     
     // Mark all fields as touched
-    ['storyTitle', 'selectedTribe', 'startDate', 'endDate', 'description', 'referenceLinks'].forEach(field => {
+    ['storyTitle', 'selectedTribe', 'startDate', 'description', 'referenceLinks', 'coordinates'].forEach(field => {
       newTouched[field] = true;
     });
     setTouched(newTouched);
@@ -144,9 +140,10 @@ const HeroAddingStory = () => {
     // Validate each field
     if (!storyTitle.trim()) newErrors.storyTitle = "Story title is required";
     if (!selectedTribe) newErrors.selectedTribe = "Tribe selection is required";
-    if (!startDate && !endDate) newErrors.startDate = "Either start or end year is required";
+    if (!startDate) newErrors.startDate = "Start year is required";
     if (!description.trim()) newErrors.description = "Description is required";
     if (!referenceLinks.trim()) newErrors.referenceLinks = "Reference is required";
+    if (!coordinates) newErrors.coordinates = "Location coordinates are required";
     
     setErrors(newErrors);
     
@@ -182,21 +179,11 @@ const HeroAddingStory = () => {
       return;
     }
 
-    // Use the first available year (startDate or endDate)
-    const storyYear = startDate ? startDate.getFullYear().toString() : 
-                      endDate ? endDate.getFullYear().toString() : null;
+    const storyYear = startDate.getFullYear().toString();
 
     // Ensure coordinates are valid numbers
-    const lat = coordinates && coordinates.latitude ? Number(coordinates.latitude) : null;
-    const lng = coordinates && coordinates.longitude ? Number(coordinates.longitude) : null;
-
-    // Validate coordinates if they exist
-    if ((coordinates && coordinates.latitude && isNaN(lat)) || 
-        (coordinates && coordinates.longitude && isNaN(lng))) {
-      setModalMessage("Invalid coordinates format.");
-      setShowModal(true);
-      return;
-    }
+    const lat = coordinates.latitude;
+    const lng = coordinates.longitude;
 
     const requestData = {
       story_name: storyTitle,
@@ -256,7 +243,6 @@ const HeroAddingStory = () => {
       setStoryTitle("");
       setSelectedTribe("");
       setStartDate(null);
-      setEndDate(null);
       setDescription("");
       setReferenceLinks("");
       setSelectedImages([]);
@@ -289,8 +275,10 @@ const HeroAddingStory = () => {
         longitude: Number(marker.longitude)
       };
       setCoordinates(coords);
+      validateField('coordinates');
     } else {
       setCoordinates(null);
+      setErrors(prev => ({ ...prev, coordinates: "Location coordinates are required" }));
     }
   };
 
@@ -364,7 +352,7 @@ const HeroAddingStory = () => {
           <div className="storyRange">
             <div className="year-range">
               <label className="adding-story-label">
-                Start Year <span style={{ color: "#dc3545" }}>*</span>
+                Year <span style={{ color: "#dc3545" }}>*</span>
               </label>
               <DatePicker
                 ref={startYearRef}
@@ -373,7 +361,7 @@ const HeroAddingStory = () => {
                 showYearPicker
                 dateFormat="yyyy"
                 className={getInputClassName('startDate')}
-                placeholderText="Select start year"
+                placeholderText="Select year"
                 onBlur={() => handleBlur('startDate')}
                 style={touched.startDate && errors.startDate ? { borderColor: "#dc3545" } : {}}
               />
@@ -383,31 +371,7 @@ const HeroAddingStory = () => {
                 </div>
               )}
             </div>
-            <div className="year-range">
-              <label className="adding-story-label">
-                End Year 
-              </label>
-              <DatePicker
-                ref={endYearRef}
-                selected={endDate}
-                onChange={(date) => setEndDate(date)}
-                showYearPicker
-                dateFormat="yyyy"
-                className={getInputClassName('endDate')}
-                placeholderText="Select end year"
-                onBlur={() => handleBlur('endDate')}
-                style={touched.endDate && errors.endDate ? { borderColor: "#dc3545" } : {}}
-              />
-              {touched.endDate && errors.endDate && (
-                <div className="error-message" style={{ color: "#dc3545", fontSize: "0.875rem", marginTop: "5px" }}>
-                  {errors.endDate}
-                </div>
-              )}
-            </div>
           </div>
-          <p className="form-hint" style={{ fontSize: "0.8rem", color: "#6c757d", marginTop: "5px" }}>
-            At least one year field is required.
-          </p>
         </div>
 
         <div className="adding-story-form-group">
@@ -432,12 +396,19 @@ const HeroAddingStory = () => {
         </div>
 
         <div>
-        <label className="adding-story-label">Mark the Coordinate</label>
+          <label className="adding-story-label">
+            Mark the Location <span style={{ color: "#dc3545" }}>*</span>
+          </label>
           <TribesMapWithMarker
             tribeId={selectedTribeId}   
             onTribesDataLoaded={handleTribesDataLoaded}
             onCoordinatesChange={handleCoordinatesChange}
           />
+          {touched.coordinates && errors.coordinates && (
+            <div className="error-message" style={{ color: "#dc3545", fontSize: "0.875rem", marginTop: "5px" }}>
+              {errors.coordinates}
+            </div>
+          )}
         </div>
 
         <div className="adding-story-form-group">

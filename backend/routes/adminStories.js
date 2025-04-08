@@ -86,7 +86,7 @@ router.post('/', async (req, res) => {
 // PUT - Update a story by ID
 router.put('/:storyId', async (req, res) => {
   const { storyId } = req.params;
-  const { story_name, tribe_id, story_year, story_text, story_references, published } = req.body;
+  const { story_name, tribe_id, story_year, story_text, story_references, published, latitude, longitude } = req.body;
 
   try {
     // Check if story exists
@@ -105,12 +105,15 @@ router.put('/:storyId', async (req, res) => {
       story_text: story_text || currentStory.story_text,
       story_references: story_references || currentStory.story_references,
       published: published !== undefined ? published : currentStory.published,
+      latitude: latitude !== undefined ? latitude : currentStory.latitude,
+      longitude: longitude !== undefined ? longitude : currentStory.longitude
     };
 
     const result = await client.query(
       `UPDATE stories 
-       SET story_name = $1, tribe_id = $2, story_year = $3, story_text = $4, story_references = $5, published = $6 
-       WHERE story_id = $7 RETURNING *`,
+       SET story_name = $1, tribe_id = $2, story_year = $3, story_text = $4, 
+           story_references = $5, published = $6, latitude = $7, longitude = $8 
+       WHERE story_id = $9 RETURNING *`,
       [
         updateData.story_name,
         updateData.tribe_id,
@@ -118,6 +121,8 @@ router.put('/:storyId', async (req, res) => {
         updateData.story_text,
         updateData.story_references,
         updateData.published,
+        updateData.latitude,
+        updateData.longitude,
         storyId
       ]
     );
