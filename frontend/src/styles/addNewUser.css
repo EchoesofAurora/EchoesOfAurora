@@ -1,0 +1,218 @@
+/* AddNewUser.css */
+
+/* Container for the whole form */
+.content-container {
+    max-width: 800px;
+    margin: 20px auto;
+    padding: 20px;
+  }
+  
+  /* Page title */
+  .page-title {
+    font-size: 28px;
+    font-weight: 600;
+    color: #333;
+    margin-bottom: 25px;
+  }
+  
+  /* Form container */
+  .profile-container {
+    max-width: 600px;
+    margin: 0 auto;
+    padding: 10px 0;
+  }
+  
+  /* Input container */
+  .input-container {
+    margin-bottom: 15px;
+  }
+  
+  /* Label styling */
+  .label {
+    display: block;
+    font-size: 18px;
+    font-weight: 500;
+    color: #444;
+    margin-bottom: 5px;
+  }
+  
+  /* Input wrapper */
+  .input-wrapper {
+    display: flex;
+    align-items: center;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    padding: 0 12px;
+    background-color: #f9f9f9;
+    transition: all 0.3s ease;
+  }
+  
+  .input-wrapper:focus-within {
+    border-color: #a49cbe;
+    box-shadow: 0 0 0 2px rgba(164, 156, 190, 0.2);
+  }
+  
+  /* Error state styling for input wrapper */
+  .input-wrapper.error {
+    border-color: #ff585d;
+    background-color: #fff0f0;
+  }
+  
+  /* Icon styling */
+  .newUserFormIcon {
+    width: 20px;
+    height: 20px;
+    margin-right: 12px;
+    opacity: 0.6;
+  }
+  
+  /* Input styling */
+  .input {
+    width: 100%;
+    padding: 7px 0;
+    border: none;
+    background: transparent;
+    font-size: 16px;
+    color: #333;
+    outline: none;
+  }
+  
+  .input::placeholder {
+    color: #aaa;
+  }
+  
+  /* Error text below input */
+  .error-text {
+    color: #ff585d;
+    font-size: 14px;
+    margin-top: 4px;
+    margin-left: 4px;
+  }
+  
+  /* Button container */
+  .buttons-container {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 20px;
+  }
+  
+  /* Back button */
+  .back-button {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    width: 25%;
+    background-color: #a49cbe;
+    color: white;
+    font-size: 16px;
+    font-weight: 500;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+  }
+  
+  .back-button:hover {
+    background-color: #8d82b0;
+  }
+  
+  /* Submit button */
+  .submit-button {
+    width: 25%;
+    background-color: #a49cbe;
+    color: white;
+    font-size: 16px;
+    font-weight: 500;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+  }
+  
+  .submit-button:hover {
+    background-color: #8d82b0;
+  }
+  
+  /* Modal overlay */
+  .modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(0, 0, 0, 0.5);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+  }
+  
+  /* Modal content */
+  .modal-content {
+    background-color: white;
+    border-radius: 12px;
+    padding: 24px;
+    width: 400px;
+    box-shadow: 0 4px 24px rgba(0, 0, 0, 0.2);
+  }
+  
+  .modal-content h3 {
+    font-size: 20px;
+    font-weight: 600;
+    color: #333;
+    margin-bottom: 16px;
+  }
+  
+  .modal-content p {
+    font-size: 16px;
+    color: #555;
+    margin-bottom: 24px;
+  }
+  
+  /* Modal buttons */
+  .modal-buttons {
+    display: flex;
+    justify-content: flex-end;
+  }
+  
+  .action-btn {
+    padding: 10px 20px;
+    border-radius: 6px;
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.3s ease;
+  }
+  
+  .edit-btn {
+    background-color: #a49cbe;
+    color: white;
+    border: none;
+  }
+  
+  .edit-btn:hover {
+    background-color: #8d82b0;
+  }
+  
+  /* Responsive adjustments */
+  @media (max-width: 768px) {
+    .content-container {
+      padding: 16px;
+    }
+    
+    .buttons-container {
+      flex-direction: column;
+      gap: 12px;
+    }
+    
+    .back-button, .submit-button {
+      width: 100%;
+    }
+    
+    .modal-content {
+      width: 90%;
+      max-width: 400px;
+    }
+  }

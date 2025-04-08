@@ -16,7 +16,6 @@ const ManageTribes = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
-  const [showStatusModal, setShowStatusModal] = useState(false);
   const [selectedTribe, setSelectedTribe] = useState(null);
   const [statusUpdating, setStatusUpdating] = useState(false);
   
@@ -86,18 +85,23 @@ const ManageTribes = () => {
         setSearchResults(searchResults.filter((tribe) => tribe.tribe_id !== selectedTribe.tribe_id));
         setShowDeleteModal(false);
         setSelectedTribe(null);
-        
-        // Show success message
-        setError(`"${selectedTribe.tribe_name}" has been deleted successfully.`);
-        setShowStatusModal(true);
+        // Removing the status modal trigger completely
       } else {
+        // Only show error message if deletion fails
         setError("Failed to delete the tribe. Please try again.");
-        setShowStatusModal(true);
+        // Keep the error modal for failure cases
+        Modal.error({
+          title: "Error",
+          content: "Failed to delete the tribe. Please try again.",
+        });
       }
     } catch (err) {
       console.error("Error deleting tribe:", err);
-      setError("An error occurred while deleting the tribe.");
-      setShowStatusModal(true);
+      // Only show error message if deletion fails
+      Modal.error({
+        title: "Error",
+        content: "An error occurred while deleting the tribe.",
+      });
     }
   };
 
@@ -165,14 +169,14 @@ const ManageTribes = () => {
         );
       }
       
-      // Show success message
-      setError(`"${tribe.tribe_name}" has been ${newPublishStatus ? "published" : "unpublished"} successfully.`);
-      setShowStatusModal(true);
-      
     } catch (err) {
       console.error(`Error updating tribe status:`, err);
       setError(`Failed to update tribe status: ${err.message}`);
-      setShowStatusModal(true);
+      // Show error modal only for failed status updates
+      Modal.error({
+        title: "Error",
+        content: `Failed to update tribe status: ${err.message}`,
+      });
     } finally {
       setStatusUpdating(false);
     }
@@ -295,7 +299,7 @@ const ManageTribes = () => {
 
         {loading ? (
           <div className="loading">Loading tribes...</div>
-        ) : error && !showStatusModal ? (
+        ) : error ? (
           <div className="error-message">{error}</div>
         ) : (
           <>
@@ -412,31 +416,7 @@ const ManageTribes = () => {
           </div>
         )}
 
-      {/* Status/Error Modal - Updated to clear message on close */}
-      <Modal 
-        show={showStatusModal} 
-        onHide={() => {
-          setShowStatusModal(false);
-          setError(null);
-        }} 
-        centered
-      >
-        <Modal.Header closeButton>
-          <Modal.Title>{error && error.includes("Failed") ? "Error" : "Status Update"}</Modal.Title>
-        </Modal.Header>
-        <Modal.Body>{error}</Modal.Body>
-        <Modal.Footer>
-          <button 
-            className="action-btn edit-btn"
-            onClick={() => {
-              setShowStatusModal(false);
-              setError(null);
-            }}
-          >
-            Close
-          </button>
-        </Modal.Footer>
-      </Modal>
+      {/* Removed the showStatusModal modal completely */}
       
       {/* Loading overlay for status updates */}
       {statusUpdating && (
