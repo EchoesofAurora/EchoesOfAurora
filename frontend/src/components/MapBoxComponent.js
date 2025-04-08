@@ -366,13 +366,13 @@ const MapBoxComponent = () => {
             transitionDuration: 0, // Keep transition duration at 0 for immediate response
           })
         }
-        onClick={selectedTribe ? null : handleClick} // Disable click when SidePanel is open
-        onHover={selectedTribe ? null : handleHover} // Disable hover when SidePanel is open
-        interactiveLayerIds={selectedTribe ? [] : ["tribe-fill"]} // Disable interactive layers
-        scrollZoom={selectedTribe ? false : interactionState.scrollZoom} // Disable scroll zoom
-        dragPan={selectedTribe ? false : interactionState.dragPan} // Disable drag pan
-        keyboard={selectedTribe ? false : interactionState.keyboard} // Disable keyboard
-        doubleClickZoom={selectedTribe ? false : interactionState.doubleClickZoom}
+        onClick={selectedTribe && screenSize.isMobile ? null : handleClick}
+        onHover={selectedTribe && screenSize.isMobile ? null : handleHover}
+        interactiveLayerIds={selectedTribe && screenSize.isMobile ? [] : ["tribe-fill"]}
+        scrollZoom={selectedTribe && screenSize.isMobile ? false : interactionState.scrollZoom}
+        dragPan={selectedTribe && screenSize.isMobile ? false : interactionState.dragPan}
+        keyboard={selectedTribe && screenSize.isMobile ? false : interactionState.keyboard}
+        doubleClickZoom={selectedTribe && screenSize.isMobile ? false : interactionState.doubleClickZoom}
         // Add these options to maintain smooth interaction flow
         clickZoom={false} // Disable automatic zoom on click
         touchAction="pan-y" // Allow vertical touch scrolling while maintaining map interactions
