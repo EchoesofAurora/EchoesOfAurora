@@ -135,10 +135,10 @@ const SidePanel = ({ tribe, onClose, isMobile, initialTab = "tribes", selectedSt
 
                 <p className="tribe-text">{tribe?.tribe_text}</p>
 
-                <div className="references-section">
+                {/* <div className="references-section">
                   <p className="section-label">References:</p>
                   <p className="tribe-text">{tribe?.tribe_references}</p>
-                </div>
+                </div> */}
               </div>
             ) : (
               <div className="empty-state">
