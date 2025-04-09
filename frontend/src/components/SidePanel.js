@@ -4,16 +4,30 @@ import "../styles/SidePanel.css";
 import tribesIcon from "../images/tribes/bg-tribe.png";
 import storiesIcon from "../images/stories/bg-stories.png";
 
-const SidePanel = ({ tribe, onClose, isMobile }) => {
+const SidePanel = ({ tribe, onClose, isMobile, initialTab = "tribes", selectedStoryTitle }) => {
   const navigate = useNavigate(); // Initialize navigate function
-  const [activeTab, setActiveTab] = useState("tribes");
+  const [activeTab, setActiveTab] = useState(initialTab);
   const [currentStoryIndex, setCurrentStoryIndex] = useState(0);
   const stories = tribe?.stories;
 
-  // Reset story index when tribe changes
+  // Reset story index when tribe changes or when selectedStoryTitle changes
   useEffect(() => {
-    setCurrentStoryIndex(0);
-  }, [tribe]);
+    if (selectedStoryTitle && stories) {
+      const storyIndex = stories.findIndex(story => story.story_name === selectedStoryTitle);
+      if (storyIndex !== -1) {
+        setCurrentStoryIndex(storyIndex);
+      } else {
+        setCurrentStoryIndex(0);
+      }
+    } else {
+      setCurrentStoryIndex(0);
+    }
+  }, [tribe, selectedStoryTitle, stories]);
+
+  // Update active tab when initialTab changes
+  useEffect(() => {
+    setActiveTab(initialTab);
+  }, [initialTab]);
 
   const handleStoryChange = (index) => {
     setCurrentStoryIndex(index);
@@ -76,7 +90,7 @@ const SidePanel = ({ tribe, onClose, isMobile }) => {
                     navigate(`/tribe/${tribe.tribe_id}`, { state: { tribe } })
                   }
                 >
-                  {tribe.tribe_name.charAt(0).toUpperCase() + tribe.tribe_name.slice(1)}
+                  {tribe?.tribe_name?.charAt(0).toUpperCase() + tribe?.tribe_name?.slice(1)}
                 </h3>
 
                 <p className="tribe-text">

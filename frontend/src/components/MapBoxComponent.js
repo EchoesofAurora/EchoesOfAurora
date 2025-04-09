@@ -69,6 +69,7 @@ const MapBoxComponent = () => {
   
   const [filteredStories, setFilteredStories] = useState(null);
   const [selectedTribe, setSelectedTribe] = useState(null);
+  const [selectedStoryId, setSelectedStoryId] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
   const [showControls, setShowControls] = useState(true);
   
@@ -230,13 +231,21 @@ const MapBoxComponent = () => {
     if (ignoreMapClicks) return;
 
     const features = event.features;
-    // Only process tribe clicks, not general map clicks
-    if (features && features.length > 0) {
-      const clickedFeature = features[0];
+    if (!features || features.length === 0) return;
+
+    const clickedFeature = features[0];
+    
+    if (clickedFeature.layer.id === "tribe-fill") {
+      // Handle tribe click
       const tribeId = clickedFeature.id;
+      setSelectedStoryId(null); // Reset selected story
       fetchTribeStoriesData(tribeId);
+    } else if (clickedFeature.layer.id === "stories-layer") {
+      // Handle story click
+      const storyTribeId = clickedFeature.properties.tribeid;
+      setSelectedStoryId(clickedFeature.properties.title); // Store the clicked story's title
+      fetchTribeStoriesData(storyTribeId);
     }
-    // Important: Do not reset or interfere with scroll zoom state
   };
 
   const fetchTribeStoriesData = async (id) => {
@@ -591,6 +600,8 @@ const MapBoxComponent = () => {
             tribe={selectedTribe}
             onClose={handlePanelClose}
             isMobile={screenSize.isMobile}
+            initialTab={selectedStoryId ? "stories" : "tribes"}
+            selectedStoryTitle={selectedStoryId}
           />
         )}
       </MapGL>
