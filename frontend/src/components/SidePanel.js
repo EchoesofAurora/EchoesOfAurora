@@ -59,14 +59,69 @@ const SidePanel = ({ tribe, onClose, isMobile, initialTab = "tribes", selectedSt
     setActiveTab(initialTab);
   }, [initialTab]);
 
-  const handleStoryChange = (index) => {
-    setCurrentStoryIndex(index);
-  };
+  // Add effect to set up pagination button event listeners and update active state
+  useEffect(() => {
+    if (!stories || stories.length === 0) return;
+    
+    // Set up pagination button event listeners after rendering
+    const paginationButtons = document.querySelectorAll('.page-btn');
+    
+    // First update the active state to match currentStoryIndex
+    paginationButtons.forEach((button, index) => {
+      if (index === currentStoryIndex) {
+        button.classList.add('active-page');
+      } else {
+        button.classList.remove('active-page');
+      }
+    });
+    
+    // Then set up the click handlers
+    paginationButtons.forEach((button, index) => {
+      const handleButtonClick = (e) => {
+        e.stopPropagation();
+        e.preventDefault();
+        
+        // Update the current story index
+        setCurrentStoryIndex(index);
+        
+        // Manually update the active class immediately for better user feedback
+        paginationButtons.forEach((btn, idx) => {
+          if (idx === index) {
+            btn.classList.add('active-page');
+          } else {
+            btn.classList.remove('active-page');
+          }
+        });
+        
+        return false;
+      };
+      
+      // Remove existing listeners first to prevent duplicates
+      button.removeEventListener('mousedown', handleButtonClick);
+      button.removeEventListener('touchstart', handleButtonClick);
+      
+      // Add both mouse and touch event listeners
+      button.addEventListener('mousedown', handleButtonClick);
+      button.addEventListener('touchstart', handleButtonClick, { passive: false });
+    });
+    
+    // Cleanup function
+    return () => {
+      paginationButtons.forEach((button) => {
+        const clone = button.cloneNode(true);
+        if (button.parentNode) {
+          button.parentNode.replaceChild(clone, button);
+        }
+      });
+    };
+  }, [activeTab, stories, currentStoryIndex]);
 
   const stopAllEvents = (e) => {
     e.stopPropagation();
     e.preventDefault();
-    e.nativeEvent.stopImmediatePropagation();
+    if (e.nativeEvent) {
+      e.nativeEvent.stopImmediatePropagation();
+    }
     return false;
   };
 
@@ -186,14 +241,17 @@ const SidePanel = ({ tribe, onClose, isMobile, initialTab = "tribes", selectedSt
 
             {/* Pagination Controls - only shown for stories */}
             {stories && stories.length > 0 && (
-              <div className="pagination">
+              <div 
+                className="pagination" 
+                onTouchStart={stopAllEvents}
+                onMouseDown={stopAllEvents}
+                onClick={stopAllEvents}
+              >
                 {stories?.map((_, index) => (
                   <button
                     key={index}
-                    className={`page-btn ${
-                      currentStoryIndex === index ? "active-page" : ""
-                    }`}
-                    onClick={() => handleStoryChange(index)}
+                    className="page-btn"
+                    data-index={index}
                   >
                     {index + 1}
                   </button>
