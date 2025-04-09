@@ -47,6 +47,7 @@ const MapBoxComponent = () => {
 
   // UI states
   const [hoveredFeatureId, setHoveredFeatureId] = useState(null);
+  const [hoveredStory, setHoveredStory] = useState(null);
   const [is3dOn, setIs3dOn] = useState(false);
   const [isStoriesOn, setIsStoriesOn] = useState(true);
   const [mapStyle, setMapStyle] = useState(
@@ -209,9 +210,20 @@ const MapBoxComponent = () => {
 
   const handleHover = useCallback((event) => {
     const features = event.features;
-    setHoveredFeatureId(
-      features && features.length > 0 ? features[0].id : null
-    );
+    if (!features || features.length === 0) {
+      setHoveredFeatureId(null);
+      setHoveredStory(null);
+      return;
+    }
+
+    const feature = features[0];
+    if (feature.layer.id === "tribe-fill") {
+      setHoveredFeatureId(feature.id);
+      setHoveredStory(null);
+    } else if (feature.layer.id === "stories-layer") {
+      setHoveredStory(feature.properties);
+      setHoveredFeatureId(null);
+    }
   }, []);
 
   const handleClick = (event) => {
@@ -338,11 +350,31 @@ const MapBoxComponent = () => {
     id: "stories-layer",
     type: "circle",
     paint: {
-      "circle-radius": screenSize.isMobile ? 4 : 6, // Smaller circles on mobile
-      "circle-color": "#B366FF", // Purple color for stories
-      "circle-stroke-width": screenSize.isMobile ? 1 : 2, // Thinner stroke on mobile
+      "circle-radius": screenSize.isMobile ? 4 : 6,
+      "circle-color": "#B366FF",
+      "circle-stroke-width": screenSize.isMobile ? 1 : 2,
       "circle-stroke-color": "#ffffff",
     },
+  };
+
+  const storyLabelLayer = {
+    id: "story-label",
+    type: "symbol",
+    layout: {
+      "text-field": ["get", "title"],
+      "text-font": ["Open Sans Bold", "Arial Unicode MS Bold"],
+      "text-size": screenSize.isMobile ? 10 : 12,
+      "text-offset": [0, -1.5],
+      "text-anchor": "bottom",
+    },
+    paint: {
+      "text-color": "#000000",
+      "text-halo-color": "#ffffff",
+      "text-halo-width": 2,
+      "text-halo-blur": 1,
+      "text-opacity": 1,
+    },
+    filter: ["==", ["get", "title"], hoveredStory ? hoveredStory.title : ""],
   };
 
   if (isLoading) {
@@ -368,7 +400,7 @@ const MapBoxComponent = () => {
         }
         onClick={selectedTribe && screenSize.isMobile ? null : handleClick}
         onHover={selectedTribe && screenSize.isMobile ? null : handleHover}
-        interactiveLayerIds={selectedTribe && screenSize.isMobile ? [] : ["tribe-fill"]}
+        interactiveLayerIds={selectedTribe && screenSize.isMobile ? [] : ["tribe-fill", "stories-layer"]}
         scrollZoom={selectedTribe && screenSize.isMobile ? false : interactionState.scrollZoom}
         dragPan={selectedTribe && screenSize.isMobile ? false : interactionState.dragPan}
         keyboard={selectedTribe && screenSize.isMobile ? false : interactionState.keyboard}
@@ -395,6 +427,7 @@ const MapBoxComponent = () => {
         {isStoriesOn && filteredStories && (
           <Source id="stories" type="geojson" data={filteredStories}>
             <Layer {...storiesLayer} />
+            <Layer {...storyLabelLayer} />
           </Source>
         )}
 
