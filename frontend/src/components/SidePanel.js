@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom"; // Import useNavigate
 import "../styles/SidePanel.css";
 import tribesIcon from "../images/tribes/bg-tribe.png";
@@ -9,6 +9,11 @@ const SidePanel = ({ tribe, onClose, isMobile }) => {
   const [activeTab, setActiveTab] = useState("tribes");
   const [currentStoryIndex, setCurrentStoryIndex] = useState(0);
   const stories = tribe?.stories;
+
+  // Reset story index when tribe changes
+  useEffect(() => {
+    setCurrentStoryIndex(0);
+  }, [tribe]);
 
   const handleStoryChange = (index) => {
     setCurrentStoryIndex(index);
@@ -101,7 +106,7 @@ const SidePanel = ({ tribe, onClose, isMobile }) => {
           <>
             <div className="story-container">
               {stories && stories.length > 0 ? (
-                <div key={stories[currentStoryIndex].properties?.id}>
+                <div key={stories[currentStoryIndex]?.story_id}>
                   <img
                     src={getStoryImage(stories[currentStoryIndex]?.image)}
                     alt="Story"

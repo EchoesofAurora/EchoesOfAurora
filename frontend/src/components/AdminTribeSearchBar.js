@@ -1,12 +1,17 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { FaSearch } from "react-icons/fa"; 
 import "../styles/AdminTribeSearchBar.css"; 
 
-const AdminTribeSearchBar = ({ onSearch, onSort, onFilter }) => {
+const AdminTribeSearchBar = ({ onSearch, onSort, onFilter, defaultStatusFilter = "all" }) => {
   const [searchQuery, setSearchQuery] = useState("");
   const [sortOption, setSortOption] = useState("");
   const [timeRange, setTimeRange] = useState([0, new Date().getFullYear()]);
-  const [statusFilter, setStatusFilter] = useState("all");
+  const [statusFilter, setStatusFilter] = useState(defaultStatusFilter);
+
+  // Update status filter when defaultStatusFilter changes (e.g., when navigating from key metrics)
+  useEffect(() => {
+    setStatusFilter(defaultStatusFilter);
+  }, [defaultStatusFilter]);
 
   const handleSearch = (e) => {
     setSearchQuery(e.target.value);

@@ -62,7 +62,7 @@ const MapBoxComponent = () => {
   
   // Initialize with predefined values
   const [yearRange, setYearRange] = useState({
-    startYear: 1900,
+    startYear: 1400,
     endYear: currentYear
   });
   
@@ -262,9 +262,9 @@ const MapBoxComponent = () => {
         return {
           position: "fixed", 
           bottom: 20,      
-          right: 20,       // Adjusted based on side panel width
+          right: 350,       // Adjusted based on side panel width
           left: 'auto',
-          width: "50%",
+          width: "40%",
           zIndex: 1000     // Ensure it's above map but below other controls
         };
       }

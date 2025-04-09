@@ -60,6 +60,9 @@ const TribesMapWithMarker = ({ tribeId, onTribesDataLoaded, onCoordinatesChange,
     title: `Selected Location (${initialMarker.longitude.toFixed(4)}, ${initialMarker.latitude.toFixed(4)})`
   } : null);
   
+  // New state for existing story markers
+  const [storyMarkers, setStoryMarkers] = useState([]);
+  
   // Effect to initialize marker from prop
   useEffect(() => {
     if (initialMarker && !marker) {
@@ -150,7 +153,7 @@ const TribesMapWithMarker = ({ tribeId, onTribesDataLoaded, onCoordinatesChange,
       setIsLoading(true);
       try {
         // Fetch tribes data
-        const tribesResponse = await fetch('/api/mapData');
+        const tribesResponse = await fetch('/api/mapData/admin');
         const data = await tribesResponse.json();
 
         // Guard against component unmounting during async operation
@@ -176,6 +179,34 @@ const TribesMapWithMarker = ({ tribeId, onTribesDataLoaded, onCoordinatesChange,
         };
         
         setTribesData(transformedTribesData);
+        
+        // Get story markers for the selected tribe
+        if (tribeId) {
+          const storiesJson = data["stories"];
+          if (storiesJson && storiesJson.length > 0) {
+            const filteredStories = storiesJson.filter(story => 
+              story.tribe_id.toString() === tribeId.toString()
+            );
+            
+            const markers = filteredStories.map(story => {
+              // Extract coordinates from story's geometry
+              if (story.geometry && story.geometry.coordinates && story.geometry.coordinates.length > 0) {
+                const coords = story.geometry.coordinates[0]; // [lng, lat]
+                return {
+                  longitude: coords[0],
+                  latitude: coords[1],
+                  title: story.story_name,
+                  year: story.story_year,
+                  storyId: story.story_id,
+                  published: story.published
+                };
+              }
+              return null;
+            }).filter(Boolean); // Filter out null values
+            
+            setStoryMarkers(markers);
+          }
+        }
         
         // Pass the tribes data to parent component using the ref
         if (onTribesDataLoadedRef.current) {
@@ -234,6 +265,11 @@ const TribesMapWithMarker = ({ tribeId, onTribesDataLoaded, onCoordinatesChange,
         });
       }
       
+      // Include story markers in bounds calculation
+      storyMarkers.forEach(story => {
+        bounds.extend([story.longitude, story.latitude]);
+      });
+      
       // If we have valid bounds, update the viewport
       if (!bounds.isEmpty()) {
         // Calculate optimal zoom level based on the size of the bounds
@@ -287,7 +323,7 @@ const TribesMapWithMarker = ({ tribeId, onTribesDataLoaded, onCoordinatesChange,
     } catch (error) {
       // Error handling maintained without console.error
     }
-  }, [tribesData, viewport]); // Remove screenSize.isMobile dependency
+  }, [tribesData, viewport, storyMarkers]); // Add storyMarkers as dependency
 
   // Zoom to selected tribe when it's available or changes
   useEffect(() => {
@@ -531,7 +567,36 @@ const TribesMapWithMarker = ({ tribeId, onTribesDataLoaded, onCoordinatesChange,
             </div>
           )}
 
-          {/* Single Map Marker */}
+          {/* Existing Story Markers */}
+          {storyMarkers.map((storyMarker, index) => (
+            <Marker 
+              key={`story-${storyMarker.storyId || index}`}
+              longitude={storyMarker.longitude} 
+              latitude={storyMarker.latitude} 
+              offsetTop={-10} 
+              offsetLeft={-10}
+              anchor="bottom" 
+            >
+              <div className="story-marker" title={`${storyMarker.title} (${storyMarker.year})${storyMarker.published ? '' : ' - Unpublished'}`}>
+                <svg 
+                  height="20" 
+                  width="20" 
+                  viewBox="0 0 24 24" 
+                  style={{
+                    cursor: 'pointer',
+                    fill: storyMarker.published ? '#0066cc' : '#888888',
+                    stroke: '#ffffff',
+                    strokeWidth: '1px',
+                    transform: 'translate(0, 0)'
+                  }}
+                >
+                  <path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7z" />
+                </svg>
+              </div>
+            </Marker>
+          ))}
+
+          {/* New Story Marker (in a different color) */}
           {marker && (
             <Marker 
               longitude={marker.longitude} 
@@ -548,7 +613,8 @@ const TribesMapWithMarker = ({ tribeId, onTribesDataLoaded, onCoordinatesChange,
                   style={{
                     cursor: 'pointer',
                     fill: '#d00',
-                    stroke: 'none',
+                    stroke: '#ffffff',
+                    strokeWidth: '1px',
                     transform: 'translate(0, 0)'
                   }}
                 >
@@ -567,7 +633,7 @@ const TribesMapWithMarker = ({ tribeId, onTribesDataLoaded, onCoordinatesChange,
         </MapGL>
       </div>
 
-      {/* Location Information Below Map Instead of Popup */}
+      {/* Location Information Below Map */}
       <div 
         style={{
           marginTop: "20px",
@@ -601,10 +667,42 @@ const TribesMapWithMarker = ({ tribeId, onTribesDataLoaded, onCoordinatesChange,
           </div>
         ) : (
           <p style={{ color: "#6c757d", fontStyle: "italic" }}>
-            Click on the map to select a location
+            Click on the map to select a location for this story. Blue markers show existing stories.
           </p>
         )}
       </div>
+      
+      {/* Legend for map markers */}
+      {storyMarkers.length > 0 && (
+        <div 
+          style={{
+            marginTop: "10px",
+            padding: "10px",
+            backgroundColor: "#f8f9fa",
+            borderRadius: "8px",
+            border: "1px solid #dee2e6"
+          }}
+        >
+          <div style={{ display: "flex", alignItems: "center", marginBottom: "5px" }}>
+            <svg height="16" width="16" viewBox="0 0 24 24" style={{ fill: '#0066cc', marginRight: "8px" }}>
+              <path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7z" />
+            </svg>
+            <span>Published stories ({storyMarkers.filter(marker => marker.published).length})</span>
+          </div>
+          <div style={{ display: "flex", alignItems: "center", marginBottom: "5px" }}>
+            <svg height="16" width="16" viewBox="0 0 24 24" style={{ fill: '#888888', marginRight: "8px" }}>
+              <path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7z" />
+            </svg>
+            <span>Unpublished stories ({storyMarkers.filter(marker => !marker.published).length})</span>
+          </div>
+          <div style={{ display: "flex", alignItems: "center" }}>
+            <svg height="16" width="16" viewBox="0 0 24 24" style={{ fill: '#d00', marginRight: "8px" }}>
+              <path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7z" />
+            </svg>
+            <span>New story location</span>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

@@ -1,13 +1,18 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { FaSearch } from "react-icons/fa"; 
 import "../styles/AdminStorySearchBar.css"; 
 
-const AdminStorySearchBar = ({ onSearch, onSort, onFilter }) => {
+const AdminStorySearchBar = ({ onSearch, onSort, onFilter, defaultStatusFilter = "all" }) => {
   const [searchQuery, setSearchQuery] = useState("");
   const [sortOption, setSortOption] = useState("");
   const [filterTribe, setFilterTribe] = useState("");
   const [timeRange, setTimeRange] = useState([0, new Date().getFullYear()]);
-  const [statusFilter, setStatusFilter] = useState("all");
+  const [statusFilter, setStatusFilter] = useState(defaultStatusFilter);
+
+  // Update status filter when defaultStatusFilter changes (e.g., when navigating from key metrics)
+  useEffect(() => {
+    setStatusFilter(defaultStatusFilter);
+  }, [defaultStatusFilter]);
 
   const handleSearch = (e) => {
     setSearchQuery(e.target.value);
