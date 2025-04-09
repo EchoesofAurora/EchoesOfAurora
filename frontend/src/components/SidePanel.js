@@ -10,28 +10,31 @@ const SidePanel = ({ tribe, onClose, isMobile, initialTab = "tribes", selectedSt
   const [currentStoryIndex, setCurrentStoryIndex] = useState(0);
   const stories = tribe?.stories;
 
-  // Add event handler to prevent map interactions
+  // Add event handler to prevent map interactions only for the content area
   const preventMapInteraction = (e) => {
-    e.stopPropagation();
-    // Prevent mousewheel/touch events from reaching the map
-    if (e.type === 'wheel' || e.type === 'touchstart' || e.type === 'touchmove') {
-      e.preventDefault();
+    // Only prevent events on the content area
+    if (e.target.closest('.content')) {
+      e.stopPropagation();
+      // Prevent mousewheel/touch events from reaching the map
+      if (e.type === 'wheel' || e.type === 'touchstart' || e.type === 'touchmove') {
+        e.preventDefault();
+      }
     }
   };
 
   // Add event listeners when component mounts
   useEffect(() => {
-    const panel = document.querySelector('.side-panel');
-    if (panel) {
-      const events = ['click', 'wheel', 'touchstart', 'touchmove', 'mousedown', 'mousemove'];
+    const contentArea = document.querySelector('.side-panel .content');
+    if (contentArea) {
+      const events = ['wheel', 'touchstart', 'touchmove'];
       events.forEach(event => {
-        panel.addEventListener(event, preventMapInteraction, { passive: false });
+        contentArea.addEventListener(event, preventMapInteraction, { passive: false });
       });
 
       // Cleanup listeners when component unmounts
       return () => {
         events.forEach(event => {
-          panel.removeEventListener(event, preventMapInteraction);
+          contentArea.removeEventListener(event, preventMapInteraction);
         });
       };
     }
@@ -169,12 +172,12 @@ const SidePanel = ({ tribe, onClose, isMobile, initialTab = "tribes", selectedSt
                     {stories[currentStoryIndex]?.story_text}
                   </p>
 
-                  <div className="references-section">
+                  {/* <div className="references-section">
                     <p className="section-label">References:</p>
                     <p className="tribe-text">
                       {stories[currentStoryIndex]?.story_references}
                     </p>
-                  </div>
+                  </div> */}
                 </div>
               ) : (
                 <div className="empty-state">No stories available...</div>
