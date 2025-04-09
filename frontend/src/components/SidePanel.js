@@ -76,6 +76,8 @@ const SidePanel = ({ tribe, onClose, isMobile, initialTab = "tribes", selectedSt
     });
     
     // Then set up the click handlers
+    const handleButtonClicks = [];
+    
     paginationButtons.forEach((button, index) => {
       const handleButtonClick = (e) => {
         e.stopPropagation();
@@ -103,15 +105,16 @@ const SidePanel = ({ tribe, onClose, isMobile, initialTab = "tribes", selectedSt
       // Add both mouse and touch event listeners
       button.addEventListener('mousedown', handleButtonClick);
       button.addEventListener('touchstart', handleButtonClick, { passive: false });
+      
+      // Store the handlers for cleanup
+      handleButtonClicks.push({ element: button, handler: handleButtonClick });
     });
     
     // Cleanup function
     return () => {
-      paginationButtons.forEach((button) => {
-        const clone = button.cloneNode(true);
-        if (button.parentNode) {
-          button.parentNode.replaceChild(clone, button);
-        }
+      handleButtonClicks.forEach(({ element, handler }) => {
+        element.removeEventListener('mousedown', handler);
+        element.removeEventListener('touchstart', handler);
       });
     };
   }, [activeTab, stories, currentStoryIndex]);
