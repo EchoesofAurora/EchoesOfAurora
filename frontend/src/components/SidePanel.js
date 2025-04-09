@@ -1,44 +1,14 @@
 import { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom"; // Import useNavigate
+import { useNavigate } from "react-router-dom";
 import "../styles/SidePanel.css";
 import tribesIcon from "../images/tribes/bg-tribe.png";
 import storiesIcon from "../images/stories/bg-stories.png";
 
 const SidePanel = ({ tribe, onClose, isMobile, initialTab = "tribes", selectedStoryTitle }) => {
-  const navigate = useNavigate(); // Initialize navigate function
+  const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState(initialTab);
   const [currentStoryIndex, setCurrentStoryIndex] = useState(0);
   const stories = tribe?.stories;
-
-  // Add event handler to prevent map interactions only for the content area
-  const preventMapInteraction = (e) => {
-    // Only prevent events on the content area
-    if (e.target.closest('.content')) {
-      e.stopPropagation();
-      // Prevent mousewheel/touch events from reaching the map
-      if (e.type === 'wheel' || e.type === 'touchstart' || e.type === 'touchmove') {
-        e.preventDefault();
-      }
-    }
-  };
-
-  // Add event listeners when component mounts
-  useEffect(() => {
-    const contentArea = document.querySelector('.side-panel .content');
-    if (contentArea) {
-      const events = ['wheel', 'touchstart', 'touchmove'];
-      events.forEach(event => {
-        contentArea.addEventListener(event, preventMapInteraction, { passive: false });
-      });
-
-      // Cleanup listeners when component unmounts
-      return () => {
-        events.forEach(event => {
-          contentArea.removeEventListener(event, preventMapInteraction);
-        });
-      };
-    }
-  }, []);
 
   // Reset story index when tribe changes or when selectedStoryTitle changes
   useEffect(() => {
@@ -59,73 +29,18 @@ const SidePanel = ({ tribe, onClose, isMobile, initialTab = "tribes", selectedSt
     setActiveTab(initialTab);
   }, [initialTab]);
 
-  // Add effect to set up pagination button event listeners and update active state
-  useEffect(() => {
-    if (!stories || stories.length === 0) return;
-    
-    // Set up pagination button event listeners after rendering
-    const paginationButtons = document.querySelectorAll('.page-btn');
-    
-    // First update the active state to match currentStoryIndex
-    paginationButtons.forEach((button, index) => {
-      if (index === currentStoryIndex) {
-        button.classList.add('active-page');
-      } else {
-        button.classList.remove('active-page');
-      }
-    });
-    
-    // Then set up the click handlers
-    const handleButtonClicks = [];
-    
-    paginationButtons.forEach((button, index) => {
-      const handleButtonClick = (e) => {
-        e.stopPropagation();
-        e.preventDefault();
-        
-        // Update the current story index
-        setCurrentStoryIndex(index);
-        
-        // Manually update the active class immediately for better user feedback
-        paginationButtons.forEach((btn, idx) => {
-          if (idx === index) {
-            btn.classList.add('active-page');
-          } else {
-            btn.classList.remove('active-page');
-          }
-        });
-        
-        return false;
-      };
-      
-      // Remove existing listeners first to prevent duplicates
-      button.removeEventListener('mousedown', handleButtonClick);
-      button.removeEventListener('touchstart', handleButtonClick);
-      
-      // Add both mouse and touch event listeners
-      button.addEventListener('mousedown', handleButtonClick);
-      button.addEventListener('touchstart', handleButtonClick, { passive: false });
-      
-      // Store the handlers for cleanup
-      handleButtonClicks.push({ element: button, handler: handleButtonClick });
-    });
-    
-    // Cleanup function
-    return () => {
-      handleButtonClicks.forEach(({ element, handler }) => {
-        element.removeEventListener('mousedown', handler);
-        element.removeEventListener('touchstart', handler);
-      });
-    };
-  }, [activeTab, stories, currentStoryIndex]);
-
-  const stopAllEvents = (e) => {
-    e.stopPropagation();
-    e.preventDefault();
-    if (e.nativeEvent) {
-      e.nativeEvent.stopImmediatePropagation();
+  const navigateToRoute = (path, data) => {
+    // Close the panel on mobile first
+    if (isMobile) {
+      onClose();
+      // Use a delay for mobile navigation to ensure the panel is fully closed
+      setTimeout(() => {
+        navigate(path, { state: data });
+      }, 100);
+    } else {
+      // Navigate immediately on desktop
+      navigate(path, { state: data });
     }
-    return false;
   };
 
   const getStoryImage = (image) => {
@@ -135,10 +50,13 @@ const SidePanel = ({ tribe, onClose, isMobile, initialTab = "tribes", selectedSt
     return activeTab === "stories" ? storiesIcon : tribesIcon;
   };
 
+  // Handle page selection
+  const handlePageClick = (index) => {
+    setCurrentStoryIndex(index);
+  };
+
   return (
-    <div 
-      className={`side-panel ${isMobile ? 'mobile' : ''}`}
-    >
+    <div className={`side-panel ${isMobile ? 'mobile' : ''}`}>
       {/* Navigation Tabs */}
       <div className="tabs">
         <button
@@ -171,15 +89,16 @@ const SidePanel = ({ tribe, onClose, isMobile, initialTab = "tribes", selectedSt
                   alt="Tribe"
                   className="tab-icon"
                 />
-                {/* Tribe Name Clickable for Navigation */}
-                <h3
-                  className="tribe-title"
-                  onClick={() =>
-                    navigate(`/tribe/${tribe.tribe_id}`, { state: { tribe } })
-                  }
-                >
-                  {tribe?.tribe_name?.charAt(0).toUpperCase() + tribe?.tribe_name?.slice(1)}
-                </h3>
+                <div className="title-wrapper">
+                  <button
+                    className="title-btn"
+                    onClick={() => navigateToRoute(`/tribe/${tribe.tribe_id}`, { tribe })}
+                  >
+                    <h3 className="tribe-title">
+                      {tribe?.tribe_name?.charAt(0).toUpperCase() + tribe?.tribe_name?.slice(1)}
+                    </h3>
+                  </button>
+                </div>
 
                 <p className="tribe-text">
                   <span className="section-label">Start year:</span>{" "}
@@ -192,11 +111,6 @@ const SidePanel = ({ tribe, onClose, isMobile, initialTab = "tribes", selectedSt
                 </p>
 
                 <p className="tribe-text">{tribe?.tribe_text}</p>
-
-                {/* <div className="references-section">
-                  <p className="section-label">References:</p>
-                  <p className="tribe-text">{tribe?.tribe_references}</p>
-                </div> */}
               </div>
             ) : (
               <div className="empty-state">
@@ -214,12 +128,16 @@ const SidePanel = ({ tribe, onClose, isMobile, initialTab = "tribes", selectedSt
                     alt="Story"
                     className="tab-icon"
                   />
-                  <h3 className="tribe-title"
-                  onClick={() =>
-                    navigate(`/story/${stories[currentStoryIndex]?.story_id}`, { state: { tribe } })
-                  }>
-                    {stories[currentStoryIndex]?.story_name}
-                  </h3>
+                  <div className="title-wrapper">
+                    <button
+                      className="title-btn"
+                      onClick={() => navigateToRoute(`/story/${stories[currentStoryIndex]?.story_id}`, { tribe })}
+                    >
+                      <h3 className="tribe-title">
+                        {stories[currentStoryIndex]?.story_name}
+                      </h3>
+                    </button>
+                  </div>
 
                   <p className="tribe-text">
                     <span className="section-label">Year:</span>{" "}
@@ -229,13 +147,6 @@ const SidePanel = ({ tribe, onClose, isMobile, initialTab = "tribes", selectedSt
                   <p className="tribe-text">
                     {stories[currentStoryIndex]?.story_text}
                   </p>
-
-                  {/* <div className="references-section">
-                    <p className="section-label">References:</p>
-                    <p className="tribe-text">
-                      {stories[currentStoryIndex]?.story_references}
-                    </p>
-                  </div> */}
                 </div>
               ) : (
                 <div className="empty-state">No stories available...</div>
@@ -244,17 +155,12 @@ const SidePanel = ({ tribe, onClose, isMobile, initialTab = "tribes", selectedSt
 
             {/* Pagination Controls - only shown for stories */}
             {stories && stories.length > 0 && (
-              <div 
-                className="pagination" 
-                onTouchStart={stopAllEvents}
-                onMouseDown={stopAllEvents}
-                onClick={stopAllEvents}
-              >
+              <div className="pagination">
                 {stories?.map((_, index) => (
                   <button
                     key={index}
-                    className="page-btn"
-                    data-index={index}
+                    className={`page-btn ${index === currentStoryIndex ? 'active-page' : ''}`}
+                    onClick={() => handlePageClick(index)}
                   >
                     {index + 1}
                   </button>
