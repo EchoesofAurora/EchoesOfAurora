@@ -262,9 +262,9 @@ const MapBoxComponent = () => {
         return {
           position: "fixed", 
           bottom: 20,      
-          right: 350,       // Adjusted based on side panel width
+          right: 50,       // Adjusted based on side panel width
           left: 'auto',
-          width: "40%",
+          width: "50%",
           zIndex: 1000     // Ensure it's above map but below other controls
         };
       }
