@@ -10,6 +10,33 @@ const SidePanel = ({ tribe, onClose, isMobile, initialTab = "tribes", selectedSt
   const [currentStoryIndex, setCurrentStoryIndex] = useState(0);
   const stories = tribe?.stories;
 
+  // Add event handler to prevent map interactions
+  const preventMapInteraction = (e) => {
+    e.stopPropagation();
+    // Prevent mousewheel/touch events from reaching the map
+    if (e.type === 'wheel' || e.type === 'touchstart' || e.type === 'touchmove') {
+      e.preventDefault();
+    }
+  };
+
+  // Add event listeners when component mounts
+  useEffect(() => {
+    const panel = document.querySelector('.side-panel');
+    if (panel) {
+      const events = ['click', 'wheel', 'touchstart', 'touchmove', 'mousedown', 'mousemove'];
+      events.forEach(event => {
+        panel.addEventListener(event, preventMapInteraction, { passive: false });
+      });
+
+      // Cleanup listeners when component unmounts
+      return () => {
+        events.forEach(event => {
+          panel.removeEventListener(event, preventMapInteraction);
+        });
+      };
+    }
+  }, []);
+
   // Reset story index when tribe changes or when selectedStoryTitle changes
   useEffect(() => {
     if (selectedStoryTitle && stories) {

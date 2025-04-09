@@ -417,6 +417,10 @@ const MapBoxComponent = () => {
         // Add these options to maintain smooth interaction flow
         clickZoom={false} // Disable automatic zoom on click
         touchAction="pan-y" // Allow vertical touch scrolling while maintaining map interactions
+        dragRotate={false} // Disable rotation for better touch handling
+        touchZoom={true} // Enable touch zoom gestures
+        touchPitch={false} // Disable pitch changes on touch
+        cooperativeGestures={true} // Enable cooperative gestures
       >
         {/* Tribes Source and Layers */}
         {tribesData && (
