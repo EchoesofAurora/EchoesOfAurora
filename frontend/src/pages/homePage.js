@@ -6,20 +6,19 @@ import "../styles/styles.css";
 import logo from '../images/logo.png';
 
 // Importing images directly for the carousel
-import carousel2 from "../images/hero_carousel/h5.jpg";
-import carousel3 from "../images/hero_carousel/h12.jpg";
-import carousel4 from "../images/hero_carousel/h13.jpg";
-import carousel5 from "../images/hero_carousel/h14.jpg";
-import carousel6 from "../images/hero_carousel/h15.jpg";
-import carousel7 from "../images/hero_carousel/h10.jpg";
-import carousel8 from "../images/hero_carousel/h7.jpg";
-import carousel9 from "../images/hero_carousel/h3.jpeg";
+import carousel2 from "../images/hero_carousel/carousel2.png";
+import carousel3 from "../images/hero_carousel/carousel3.png";
+import carousel4 from "../images/hero_carousel/carousel4.jpg";
+import carousel5 from "../images/hero_carousel/carousel5.png";
+import carousel6 from "../images/hero_carousel/carousel6.jpg";
+import carousel7 from "../images/hero_carousel/carousel7.png";
+import carousel8 from "../images/hero_carousel/carousel9.png";
 import defaultStoryImage from "../images/stories/1.png";
 
 
 // Hero Section Component with Slider
 const HeroSection = () => {
-  const images = [carousel2, carousel4, carousel3, carousel5, carousel6, carousel7, carousel8, carousel9];
+  const images = [carousel2, carousel4, carousel3, carousel5, carousel6, carousel7, carousel8];
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
 
   useEffect(() => {
