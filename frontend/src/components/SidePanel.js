@@ -4,7 +4,13 @@ import "../styles/SidePanel.css";
 import tribesIcon from "../images/tribes/bg-tribe.png";
 import storiesIcon from "../images/stories/bg-stories.png";
 
-const SidePanel = ({ tribe, onClose, isMobile, initialTab = "tribes", selectedStoryTitle }) => {
+const SidePanel = ({
+  tribe,
+  onClose,
+  isMobile,
+  initialTab = "tribes",
+  selectedStoryTitle,
+}) => {
   const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState(initialTab);
   const [currentStoryIndex, setCurrentStoryIndex] = useState(0);
@@ -13,7 +19,9 @@ const SidePanel = ({ tribe, onClose, isMobile, initialTab = "tribes", selectedSt
   // Reset story index when tribe changes or when selectedStoryTitle changes
   useEffect(() => {
     if (selectedStoryTitle && stories) {
-      const storyIndex = stories.findIndex(story => story.story_name === selectedStoryTitle);
+      const storyIndex = stories.findIndex(
+        (story) => story.story_name === selectedStoryTitle
+      );
       if (storyIndex !== -1) {
         setCurrentStoryIndex(storyIndex);
       } else {
@@ -55,18 +63,28 @@ const SidePanel = ({ tribe, onClose, isMobile, initialTab = "tribes", selectedSt
     setCurrentStoryIndex(index);
   };
 
+  const sliceToWords = (text, wordCount) => {
+    if (!text) return '';
+    const words = text.split(/\s+/);
+    return words.slice(0, wordCount).join(' ');
+  };
+
   return (
-    <div className={`side-panel ${isMobile ? 'mobile' : ''}`}>
+    <div className={`side-panel ${isMobile ? "mobile" : ""}`}>
       {/* Navigation Tabs */}
       <div className="tabs">
         <button
-          className={activeTab === "tribes" ? "sidebar-tab active" : "sidebar-tab"}
+          className={
+            activeTab === "tribes" ? "sidebar-tab active" : "sidebar-tab"
+          }
           onClick={() => setActiveTab("tribes")}
         >
           Tribes
         </button>
         <button
-          className={activeTab === "stories" ? "sidebar-tab active" : "sidebar-tab"}
+          className={
+            activeTab === "stories" ? "sidebar-tab active" : "sidebar-tab"
+          }
           onClick={() => setActiveTab("stories")}
         >
           Stories
@@ -92,10 +110,13 @@ const SidePanel = ({ tribe, onClose, isMobile, initialTab = "tribes", selectedSt
                 <div className="title-wrapper">
                   <button
                     className="title-btn"
-                    onClick={() => navigateToRoute(`/tribe/${tribe.tribe_id}`, { tribe })}
+                    onClick={() =>
+                      navigateToRoute(`/tribe/${tribe.tribe_id}`, { tribe })
+                    }
                   >
                     <h3 className="tribe-title">
-                      {tribe?.tribe_name?.charAt(0).toUpperCase() + tribe?.tribe_name?.slice(1)}
+                      {tribe?.tribe_name?.charAt(0).toUpperCase() +
+                        tribe?.tribe_name?.slice(1)}
                     </h3>
                   </button>
                 </div>
@@ -109,8 +130,9 @@ const SidePanel = ({ tribe, onClose, isMobile, initialTab = "tribes", selectedSt
                   <span className="section-label">End year:</span>{" "}
                   {tribe?.end_year || new Date().getFullYear()}
                 </p>
-
-                <p className="tribe-text">{tribe?.tribe_text}</p>
+                <p className="tribe-text">
+                  {sliceToWords(tribe?.tribe_text, 63) + "..."}
+                </p>
               </div>
             ) : (
               <div className="empty-state">
@@ -131,7 +153,12 @@ const SidePanel = ({ tribe, onClose, isMobile, initialTab = "tribes", selectedSt
                   <div className="title-wrapper">
                     <button
                       className="title-btn"
-                      onClick={() => navigateToRoute(`/story/${stories[currentStoryIndex]?.story_id}`, { tribe })}
+                      onClick={() =>
+                        navigateToRoute(
+                          `/story/${stories[currentStoryIndex]?.story_id}`,
+                          { tribe }
+                        )
+                      }
                     >
                       <h3 className="tribe-title">
                         {stories[currentStoryIndex]?.story_name}
@@ -145,7 +172,8 @@ const SidePanel = ({ tribe, onClose, isMobile, initialTab = "tribes", selectedSt
                   </p>
 
                   <p className="tribe-text">
-                    {stories[currentStoryIndex]?.story_text}
+                    {sliceToWords(stories[currentStoryIndex]?.story_text, 70) +
+                      "..."}
                   </p>
                 </div>
               ) : (
@@ -159,7 +187,9 @@ const SidePanel = ({ tribe, onClose, isMobile, initialTab = "tribes", selectedSt
                 {stories?.map((_, index) => (
                   <button
                     key={index}
-                    className={`page-btn ${index === currentStoryIndex ? 'active-page' : ''}`}
+                    className={`page-btn ${
+                      index === currentStoryIndex ? "active-page" : ""
+                    }`}
                     onClick={() => handlePageClick(index)}
                   >
                     {index + 1}
