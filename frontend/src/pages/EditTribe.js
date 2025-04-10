@@ -516,7 +516,7 @@ const HeroEditTribe = () => {
           });
           formData.append("tribe_id", tribeId);
 
-          const imageResponse = await fetch("http://localhost:5001/api/images/upload", {
+          const imageResponse = await fetch("/api/images/upload", {
             method: "POST",
             body: formData,
           });

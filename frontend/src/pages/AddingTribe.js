@@ -201,7 +201,7 @@ const HeroAddingTribe = () => {
 
         console.log("Sending image upload request with tribe_id:", tribeData.tribe_id);
         console.log("FormData entries:", Array.from(formData.entries())); // Debug FormData contents
-        const imageResponse = await fetch("http://localhost:5001/api/images/upload", {
+        const imageResponse = await fetch("/api/images/upload", {
           method: "POST",
           body: formData,
         });
