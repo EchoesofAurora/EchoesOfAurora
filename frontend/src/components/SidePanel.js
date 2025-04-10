@@ -172,7 +172,7 @@ const SidePanel = ({
                   </p>
 
                   <p className="tribe-text">
-                    {sliceToWords(stories[currentStoryIndex]?.story_text, 70) +
+                    {sliceToWords(stories[currentStoryIndex]?.story_text, 63) +
                       "..."}
                   </p>
                 </div>
