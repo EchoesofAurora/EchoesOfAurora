@@ -47,6 +47,7 @@ const MapBoxComponent = () => {
 
   // UI states
   const [hoveredFeatureId, setHoveredFeatureId] = useState(null);
+  const [hoveredStory, setHoveredStory] = useState(null);
   const [is3dOn, setIs3dOn] = useState(false);
   const [isStoriesOn, setIsStoriesOn] = useState(true);
   const [mapStyle, setMapStyle] = useState(
@@ -68,6 +69,7 @@ const MapBoxComponent = () => {
   
   const [filteredStories, setFilteredStories] = useState(null);
   const [selectedTribe, setSelectedTribe] = useState(null);
+  const [selectedStoryId, setSelectedStoryId] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
   const [showControls, setShowControls] = useState(true);
   
@@ -209,22 +211,41 @@ const MapBoxComponent = () => {
 
   const handleHover = useCallback((event) => {
     const features = event.features;
-    setHoveredFeatureId(
-      features && features.length > 0 ? features[0].id : null
-    );
+    if (!features || features.length === 0) {
+      setHoveredFeatureId(null);
+      setHoveredStory(null);
+      return;
+    }
+
+    const feature = features[0];
+    if (feature.layer.id === "tribe-fill") {
+      setHoveredFeatureId(feature.id);
+      setHoveredStory(null);
+    } else if (feature.layer.id === "stories-layer") {
+      setHoveredStory(feature.properties);
+      setHoveredFeatureId(null);
+    }
   }, []);
 
   const handleClick = (event) => {
     if (ignoreMapClicks) return;
 
     const features = event.features;
-    // Only process tribe clicks, not general map clicks
-    if (features && features.length > 0) {
-      const clickedFeature = features[0];
+    if (!features || features.length === 0) return;
+
+    const clickedFeature = features[0];
+    
+    if (clickedFeature.layer.id === "tribe-fill") {
+      // Handle tribe click
       const tribeId = clickedFeature.id;
+      setSelectedStoryId(null); // Reset selected story
       fetchTribeStoriesData(tribeId);
+    } else if (clickedFeature.layer.id === "stories-layer") {
+      // Handle story click
+      const storyTribeId = clickedFeature.properties.tribeid;
+      setSelectedStoryId(clickedFeature.properties.title); // Store the clicked story's title
+      fetchTribeStoriesData(storyTribeId);
     }
-    // Important: Do not reset or interfere with scroll zoom state
   };
 
   const fetchTribeStoriesData = async (id) => {
@@ -338,11 +359,31 @@ const MapBoxComponent = () => {
     id: "stories-layer",
     type: "circle",
     paint: {
-      "circle-radius": screenSize.isMobile ? 4 : 6, // Smaller circles on mobile
-      "circle-color": "#B366FF", // Purple color for stories
-      "circle-stroke-width": screenSize.isMobile ? 1 : 2, // Thinner stroke on mobile
+      "circle-radius": screenSize.isMobile ? 4 : 6,
+      "circle-color": "#B366FF",
+      "circle-stroke-width": screenSize.isMobile ? 1 : 2,
       "circle-stroke-color": "#ffffff",
     },
+  };
+
+  const storyLabelLayer = {
+    id: "story-label",
+    type: "symbol",
+    layout: {
+      "text-field": ["get", "title"],
+      "text-font": ["Open Sans Bold", "Arial Unicode MS Bold"],
+      "text-size": screenSize.isMobile ? 10 : 12,
+      "text-offset": [0, -1.5],
+      "text-anchor": "bottom",
+    },
+    paint: {
+      "text-color": "#000000",
+      "text-halo-color": "#ffffff",
+      "text-halo-width": 2,
+      "text-halo-blur": 1,
+      "text-opacity": 1,
+    },
+    filter: ["==", ["get", "title"], hoveredStory ? hoveredStory.title : ""],
   };
 
   if (isLoading) {
@@ -368,7 +409,7 @@ const MapBoxComponent = () => {
         }
         onClick={selectedTribe && screenSize.isMobile ? null : handleClick}
         onHover={selectedTribe && screenSize.isMobile ? null : handleHover}
-        interactiveLayerIds={selectedTribe && screenSize.isMobile ? [] : ["tribe-fill"]}
+        interactiveLayerIds={selectedTribe && screenSize.isMobile ? [] : ["tribe-fill", "stories-layer"]}
         scrollZoom={selectedTribe && screenSize.isMobile ? false : interactionState.scrollZoom}
         dragPan={selectedTribe && screenSize.isMobile ? false : interactionState.dragPan}
         keyboard={selectedTribe && screenSize.isMobile ? false : interactionState.keyboard}
@@ -376,6 +417,10 @@ const MapBoxComponent = () => {
         // Add these options to maintain smooth interaction flow
         clickZoom={false} // Disable automatic zoom on click
         touchAction="pan-y" // Allow vertical touch scrolling while maintaining map interactions
+        dragRotate={false} // Disable rotation for better touch handling
+        touchZoom={true} // Enable touch zoom gestures
+        touchPitch={false} // Disable pitch changes on touch
+        cooperativeGestures={true} // Enable cooperative gestures
       >
         {/* Tribes Source and Layers */}
         {tribesData && (
@@ -395,6 +440,7 @@ const MapBoxComponent = () => {
         {isStoriesOn && filteredStories && (
           <Source id="stories" type="geojson" data={filteredStories}>
             <Layer {...storiesLayer} />
+            <Layer {...storyLabelLayer} />
           </Source>
         )}
 
@@ -558,6 +604,8 @@ const MapBoxComponent = () => {
             tribe={selectedTribe}
             onClose={handlePanelClose}
             isMobile={screenSize.isMobile}
+            initialTab={selectedStoryId ? "stories" : "tribes"}
+            selectedStoryTitle={selectedStoryId}
           />
         )}
       </MapGL>

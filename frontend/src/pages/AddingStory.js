@@ -197,7 +197,7 @@ const HeroAddingStory = () => {
     };
 
     try {
-      const response = await fetch("http://localhost:5001/api/admin/stories", {
+      const response = await fetch("/api/admin/stories", {
         method: "POST",
         headers: { 
           "Content-Type": "application/json",
@@ -221,7 +221,7 @@ const HeroAddingStory = () => {
           formData.append("images", image.file);
         });
 
-        const imageResponse = await fetch("http://localhost:5001/api/images/upload", {
+        const imageResponse = await fetch("/api/images/upload", {
           method: "POST",
           body: formData,
         });

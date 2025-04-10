@@ -1,29 +1,54 @@
 import { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom"; // Import useNavigate
+import { useNavigate } from "react-router-dom";
 import "../styles/SidePanel.css";
 import tribesIcon from "../images/tribes/bg-tribe.png";
 import storiesIcon from "../images/stories/bg-stories.png";
 
-const SidePanel = ({ tribe, onClose, isMobile }) => {
-  const navigate = useNavigate(); // Initialize navigate function
-  const [activeTab, setActiveTab] = useState("tribes");
+const SidePanel = ({
+  tribe,
+  onClose,
+  isMobile,
+  initialTab = "tribes",
+  selectedStoryTitle,
+}) => {
+  const navigate = useNavigate();
+  const [activeTab, setActiveTab] = useState(initialTab);
   const [currentStoryIndex, setCurrentStoryIndex] = useState(0);
   const stories = tribe?.stories;
 
-  // Reset story index when tribe changes
+  // Reset story index when tribe changes or when selectedStoryTitle changes
   useEffect(() => {
-    setCurrentStoryIndex(0);
-  }, [tribe]);
+    if (selectedStoryTitle && stories) {
+      const storyIndex = stories.findIndex(
+        (story) => story.story_name === selectedStoryTitle
+      );
+      if (storyIndex !== -1) {
+        setCurrentStoryIndex(storyIndex);
+      } else {
+        setCurrentStoryIndex(0);
+      }
+    } else {
+      setCurrentStoryIndex(0);
+    }
+  }, [tribe, selectedStoryTitle, stories]);
 
-  const handleStoryChange = (index) => {
-    setCurrentStoryIndex(index);
-  };
+  // Update active tab when initialTab changes
+  useEffect(() => {
+    setActiveTab(initialTab);
+  }, [initialTab]);
 
-  const stopAllEvents = (e) => {
-    e.stopPropagation();
-    e.preventDefault();
-    e.nativeEvent.stopImmediatePropagation();
-    return false;
+  const navigateToRoute = (path, data) => {
+    // Close the panel on mobile first
+    if (isMobile) {
+      onClose();
+      // Use a delay for mobile navigation to ensure the panel is fully closed
+      setTimeout(() => {
+        navigate(path, { state: data });
+      }, 100);
+    } else {
+      // Navigate immediately on desktop
+      navigate(path, { state: data });
+    }
   };
 
   const getStoryImage = (image) => {
@@ -33,20 +58,33 @@ const SidePanel = ({ tribe, onClose, isMobile }) => {
     return activeTab === "stories" ? storiesIcon : tribesIcon;
   };
 
+  // Handle page selection
+  const handlePageClick = (index) => {
+    setCurrentStoryIndex(index);
+  };
+
+  const sliceToWords = (text, wordCount) => {
+    if (!text) return '';
+    const words = text.split(/\s+/);
+    return words.slice(0, wordCount).join(' ');
+  };
+
   return (
-    <div 
-      className={`side-panel ${isMobile ? 'mobile' : ''}`}
-    >
+    <div className={`side-panel ${isMobile ? "mobile" : ""}`}>
       {/* Navigation Tabs */}
       <div className="tabs">
         <button
-          className={activeTab === "tribes" ? "sidebar-tab active" : "sidebar-tab"}
+          className={
+            activeTab === "tribes" ? "sidebar-tab active" : "sidebar-tab"
+          }
           onClick={() => setActiveTab("tribes")}
         >
           Tribes
         </button>
         <button
-          className={activeTab === "stories" ? "sidebar-tab active" : "sidebar-tab"}
+          className={
+            activeTab === "stories" ? "sidebar-tab active" : "sidebar-tab"
+          }
           onClick={() => setActiveTab("stories")}
         >
           Stories
@@ -69,15 +107,19 @@ const SidePanel = ({ tribe, onClose, isMobile }) => {
                   alt="Tribe"
                   className="tab-icon"
                 />
-                {/* Tribe Name Clickable for Navigation */}
-                <h3
-                  className="tribe-title"
-                  onClick={() =>
-                    navigate(`/tribe/${tribe.tribe_id}`, { state: { tribe } })
-                  }
-                >
-                  {tribe.tribe_name.charAt(0).toUpperCase() + tribe.tribe_name.slice(1)}
-                </h3>
+                <div className="title-wrapper">
+                  <button
+                    className="title-btn"
+                    onClick={() =>
+                      navigateToRoute(`/tribe/${tribe.tribe_id}`, { tribe })
+                    }
+                  >
+                    <h3 className="tribe-title">
+                      {tribe?.tribe_name?.charAt(0).toUpperCase() +
+                        tribe?.tribe_name?.slice(1)}
+                    </h3>
+                  </button>
+                </div>
 
                 <p className="tribe-text">
                   <span className="section-label">Start year:</span>{" "}
@@ -88,13 +130,9 @@ const SidePanel = ({ tribe, onClose, isMobile }) => {
                   <span className="section-label">End year:</span>{" "}
                   {tribe?.end_year || new Date().getFullYear()}
                 </p>
-
-                <p className="tribe-text">{tribe?.tribe_text}</p>
-
-                <div className="references-section">
-                  <p className="section-label">References:</p>
-                  <p className="tribe-text">{tribe?.tribe_references}</p>
-                </div>
+                <p className="tribe-text">
+                  {sliceToWords(tribe?.tribe_text, 63) + "..."}
+                </p>
               </div>
             ) : (
               <div className="empty-state">
@@ -112,12 +150,21 @@ const SidePanel = ({ tribe, onClose, isMobile }) => {
                     alt="Story"
                     className="tab-icon"
                   />
-                  <h3 className="tribe-title"
-                  onClick={() =>
-                    navigate(`/story/${stories[currentStoryIndex]?.story_id}`, { state: { tribe } })
-                  }>
-                    {stories[currentStoryIndex]?.story_name}
-                  </h3>
+                  <div className="title-wrapper">
+                    <button
+                      className="title-btn"
+                      onClick={() =>
+                        navigateToRoute(
+                          `/story/${stories[currentStoryIndex]?.story_id}`,
+                          { tribe }
+                        )
+                      }
+                    >
+                      <h3 className="tribe-title">
+                        {stories[currentStoryIndex]?.story_name}
+                      </h3>
+                    </button>
+                  </div>
 
                   <p className="tribe-text">
                     <span className="section-label">Year:</span>{" "}
@@ -125,15 +172,9 @@ const SidePanel = ({ tribe, onClose, isMobile }) => {
                   </p>
 
                   <p className="tribe-text">
-                    {stories[currentStoryIndex]?.story_text}
+                    {sliceToWords(stories[currentStoryIndex]?.story_text, 63) +
+                      "..."}
                   </p>
-
-                  <div className="references-section">
-                    <p className="section-label">References:</p>
-                    <p className="tribe-text">
-                      {stories[currentStoryIndex]?.story_references}
-                    </p>
-                  </div>
                 </div>
               ) : (
                 <div className="empty-state">No stories available...</div>
@@ -147,9 +188,9 @@ const SidePanel = ({ tribe, onClose, isMobile }) => {
                   <button
                     key={index}
                     className={`page-btn ${
-                      currentStoryIndex === index ? "active-page" : ""
+                      index === currentStoryIndex ? "active-page" : ""
                     }`}
-                    onClick={() => handleStoryChange(index)}
+                    onClick={() => handlePageClick(index)}
                   >
                     {index + 1}
                   </button>

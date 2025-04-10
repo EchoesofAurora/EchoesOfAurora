@@ -17,7 +17,7 @@ const HeroSubmissionDetail = () => {
   useEffect(() => {
     const fetchSubmission = async () => {
       try {
-        const response = await fetch(`http://localhost:5001/api/submissions/${id}`);
+        const response = await fetch(`/api/submissions/${id}`);
         if (!response.ok) {
           throw new Error('Failed to fetch submission');
         }
@@ -46,7 +46,7 @@ const HeroSubmissionDetail = () => {
   const confirmDelete = async () => {
     setIsDeleting(true);
     try {
-      const response = await fetch(`http://localhost:5001/api/submissions/${id}`, {
+      const response = await fetch(`/api/submissions/${id}`, {
         method: 'DELETE',
       });
       if (!response.ok) {

@@ -17,6 +17,10 @@
   padding: 15px;
   border-radius: 0px 8px 8px 8px; /* Rounded corners */
   pointer-events: auto;
+  touch-action: pan-y pinch-zoom; /* Allow vertical scrolling and pinch zoom within panel */
+  isolation: isolate; /* Create a new stacking context */
+  -webkit-overflow-scrolling: touch; /* Smooth scrolling on iOS */
+  user-select: text; /* Enable text selection within panel */
 }
 
 /* Mobile side panel */
@@ -59,35 +63,32 @@
 
 /* Content Section */
 .content {
-  padding: 0px 5px;;
+  padding: 0px 5px;
   flex: 1;
   height: calc(100% - 0px); 
   position: relative;
   display: flex;
   flex-direction: column;
+  touch-action: pan-y pinch-zoom; /* Allow vertical scrolling and pinch zoom */
+  -webkit-overflow-scrolling: touch;
 }
 
 /* Story/Tribe Content Styling */
-.story-container{
-  background: #b08ae6;
-  border-radius: 10px;
-  padding: 15px;
-  margin-bottom: 15px;
-  height: 75%; /* Adjust to leave space for pagination */
-  overflow-y: auto;
-  box-shadow: 0 0 10px rgba(0, 0, 0, 0.3);
-  border: 5px solid #b08ae6;
-}
-
+.story-container,
 .tribe-container {
   background: #b08ae6;
   border-radius: 10px;
   padding: 15px;
   margin-bottom: 15px;
-  height: 87%; /* Adjust to leave space for pagination */
   overflow-y: auto;
   box-shadow: 0 0 10px rgba(0, 0, 0, 0.3);
   border: 5px solid #b08ae6;
+  touch-action: pan-y pinch-zoom; /* Allow vertical scrolling and pinch zoom */
+  -webkit-overflow-scrolling: touch;
+}
+
+.tribe-container {
+  height: 87%; /* Adjust to leave space for pagination */
 }
 
 /* Tab Icons */
@@ -106,8 +107,10 @@
   text-align: center;
   display: block;
   letter-spacing: 0.5px;
-  cursor: "pointer";
+  cursor: pointer;
   text-decoration: underline;
+  position: relative;
+  z-index: 20;
 }
 
 .tribe-text {
@@ -244,4 +247,43 @@
 .side-panel.mobile .story-container {
   height: 75%;
   padding: 10px;
+}
+
+/* Add these new styles for better mobile touch handling */
+.title-wrapper {
+  display: block;
+  text-align: center;
+  margin: 10px 0;
+  position: relative;
+  z-index: 50;
+}
+
+.title-btn {
+  background: transparent;
+  border: none;
+  padding: 8px 15px;
+  color: white;
+  width: 100%;
+  cursor: pointer;
+  border-radius: 6px;
+  transition: background-color 0.2s;
+}
+
+.title-btn:active, 
+.title-btn:hover {
+  background-color: rgba(255, 255, 255, 0.1);
+}
+
+/* Make sure the tribe-title has no margins inside the button */
+.title-btn .tribe-title {
+  margin: 0;
+  padding: 0;
+  text-decoration: underline;
+}
+
+/* Ensure mobile touches work properly */
+@media (max-width: 768px) {
+  .title-btn {
+    padding: 12px 15px; /* Larger touch target on mobile */
+  }
 }
