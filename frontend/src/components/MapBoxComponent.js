@@ -6,6 +6,7 @@ import "../styles/mapBox.css";
 import "rc-slider/assets/index.css"; // Required for rc-slider
 import SidePanel from "./SidePanel";
 import TimelineSlider from "./TimelineSlider"; // Import the TimelineSlider with story availability
+import SolarCycleSlider from "./SolarCycleSlider"; // Import the new SolarCycleSlider
 
 const MapBoxComponent = () => {
   const mapContainerRef = useRef(null);
@@ -50,6 +51,7 @@ const MapBoxComponent = () => {
   const [hoveredStory, setHoveredStory] = useState(null);
   const [is3dOn, setIs3dOn] = useState(false);
   const [isStoriesOn, setIsStoriesOn] = useState(true);
+  const [useSolarCycles, setUseSolarCycles] = useState(false); // New state for solar cycle toggle
   const [mapStyle, setMapStyle] = useState(
     "mapbox://styles/kodalis2/cm7kvvsfl00x601qo0597eedp"
   );
@@ -65,6 +67,14 @@ const MapBoxComponent = () => {
   const [yearRange, setYearRange] = useState({
     startYear: 1400,
     endYear: currentYear
+  });
+
+  // Add state for solar cycle range
+  const [solarCycleRange, setSolarCycleRange] = useState({
+    startYear: 1954, // Default to Solar Cycle 19 (one of the most active)
+    endYear: new Date().getFullYear(),
+    startCycle: 19,
+    endCycle: 25
   });
   
   const [filteredStories, setFilteredStories] = useState(null);
@@ -182,19 +192,22 @@ const MapBoxComponent = () => {
     fetchData();
   }, []);
 
-  // Filter stories when year range changes
+  // Filter stories when year range changes (whether from timeline or solar cycles)
   useEffect(() => {
     if (!storiesData) return;
+    
+    // Choose the active year range based on whether solar cycles mode is active
+    const activeYearRange = useSolarCycles ? solarCycleRange : yearRange;
     
     const filtered = {
       ...storiesData,
       features: storiesData.features.filter((story) => {
         const storyYear = story.properties.year;
-        return storyYear >= yearRange.startYear && storyYear <= yearRange.endYear;
+        return storyYear >= activeYearRange.startYear && storyYear <= activeYearRange.endYear;
       }),
     };
     setFilteredStories(filtered);
-  }, [yearRange, storiesData]);
+  }, [yearRange, solarCycleRange, storiesData, useSolarCycles]);
 
   // Update map style based on 3D toggle
   useEffect(() => {
@@ -208,6 +221,16 @@ const MapBoxComponent = () => {
   const handleToggle = () => setIs3dOn(!is3dOn);
   const handleStoriesToggle = () => setIsStoriesOn(!isStoriesOn);
   const toggleControls = () => setShowControls(!showControls);
+
+  // Toggle for solar cycles mode
+  const handleSolarCycleToggle = () => {
+    setUseSolarCycles(!useSolarCycles);
+  };
+
+  // Handle solar cycle slider changes
+  const handleSolarCycleChange = (cycleData) => {
+    setSolarCycleRange(cycleData);
+  };
 
   const handleHover = useCallback((event) => {
     const features = event.features;
@@ -276,7 +299,7 @@ const MapBoxComponent = () => {
           right: 10,
           left: 'auto',
           width: "60%",
-          zIndex: -2000    // Ensure it's above map but below other controls
+          zIndex: 1000    // Ensure it's above map but below other controls
         };
       } else {
         // For desktop: move timeline to right side with more space from bottom
@@ -464,7 +487,7 @@ const MapBoxComponent = () => {
           </button>
         )}
 
-        {/* 3D and Stories Toggle - Responsive */}
+        {/* 3D, Stories and Solar Cycles Toggle - Responsive */}
         {(screenSize.isMobile ? showControls : true) && (
           <div 
             className="map-toggle-controls"
@@ -487,6 +510,16 @@ const MapBoxComponent = () => {
                   type="checkbox"
                   checked={isStoriesOn}
                   onChange={handleStoriesToggle}
+                />
+                <span className="slider round"></span>
+              </label>
+              {/* Add Solar Cycles toggle */}
+              <span>Solar Cycles</span>
+              <label className="switch">
+                <input
+                  type="checkbox"
+                  checked={useSolarCycles}
+                  onChange={handleSolarCycleToggle}
                 />
                 <span className="slider round"></span>
               </label>
@@ -610,17 +643,25 @@ const MapBoxComponent = () => {
         )}
       </MapGL>
 
-      {/* Timeline Slider Component */}
+      {/* Timeline or Solar Cycle Slider Component */}
       {isStoriesOn && filteredStories && (screenSize.isMobile ? showControls : true) && (
         <div style={getTimelineStyles()} className="mapbox-timeline-container">
-          <TimelineSlider
-            startYear={startYear}
-            endYear={currentYear}
-            yearRange={yearRange}
-            onRangeChange={handleYearRangeChange}
-            isMobile={screenSize.isMobile}
-            storiesData={storiesData}
-          />
+          {useSolarCycles ? (
+            <SolarCycleSlider
+              onCycleChange={handleSolarCycleChange}
+              isMobile={screenSize.isMobile}
+              initialCycle={[solarCycleRange.startCycle, solarCycleRange.endCycle]}
+            />
+          ) : (
+            <TimelineSlider
+              startYear={startYear}
+              endYear={currentYear}
+              yearRange={yearRange}
+              onRangeChange={handleYearRangeChange}
+              isMobile={screenSize.isMobile}
+              storiesData={storiesData}
+            />
+          )}
         </div>
       )}
     </div>

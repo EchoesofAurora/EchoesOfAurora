@@ -1,0 +1,321 @@
+/* Solar Cycle Slider Enhanced Styles */
+.solar-cycle-slider-container {
+    background-color: rgba(255, 255, 255, 0.9);
+    border-radius: 8px;
+    padding: 15px 20px;
+    box-shadow: 0 3px 12px rgba(0, 0, 0, 0.15);
+    max-width: 100%;
+    margin: 0 auto;
+  }
+  
+  .solar-cycle-slider-container .timeline-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 15px;
+  }
+  
+  .solar-cycle-slider-container h4 {
+    margin: 0;
+    color: #2d5b9e;
+    font-size: 16px;
+    font-weight: 600;
+  }
+  
+  .solar-cycle-slider-container .cycle-year-range {
+    font-size: 14px;
+    color: #444;
+    font-weight: 500;
+  }
+  
+  /* Cycle details box when hovering over a cycle */
+  .solar-cycle-slider-container .cycle-details {
+    background-color: rgba(45, 91, 158, 0.08);
+    border-left: 4px solid #2d5b9e;
+    padding: 10px 15px;
+    margin: 10px 0 15px;
+    border-radius: 0 4px 4px 0;
+    transition: all 0.2s ease;
+  }
+  
+  .solar-cycle-slider-container .cycle-details h5 {
+    margin: 0 0 5px;
+    color: #2d5b9e;
+    font-size: 14px;
+    font-weight: 600;
+  }
+  
+  .solar-cycle-slider-container .cycle-details p {
+    margin: 3px 0;
+    font-size: 12px;
+    color: #444;
+  }
+  
+  /* Activity chart styling */
+  .solar-cycle-slider-container .cycle-activity-chart {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+    height: 60px;
+    margin-bottom: 15px;
+    background-color: rgba(245, 245, 245, 0.5);
+    border-radius: 4px;
+    padding: 5px 2px;
+    position: relative;
+  }
+  
+  .solar-cycle-slider-container .cycle-activity-chart:before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: linear-gradient(
+      to bottom,
+      rgba(255, 255, 255, 0),
+      rgba(255, 255, 255, 0.5)
+    );
+    pointer-events: none;
+  }
+  
+  .solar-cycle-slider-container .cycle-bar {
+    flex: 1;
+    background-color: #ccc;
+    margin: 0 1px;
+    border-radius: 2px 2px 0 0;
+    transition: all 0.2s ease;
+    position: relative;
+    min-height: 3px;
+    cursor: pointer;
+  }
+  
+  .solar-cycle-slider-container .cycle-bar.in-range {
+    opacity: 1;
+  }
+  
+  .solar-cycle-slider-container .cycle-bar:not(.in-range) {
+    opacity: 0.4;
+  }
+  
+  .solar-cycle-slider-container .cycle-bar.selected {
+    box-shadow: 0 0 5px rgba(0, 0, 0, 0.3);
+    transform: scaleX(1.2);
+    z-index: 2;
+  }
+  
+  .solar-cycle-slider-container .cycle-bar .cycle-number {
+    position: absolute;
+    bottom: -18px;
+    left: 50%;
+    transform: translateX(-50%);
+    font-size: 9px;
+    color: #666;
+    display: none;
+  }
+  
+  .solar-cycle-slider-container .cycle-bar.selected .cycle-number {
+    display: block;
+    font-weight: bold;
+    color: #2d5b9e;
+  }
+  
+  /* Timeline year labels */
+  .solar-cycle-slider-container .timeline-year-labels {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 5px;
+    font-size: 12px;
+    color: #555;
+  }
+  
+  .solar-cycle-slider-container .timeline-year-label {
+    background-color: #2d5b9e;
+    color: white;
+    padding: 3px 8px;
+    border-radius: 12px;
+    font-size: 11px;
+    font-weight: 500;
+  }
+  
+  /* Slider customization */
+  .solar-cycle-slider-container .slider-container {
+    padding: 5px 0 15px;
+    margin-bottom: 10px;
+  }
+  
+  .solar-cycle-slider-container .rc-slider {
+    margin: 5px 0 20px;
+  }
+  
+  .solar-cycle-slider-container .rc-slider-rail {
+    height: 10px;
+    background: linear-gradient(to right,
+      #d9f2ff, #ffca00, #d9f2ff,
+      #ffca00, #d9f2ff, #ffca00
+    );
+    border-radius: 5px;
+  }
+  
+  .solar-cycle-slider-container .rc-slider-track {
+    height: 10px;
+    background-color: rgba(45, 91, 158, 0.3);
+    border-radius: 5px;
+  }
+  
+  .solar-cycle-slider-container .rc-slider-handle {
+    width: 20px;
+    height: 20px;
+    margin-top: -5px;
+    border: 2px solid #2d5b9e;
+    background-color: white;
+    box-shadow: 0 0 5px rgba(0, 0, 0, 0.2);
+  }
+  
+  .solar-cycle-slider-container .rc-slider-handle:hover {
+    border-color: #ffca00;
+  }
+  
+  .solar-cycle-slider-container .rc-slider-handle-active {
+    border-color: #ffca00;
+    box-shadow: 0 0 8px rgba(255, 202, 0, 0.5);
+  }
+  
+  .solar-cycle-slider-container .rc-slider-dot {
+    width: 14px;
+    height: 14px;
+    bottom: -6px;
+    margin-left: -7px;
+    border: 2px solid #2d5b9e;
+  }
+  
+  .solar-cycle-slider-container .rc-slider-dot-active {
+    border-color: #ffca00;
+  }
+  
+  .solar-cycle-slider-container .rc-slider-mark-text {
+    margin-top: 10px;
+    font-size: 10px;
+    color: #666;
+  }
+  
+  .solar-cycle-slider-container .rc-slider-mark-text-active {
+    color: #2d5b9e;
+    font-weight: bold;
+  }
+  
+  /* Solar cycle legend */
+  .solar-cycle-slider-container .solar-cycle-legend {
+    display: flex;
+    justify-content: center;
+    gap: 15px;
+    margin-top: 5px;
+  }
+  
+  .solar-cycle-slider-container .legend-item {
+    display: flex;
+    align-items: center;
+    font-size: 10px;
+    color: #555;
+  }
+  
+  .solar-cycle-slider-container .legend-color {
+    width: 12px;
+    height: 12px;
+    border-radius: 2px;
+    margin-right: 5px;
+  }
+  
+  /* Tooltip for hover information */
+  .solar-cycle-tooltip {
+    position: absolute;
+    background-color: rgba(0, 0, 0, 0.8);
+    color: white;
+    padding: 8px 12px;
+    border-radius: 4px;
+    font-size: 12px;
+    z-index: 1000;
+    pointer-events: none;
+    max-width: 200px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+  }
+  
+  /* Mobile optimizations */
+  @media (max-width: 768px) {
+    .solar-cycle-slider-container {
+      padding: 10px 12px;
+    }
+    
+    .solar-cycle-slider-container h4 {
+      font-size: 14px;
+    }
+    
+    .solar-cycle-slider-container .cycle-year-range {
+      font-size: 11px;
+    }
+    
+    .solar-cycle-slider-container .cycle-details {
+      padding: 8px 10px;
+    }
+    
+    .solar-cycle-slider-container .cycle-details h5 {
+      font-size: 12px;
+    }
+    
+    .solar-cycle-slider-container .cycle-details p {
+      font-size: 10px;
+    }
+    
+    .solar-cycle-slider-container .cycle-activity-chart {
+      height: 40px;
+    }
+    
+    .solar-cycle-slider-container .timeline-year-label {
+      font-size: 10px;
+      padding: 2px 6px;
+    }
+    
+    .solar-cycle-slider-container .solar-cycle-legend {
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+    
+    .solar-cycle-slider-container .legend-item {
+      font-size: 9px;
+    }
+    
+    .solar-cycle-slider-container .legend-color {
+      width: 10px;
+      height: 10px;
+    }
+    
+    .solar-cycle-slider-container .rc-slider-mark-text {
+      font-size: 8px;
+    }
+  }
+  
+  /* Animation for slider transitions */
+  .solar-cycle-slider-container .slider-container {
+    transition: all 0.3s ease;
+  }
+  
+  /* Sun icon decoration */
+  .solar-cycle-slider-container .timeline-header h4::before {
+    content: "☀️";
+    margin-right: 8px;
+    font-size: 14px;
+  }
+  
+  /* Custom styling for highlighting special solar cycles */
+  .solar-cycle-slider-container .cycle-bar[data-cycle="19"] {
+    background-color: #ff4500; /* Strongest recorded cycle */
+  }
+  
+  .solar-cycle-slider-container .cycle-bar[data-cycle="24"] {
+    background-color: #6495ed; /* Weakest recent cycle */
+  }
+  
+  .solar-cycle-slider-container .cycle-bar[data-cycle="25"] {
+    background-color: #ffa500; /* Current cycle */
+    background-image: linear-gradient(to top, #ffa500, #ffcc00);
+  }
