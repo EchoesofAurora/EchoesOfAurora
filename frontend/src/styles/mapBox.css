@@ -38,6 +38,7 @@
 @media (max-width: 768px) {
   .map-navigation-controls {
     top: calc(12vh + 60px) !important; /* Position below the toggle controls on mobile */
+    left: 10px !important;
   }
   
   .controls-toggle-btn {
@@ -51,8 +52,8 @@
 /* For desktop, position controls horizontally */
 @media (min-width: 769px) {
   .map-navigation-controls {
-    top: calc(12vh + 10px) !important; /* Position at same height as toggle but to the left */
-    right: 220px !important; /* Provide enough space to not overlap with the toggle */
+    top: calc(12vh + 60px) !important; /* Position at same height as toggle but to the left */
+    right: 20px !important; /* Provide enough space to not overlap with the toggle */
   }
 }
 
