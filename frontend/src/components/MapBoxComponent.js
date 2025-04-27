@@ -6,6 +6,7 @@ import "../styles/mapBox.css";
 import "rc-slider/assets/index.css"; // Required for rc-slider
 import SidePanel from "./SidePanel";
 import TimelineSlider from "./TimelineSlider"; // Import the TimelineSlider with story availability
+import SolarCycleSlider from "./SolarCycleSlider"; // Import the SolarCycleSlider
 
 const MapBoxComponent = () => {
   const mapContainerRef = useRef(null);
@@ -50,6 +51,7 @@ const MapBoxComponent = () => {
   const [hoveredStory, setHoveredStory] = useState(null);
   const [is3dOn, setIs3dOn] = useState(false);
   const [isStoriesOn, setIsStoriesOn] = useState(true);
+  const [useSolarCycles, setUseSolarCycles] = useState(false); // Solar cycle toggle
   const [mapStyle, setMapStyle] = useState(
     "mapbox://styles/kodalis2/cm7kvvsfl00x601qo0597eedp"
   );
@@ -65,6 +67,15 @@ const MapBoxComponent = () => {
   const [yearRange, setYearRange] = useState({
     startYear: 1400,
     endYear: currentYear
+  });
+
+  // Add state for solar cycle range
+  const [solarCycleRange, setSolarCycleRange] = useState({
+    startYear: 1954, // Default to Solar Cycle 19 (one of the most active)
+    endYear: new Date().getFullYear(),
+    startCycle: 19,
+    endCycle: 25,
+    singleCycle: null // Track if a single cycle is selected
   });
   
   const [filteredStories, setFilteredStories] = useState(null);
@@ -182,19 +193,30 @@ const MapBoxComponent = () => {
     fetchData();
   }, []);
 
-  // Filter stories when year range changes
+  // Filter stories when year range changes (whether from timeline or solar cycles)
   useEffect(() => {
     if (!storiesData) return;
+    
+    // Choose the active year range based on which mode is active
+    let startYear, endYear;
+    
+    if (useSolarCycles) {
+      startYear = solarCycleRange.startYear;
+      endYear = solarCycleRange.endYear;
+    } else {
+      startYear = yearRange.startYear;
+      endYear = yearRange.endYear;
+    }
     
     const filtered = {
       ...storiesData,
       features: storiesData.features.filter((story) => {
         const storyYear = story.properties.year;
-        return storyYear >= yearRange.startYear && storyYear <= yearRange.endYear;
+        return storyYear >= startYear && storyYear <= endYear;
       }),
     };
     setFilteredStories(filtered);
-  }, [yearRange, storiesData]);
+  }, [yearRange, solarCycleRange, storiesData, useSolarCycles]);
 
   // Update map style based on 3D toggle
   useEffect(() => {
@@ -208,6 +230,19 @@ const MapBoxComponent = () => {
   const handleToggle = () => setIs3dOn(!is3dOn);
   const handleStoriesToggle = () => setIsStoriesOn(!isStoriesOn);
   const toggleControls = () => setShowControls(!showControls);
+
+  // Toggle for solar cycles mode
+  const handleSolarCycleToggle = () => {
+    setUseSolarCycles(!useSolarCycles);
+  };
+
+  // Handle solar cycle slider changes
+  const handleSolarCycleChange = (cycleData) => {
+    setSolarCycleRange(cycleData);
+    
+    // If a specific cycle is clicked, update the UI to reflect this
+    console.log("Solar cycle data updated:", cycleData);
+  };
 
   const handleHover = useCallback((event) => {
     const features = event.features;
@@ -276,7 +311,7 @@ const MapBoxComponent = () => {
           right: 10,
           left: 'auto',
           width: "60%",
-          zIndex: -2000    // Ensure it's above map but below other controls
+          zIndex: 1000    // Ensure it's above map but below other controls
         };
       } else {
         // For desktop: move timeline to right side with more space from bottom
@@ -444,7 +479,7 @@ const MapBoxComponent = () => {
           </Source>
         )}
 
-        {/* Mobile Controls Toggle Button */}
+        {/* Mobile Controls Toggle Button - FIXED POSITION */}
         {screenSize.isMobile && (
           <button
             className="controls-toggle-btn"
@@ -452,6 +487,7 @@ const MapBoxComponent = () => {
             style={{
               position: "fixed",
               top: "calc(12vh + 10px)", // Position below header
+              left: 10, // Changed to left side
               zIndex: 1001,
               background: "rgba(255, 255, 255, 0.95)",
               border: "none",
@@ -464,7 +500,33 @@ const MapBoxComponent = () => {
           </button>
         )}
 
-        {/* 3D and Stories Toggle - Responsive */}
+        {/* Add visual indicator when in solar cycle mode - FIXED POSITION */}
+        {useSolarCycles && (
+          <div 
+            className="solar-cycle-mode-indicator" 
+            style={{
+              position: "fixed",
+              top: screenSize.isMobile ? "calc(12vh + 60px)" : "calc(12vh + 10px)", // Adjusted position for mobile
+              left: 10,
+              backgroundColor: "rgba(255, 202, 0, 0.8)",
+              color: "#333",
+              padding: "4px 10px",
+              borderRadius: "15px",
+              fontSize: "12px",
+              fontWeight: "bold",
+              boxShadow: "0 2px 4px rgba(0, 0, 0, 0.2)",
+              zIndex: 1001,
+              display: "flex",
+              alignItems: "center",
+              pointerEvents: "none"
+            }}
+          >
+            <span style={{ marginRight: "5px" }}>☀️</span>
+            Solar Cycle Mode {solarCycleRange.singleCycle ? `- Cycle ${solarCycleRange.singleCycle}` : ''}
+          </div>
+        )}
+
+        {/* 3D, Stories and Solar Cycles Toggle Container - FIXED POSITION & IMPROVED LAYOUT */}
         {(screenSize.isMobile ? showControls : true) && (
           <div 
             className="map-toggle-controls"
@@ -472,9 +534,10 @@ const MapBoxComponent = () => {
               position: "fixed",
               top: "calc(12vh + 10px)", // Position below header
               right: 10,
-              zIndex: 1001
+              zIndex: 1001,
             }}
           >
+            {/* Toggle switches in a row */}
             <div className="toggle-container">
               <span>3D</span>
               <label className="switch">
@@ -490,113 +553,128 @@ const MapBoxComponent = () => {
                 />
                 <span className="slider round"></span>
               </label>
+              {/* Add Solar Cycles toggle */}
+              <span>Solar Cycles</span>
+              <label className="switch">
+                <input
+                  type="checkbox"
+                  checked={useSolarCycles}
+                  onChange={handleSolarCycleToggle}
+                />
+                <span className="slider round"></span>
+              </label>
             </div>
           </div>
         )}
-
-        {/* Navigation Controls */}
-        <div 
-          className="map-navigation-controls"
-          style={{ 
-            position: "fixed",
-            top: screenSize.isMobile ? "calc(12vh + 60px)" : "calc(12vh + 10px)", // Position below header
-            right: screenSize.isMobile ? 10 : 220, // Position to the left of the toggle
-            zIndex: 1001,
-            display: "flex",
-            flexDirection: "row",
-            backgroundColor: "white",
-            borderRadius: "4px",
-            padding: "0",
-            boxShadow: "0 2px 8px rgba(0, 0, 0, 0.3)",
-          }}
-        >
-          {/* Custom Zoom In Button */}
-          <button 
-            className="mapboxgl-ctrl-zoom-in" 
-            aria-label="Zoom In"
-            style={{
-              width: screenSize.isMobile ? "28px" : "30px",
-              height: screenSize.isMobile ? "28px" : "30px",
-              border: "none",
-              borderRight: "1px solid rgba(0,0,0,0.1)",
-              background: "white",
-              cursor: "pointer",
-              padding: "5px",
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center"
-            }}
-            onClick={() => {
-              setViewport(prev => ({
-                ...prev,
-                zoom: prev.zoom + 1,
-                transitionDuration: 200
-              }));
+            
+        {/* Navigation Controls - MOVED TO SEPARATE CONTAINER WITH FIXED POSITION AND ENFORCED STYLES */}
+        {(screenSize.isMobile ? showControls : true) && (
+          <div 
+            className="map-navigation-controls custom-nav-controls"
+            style={{ 
+              position: "fixed !important",
+              top: screenSize.isMobile ? "calc(12vh + 110px) !important" : "calc(12vh + 60px) !important", // Position at same height as toggle on desktop
+              right: screenSize.isMobile ? "10px !important" : "20px !important", // For desktop: position to left of toggle container
+              zIndex: "1001 !important",         
+              display: "flex !important",
+              flexDirection: "row !important",
+              backgroundColor: "white !important",
+              borderRadius: "4px !important",
+              padding: "0 !important",
+              boxShadow: "0 1px 4px rgba(0, 0, 0, 0.2) !important",
+              margin: "0 !important",
+              width: "auto !important",
+              height: "auto !important"
             }}
           >
-            <span style={{ fontSize: "18px", fontWeight: "bold" }}>+</span>
-          </button>
-          
-          {/* Custom Zoom Out Button */}
-          <button 
-            className="mapboxgl-ctrl-zoom-out" 
-            aria-label="Zoom Out"
-            style={{
-              width: screenSize.isMobile ? "28px" : "30px",
-              height: screenSize.isMobile ? "28px" : "30px",
-              border: "none",
-              borderRight: "1px solid rgba(0,0,0,0.1)",
-              background: "white",
-              cursor: "pointer",
-              padding: "5px",
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center"
-            }}
-            onClick={() => {
-              setViewport(prev => ({
-                ...prev,
-                zoom: prev.zoom - 1,
-                transitionDuration: 200
-              }));
-            }}
-          >
-            <span style={{ fontSize: "18px", fontWeight: "bold" }}>−</span>
-          </button>
-          
-          {/* Custom Compass Button */}
-          <button 
-            className="mapboxgl-ctrl-compass" 
-            aria-label="Reset Bearing to North"
-            style={{
-              width: screenSize.isMobile ? "28px" : "30px",
-              height: screenSize.isMobile ? "28px" : "30px",
-              border: "none",
-              background: "white",
-              cursor: "pointer",
-              padding: "5px",
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center"
-            }}
-            onClick={() => {
-              setViewport(prev => ({
-                ...prev,
-                bearing: 0,
-                pitch: 0,
-                transitionDuration: 500
-              }));
-            }}
-          >
-            <svg 
-              viewBox="0 0 20 20" 
-              style={{ width: "20px", height: "20px" }}
+            {/* Custom Zoom In Button */}
+            <button 
+              className="mapboxgl-ctrl-zoom-in" 
+              aria-label="Zoom In"
+              style={{
+                width: screenSize.isMobile ? "28px" : "30px",
+                height: screenSize.isMobile ? "28px" : "30px",
+                border: "none",
+                borderRight: "1px solid rgba(0,0,0,0.1)",
+                background: "white",
+                cursor: "pointer",
+                padding: "5px",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center"
+              }}
+              onClick={() => {
+                setViewport(prev => ({
+                  ...prev,
+                  zoom: prev.zoom + 1,
+                  transitionDuration: 200
+                }));
+              }}
             >
-              <polygon points="6,9 10,1 14,9" style={{ fill: "black" }}></polygon>
-              <polygon points="6,11 10,19 14,11" style={{ fill: "gray" }}></polygon>
-            </svg>
-          </button>
-        </div>
+              <span style={{ fontSize: "18px", fontWeight: "bold" }}>+</span>
+            </button>
+            
+            {/* Custom Zoom Out Button */}
+            <button 
+              className="mapboxgl-ctrl-zoom-out" 
+              aria-label="Zoom Out"
+              style={{
+                width: screenSize.isMobile ? "28px" : "30px",
+                height: screenSize.isMobile ? "28px" : "30px",
+                border: "none",
+                borderRight: "1px solid rgba(0,0,0,0.1)",
+                background: "white",
+                cursor: "pointer",
+                padding: "5px",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center"
+              }}
+              onClick={() => {
+                setViewport(prev => ({
+                  ...prev,
+                  zoom: prev.zoom - 1,
+                  transitionDuration: 200
+                }));
+              }}
+            >
+              <span style={{ fontSize: "18px", fontWeight: "bold" }}>−</span>
+            </button>
+            
+            {/* Custom Compass Button */}
+            <button 
+              className="mapboxgl-ctrl-compass" 
+              aria-label="Reset Bearing to North"
+              style={{
+                width: screenSize.isMobile ? "28px" : "30px",
+                height: screenSize.isMobile ? "28px" : "30px",
+                border: "none",
+                background: "white",
+                cursor: "pointer",
+                padding: "5px",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center"
+              }}
+              onClick={() => {
+                setViewport(prev => ({
+                  ...prev,
+                  bearing: 0,
+                  pitch: 0,
+                  transitionDuration: 500
+                }));
+              }}
+            >
+              <svg 
+                viewBox="0 0 20 20" 
+                style={{ width: "20px", height: "20px" }}
+              >
+                <polygon points="6,9 10,1 14,9" style={{ fill: "black" }}></polygon>
+                <polygon points="6,11 10,19 14,11" style={{ fill: "gray" }}></polygon>
+              </svg>
+            </button>
+          </div>
+        )}
        
         {/* Side Panel for tribes and stories - Responsive */}
         {selectedTribe && (
@@ -610,17 +688,25 @@ const MapBoxComponent = () => {
         )}
       </MapGL>
 
-      {/* Timeline Slider Component */}
+      {/* Timeline or Solar Cycle Slider Component */}
       {isStoriesOn && filteredStories && (screenSize.isMobile ? showControls : true) && (
         <div style={getTimelineStyles()} className="mapbox-timeline-container">
-          <TimelineSlider
-            startYear={startYear}
-            endYear={currentYear}
-            yearRange={yearRange}
-            onRangeChange={handleYearRangeChange}
-            isMobile={screenSize.isMobile}
-            storiesData={storiesData}
-          />
+          {useSolarCycles ? (
+            <SolarCycleSlider
+              onCycleChange={handleSolarCycleChange}
+              isMobile={screenSize.isMobile}
+              initialCycle={[solarCycleRange.startCycle, solarCycleRange.endCycle]}
+            />
+          ) : (
+            <TimelineSlider
+              startYear={startYear}
+              endYear={currentYear}
+              yearRange={yearRange}
+              onRangeChange={handleYearRangeChange}
+              isMobile={screenSize.isMobile}
+              storiesData={storiesData}
+            />
+          )}
         </div>
       )}
     </div>
